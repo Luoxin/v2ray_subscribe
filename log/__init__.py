@@ -1,0 +1,1 @@
+from .commonlog import logger
