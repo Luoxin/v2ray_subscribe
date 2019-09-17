@@ -28,7 +28,7 @@ def add_new_vmess(v2ray_url) -> bool:
                 except:
                     pass
 
-            new_data = SubscribeVmss(url=v2ray_url, speed=0, health_points=HEALTH_POINTS, next_time=0, interval=30*60,
+            new_data = SubscribeVmss(url=v2ray_url, speed=0, health_points=HEALTH_POINTS, next_time=0, interval=30 * 60,
                                      created_at=int(time.time()), updated_at=int(time.time()), type=url_type)
             session.add(new_data)
             session.commit()
@@ -58,7 +58,7 @@ def crawl_by_subscribe(url: str):
 
 
 # TODO 迁移cache的update_node到数据库
-cache = MemoryCache(ttl=7*24*60*60, max_size=5*1024*1024)
+cache = MemoryCache(ttl=7 * 24 * 60 * 60, max_size=5 * 1024 * 1024)
 
 
 def init():
@@ -88,29 +88,32 @@ def init():
     logger.info("初始化完成")
 
 
-
 def update_new_node():
     while True:
         try:
             now = int(time.time())
             last_update_info = cache.get_node("update_node")
-            if (last_update_info.get("jiang.netlify") is not None) and ((last_update_info.get("jiang.netlify") > now) or (last_update_info.get("jiang.netlify") == 0)):
+            if (last_update_info.get("jiang.netlify") is not None) and (
+                    (last_update_info.get("jiang.netlify") > now) or (last_update_info.get("jiang.netlify") == 0)):
                 try:
                     url = "https://jiang.netlify.com/"
                     crawl_by_subscribe(url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
 
-            if (last_update_info.get("youlianboshi.netlify") is not None) and ((last_update_info.get("youlianboshi.netlify") > now) or (last_update_info.get("youlianboshi.netlify") == 0)):
+            if (last_update_info.get("youlianboshi.netlify") is not None) and (
+                    (last_update_info.get("youlianboshi.netlify") > now) or (
+                    last_update_info.get("youlianboshi.netlify") == 0)):
                 try:
                     url = "https://youlianboshi.netlify.com/"
                     crawl_by_subscribe(url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["youlianboshi.netlify"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["youlianboshi.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(
+                        time.time())
 
             # if (last_update_info.get("free-ss-443") is not None) and ((last_update_info.get("free-ss-443") > now) or (last_update_info.get("free-ss-443") == 0)):
             #     try:
@@ -161,48 +164,56 @@ def update_new_node():
             #     except:
             #         traceback.print_exc()
 
-            if (last_update_info.get("freev2ray") is not None) and ((last_update_info.get("freev2ray") > now) or (last_update_info.get("freev2ray") == 0)):
+            if (last_update_info.get("freev2ray") is not None) and (
+                    (last_update_info.get("freev2ray") > now) or (last_update_info.get("freev2ray") == 0)):
                 try:
                     url = "https://xxx.freev2ray.org/"
                     data = requests.get(url, timeout=10).text
 
                     soup = etree.HTML(data)
-                    v2ray_url = (soup.xpath('//*[@id="intro"]/div/div/footer/ul[1]/li[2]/button/@data-clipboard-text')[0])
+                    v2ray_url = (
+                    soup.xpath('//*[@id="intro"]/div/div/footer/ul[1]/li[2]/button/@data-clipboard-text')[0])
                     add_new_vmess(v2ray_url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["freev2ray"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["freev2ray"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
 
             # 这种暂时无法进行连接解析，也暂时屏蔽
-            if (last_update_info.get("kitsunebi_sub") is not None) and ((last_update_info.get("kitsunebi_sub") > now) or (last_update_info.get("kitsunebi_sub") == 0)):
+            if (last_update_info.get("kitsunebi_sub") is not None) and (
+                    (last_update_info.get("kitsunebi_sub") > now) or (last_update_info.get("kitsunebi_sub") == 0)):
                 try:
                     url = "https://raw.githubusercontent.com/eycorsican/rule-sets/master/kitsunebi_sub"
                     crawl_by_subscribe(url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["kitsunebi_sub"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["kitsunebi_sub"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
 
             # ss订阅，屏蔽掉
-            if (last_update_info.get("muma16fx.netlify") is not None) and ((last_update_info.get("muma16fx.netlify") > now) or (last_update_info.get("muma16fx.netlify") == 0)):
+            if (last_update_info.get("muma16fx.netlify") is not None) and (
+                    (last_update_info.get("muma16fx.netlify") > now) or (
+                    last_update_info.get("muma16fx.netlify") == 0)):
                 try:
                     url = "https://muma16fx.netlify.com/"
                     crawl_by_subscribe(url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
 
             # ss订阅，屏蔽掉
-            if (last_update_info.get("heikejilaila.xyz") is not None) and ((last_update_info.get("heikejilaila.xyz") > now) or (last_update_info.get("heikejilaila.xyz") == 0)):
+            if (last_update_info.get("heikejilaila.xyz") is not None) and (
+                    (last_update_info.get("heikejilaila.xyz") > now) or (
+                    last_update_info.get("heikejilaila.xyz") == 0)):
                 try:
                     url = "https://heikejilaila.xyz/keji.php?id=c134513fcd69616d4c9fc9fdf4339846"
                     crawl_by_subscribe(url)
                 except:
                     traceback.print_exc()
                 finally:
-                    last_update_info["heikejilaila.xyz"] = now + int(random.uniform(0.5, 1.5)*60*60) + int(time.time())
+                    last_update_info["heikejilaila.xyz"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(
+                        time.time())
 
             cache.add_node("update_node", last_update_info)
         finally:
