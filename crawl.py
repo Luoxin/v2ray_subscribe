@@ -32,7 +32,7 @@ def add_new_vmess(v2ray_url) -> bool:
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
 
-            new_data = SubscribeVmss(url=v2ray_url, speed=0, health_points=HEALTH_POINTS, next_time=0, interval=30 * 60,
+            new_data = SubscribeVmss(url=v2ray_url, speed=0, health_points=HEALTH_POINTS, next_time=0, interval=60 * 60,
                                      created_at=int(time.time()), updated_at=int(time.time()), type=url_type)
             session.add(new_data)
             session.commit()
