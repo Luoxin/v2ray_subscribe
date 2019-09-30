@@ -75,7 +75,7 @@ def check_link_alive():
         try:
             data_list = session.query(SubscribeVmss).filter(SubscribeVmss.next_time < int(time.time())).filter(SubscribeVmss.health_points >= 0).all()
             if len(data_list) <= 0:
-                logger.info("暂时没有待检测节点")
+                # logger.info("暂时没有待检测节点")
                 time.sleep(20)
                 continue
             else:
