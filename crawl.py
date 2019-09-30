@@ -48,7 +48,8 @@ def crawl_by_subscribe_url(url: str):
     }
     re_text = ""
     try:
-        re_text = requests.get(url, headers=headers, timeout=10).text
+        re = requests.get(url, headers=headers, timeout=10)
+        re_text = re.text
         try:
             data = base64.b64decode(re_text.encode()).decode()
         except:
@@ -56,6 +57,8 @@ def crawl_by_subscribe_url(url: str):
 
         for v2ray_url in data.split("\n"):
             add_new_vmess(v2ray_url)
+            
+        re.close()
     except:
         logger.error("结果解码失败 {}".format(re_text))
         logger.error(traceback.format_exc())
