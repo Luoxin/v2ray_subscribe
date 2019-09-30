@@ -67,7 +67,6 @@ def crawl_by_subscribe():
         filter(SubscribeCrawl.is_closed == False). \
         filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription.value).\
         all()
-
     for data in data_list:
         try:
             crawl_by_subscribe_url(data.url)
@@ -77,6 +76,8 @@ def crawl_by_subscribe():
             session.commit()
         except:
             traceback.print_exc()
+
+    logger.info("已经获取了 {} 个".format(len(data_list)))
 
 
 # TODO 迁移cache的update_node到数据库
