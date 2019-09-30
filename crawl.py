@@ -64,14 +64,19 @@ def crawl_by_subscribe_url(url: str):
 def crawl_by_subscribe():
     data_list = session.query(SubscribeCrawl). \
         filter(SubscribeCrawl.next_time <= int(time.time())). \
-        filter(SubscribeCrawl.is_closed == False).\
-        filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription).all()
+        filter(SubscribeCrawl.is_closed == False). \
+        filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription.value).\
+        all()
 
     for data in data_list:
-        crawl_by_subscribe_url(data.url)
-        session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
-            SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5)*data.interval) + int(time.time()),
-        })
+        try:
+            crawl_by_subscribe_url(data.url)
+            session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
+                SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(time.time()),
+            })
+            session.commit()
+        except:
+            traceback.print_exc()
 
 
 # TODO 迁移cache的update_node到数据库

@@ -58,6 +58,7 @@ class SubscribeCrawlType(Enum):
 Base.metadata.create_all(engine)
 
 session = sessionmaker(bind=engine)()
+
 # # new_data = SubscribeCrawl(url="aaa")
 # get_data = session.query(SubscribeVmss).filter(SubscribeVmss.next_time < time.time()).first()
 
