@@ -73,6 +73,7 @@ def crawl_by_subscribe():
             crawl_by_subscribe_url(data.url)
             session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
                 SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(time.time()),
+                SubscribeCrawl.updated_at: int(time.time()),
             })
             session.commit()
         except:
