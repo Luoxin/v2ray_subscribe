@@ -4,11 +4,10 @@ import traceback
 from threading import Thread
 
 from flask import Flask, request
-from werkzeug.wrappers import json
 
 from check_alive import check_link_alive
 from conf.conf import *
-from crawl import init, update_new_node, add_new_vmess
+from crawl import update_new_node, add_new_vmess
 from log import logger
 from orm import session, SubscribeVmss
 
@@ -125,7 +124,6 @@ def share_by_subscription():
     return "add new node {}".format(success_count)
 
 
-init()
 update = Thread(None, update_new_node, None, )
 update.daemon = True
 update.start()
