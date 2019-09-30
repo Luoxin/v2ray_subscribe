@@ -65,8 +65,11 @@ def crawl_by_subscribe():
     data_list = session.query(SubscribeCrawl). \
         filter(SubscribeCrawl.next_time <= int(time.time())). \
         filter(SubscribeCrawl.is_closed == False). \
-        filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription.value).\
+        # filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription.value).\
+        filter(SubscribeCrawl.type == 1).\
         all()
+    print(data_list)
+
     for data in data_list:
         try:
             crawl_by_subscribe_url(data.url)
