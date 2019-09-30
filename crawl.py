@@ -11,7 +11,7 @@ import utils
 from conf.conf import HEALTH_POINTS
 from log import logger
 from memory_cache import MemoryCache
-from orm import session, SubscribeVmss
+from orm import session, SubscribeVmss, SubscribeCrawl, SubscribeCrawlType
 
 
 def add_new_vmess(v2ray_url) -> bool:
@@ -42,7 +42,7 @@ def add_new_vmess(v2ray_url) -> bool:
     return False
 
 
-def crawl_by_subscribe(url: str):
+def crawl_by_subscribe_url(url: str):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11",
     }
@@ -61,63 +61,55 @@ def crawl_by_subscribe(url: str):
         logger.error(traceback.format_exc())
 
 
+def crawl_by_subscribe():
+    data_list = session.query(SubscribeCrawl). \
+        filter(SubscribeCrawl.next_time <= int(time.time())). \
+        filter(SubscribeCrawl.is_closed == False).\
+        filter(SubscribeCrawl.type == SubscribeCrawlType.Subscription).all()
+
+    for data in data_list:
+        crawl_by_subscribe_url(data.url)
+        session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
+            SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5)*data.interval) + int(time.time()),
+        })
+
+
 # TODO 迁移cache的update_node到数据库
 cache = MemoryCache(ttl=7 * 24 * 60 * 60, max_size=5 * 1024 * 1024)
 
 
-def init():
-    global cache
-    domain_weight = {
-        "free-ss-443": 5,
-        "free-ss-80": 5,
-        "freev2ray": 1,
-        "kitsunebi_sub": 1,
-        "jiang.netlify": 1,
-        "muma16fx.netlify": 1,
-        "youlianboshi.netlify": 1,
-        "heikejilaila.xyz": 1,
-    }
-    update_node = cache.get_node("update_node")
-    if isinstance(update_node, dict):
-        for domain in domain_weight.keys():
-            if update_node.get(domain) is not None:
-                update_node[domain] = 0
-    else:
-        logger.info("初始化 update_node")
-        update_node = {}
-        for domain in domain_weight.keys():
-            update_node[domain] = 0
-    cache.add_node("update_node", update_node)
-
-    logger.info("初始化完成")
+# def init():
+#     global cache
+#     domain_weight = {
+#         "free-ss-443": 5,
+#         "free-ss-80": 5,
+#         "freev2ray": 1,
+#         "kitsunebi_sub": 1,
+#         "jiang.netlify": 1,
+#         "muma16fx.netlify": 1,
+#         "youlianboshi.netlify": 1,
+#         "heikejilaila.xyz": 1,
+#     }
+#     update_node = cache.get_node("update_node")
+#     if isinstance(update_node, dict):
+#         for domain in domain_weight.keys():
+#             if update_node.get(domain) is not None:
+#                 update_node[domain] = 0
+#     else:
+#         logger.info("初始化 update_node")
+#         update_node = {}
+#         for domain in domain_weight.keys():
+#             update_node[domain] = 0
+#     cache.add_node("update_node", update_node)
+#
+#     logger.info("初始化完成")
 
 
 def update_new_node():
     while True:
         try:
-            now = int(time.time())
-            last_update_info = cache.get_node("update_node")
-            if (last_update_info.get("jiang.netlify") is not None) and (
-                    (last_update_info.get("jiang.netlify") > now) or (last_update_info.get("jiang.netlify") == 0)):
-                try:
-                    url = "https://jiang.netlify.com/"
-                    crawl_by_subscribe(url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
-
-            if (last_update_info.get("youlianboshi.netlify") is not None) and (
-                    (last_update_info.get("youlianboshi.netlify") > now) or (
-                    last_update_info.get("youlianboshi.netlify") == 0)):
-                try:
-                    url = "https://youlianboshi.netlify.com/"
-                    crawl_by_subscribe(url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["youlianboshi.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(
-                        time.time())
+            # 对订阅类型的进行抓取
+            crawl_by_subscribe()
 
             # if (last_update_info.get("free-ss-443") is not None) and ((last_update_info.get("free-ss-443") > now) or (last_update_info.get("free-ss-443") == 0)):
             #     try:
@@ -168,58 +160,21 @@ def update_new_node():
             #     except:
             #         traceback.print_exc()
 
-            if (last_update_info.get("freev2ray") is not None) and (
-                    (last_update_info.get("freev2ray") > now) or (last_update_info.get("freev2ray") == 0)):
-                try:
-                    url = "https://xxx.freev2ray.org/"
-                    data = requests.get(url, timeout=10).text
+            # if (last_update_info.get("freev2ray") is not None) and (
+            #         (last_update_info.get("freev2ray") > now) or (last_update_info.get("freev2ray") == 0)):
+            #     try:
+            #         url = "https://xxx.freev2ray.org/"
+            #         data = requests.get(url, timeout=10).text
+            #
+            #         soup = etree.HTML(data)
+            #         v2ray_url = (
+            #             soup.xpath('//*[@id="intro"]/div/div/footer/ul[1]/li[2]/button/@data-clipboard-text')[0])
+            #         add_new_vmess(v2ray_url)
+            #     except:
+            #         traceback.print_exc()
+            #     finally:
+            #         last_update_info["freev2ray"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
 
-                    soup = etree.HTML(data)
-                    v2ray_url = (
-                    soup.xpath('//*[@id="intro"]/div/div/footer/ul[1]/li[2]/button/@data-clipboard-text')[0])
-                    add_new_vmess(v2ray_url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["freev2ray"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
-
-            # 这种暂时无法进行连接解析，也暂时屏蔽
-            if (last_update_info.get("kitsunebi_sub") is not None) and (
-                    (last_update_info.get("kitsunebi_sub") > now) or (last_update_info.get("kitsunebi_sub") == 0)):
-                try:
-                    url = "https://raw.githubusercontent.com/eycorsican/rule-sets/master/kitsunebi_sub"
-                    crawl_by_subscribe(url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["kitsunebi_sub"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
-
-            # ss订阅，屏蔽掉
-            if (last_update_info.get("muma16fx.netlify") is not None) and (
-                    (last_update_info.get("muma16fx.netlify") > now) or (
-                    last_update_info.get("muma16fx.netlify") == 0)):
-                try:
-                    url = "https://muma16fx.netlify.com/"
-                    crawl_by_subscribe(url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["jiang.netlify"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
-
-            # ss订阅，屏蔽掉
-            if (last_update_info.get("heikejilaila.xyz") is not None) and (
-                    (last_update_info.get("heikejilaila.xyz") > now) or (
-                    last_update_info.get("heikejilaila.xyz") == 0)):
-                try:
-                    url = "https://heikejilaila.xyz/keji.php?id=c134513fcd69616d4c9fc9fdf4339846"
-                    crawl_by_subscribe(url)
-                except:
-                    traceback.print_exc()
-                finally:
-                    last_update_info["heikejilaila.xyz"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(
-                        time.time())
-
-            cache.add_node("update_node", last_update_info)
         finally:
             logger.info("更新节点完成")
             time.sleep(60)
