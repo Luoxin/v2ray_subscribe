@@ -137,7 +137,7 @@ def add_subscribe_url():
             url = request.args.get("url")
         except:
             return "error args"
-        # TODO POST请求有问题
+    # TODO POST请求有问题
     elif request.method == "POST":
         try:
             url = request.json.get("url")
