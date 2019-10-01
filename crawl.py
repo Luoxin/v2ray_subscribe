@@ -37,6 +37,11 @@ def add_new_vmess(v2ray_url) -> bool:
             session.add(new_data)
             session.commit()
             return True
+        elif (data.health_points < HEALTH_POINTS) and (data.speed >= 0):
+            session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
+                SubscribeVmss.health_points: HEALTH_POINTS,
+                SubscribeVmss.updated_at: int(time.time()),
+            })
     except:
         logger.error(traceback.format_exc())
     return False
