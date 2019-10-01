@@ -153,6 +153,7 @@ def add_subscribe_url():
             data = session.query(SubscribeCrawl).filter(SubscribeCrawl.url == url).first()
             if data is None:
                 new_data = SubscribeCrawl(
+                    id=int(time.time()),
                     url=url,
                     type=1,
                     is_closed=False,
