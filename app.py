@@ -131,37 +131,40 @@ def share_by_subscription():
 
 @app.route("/add")
 def add_subscribe_url():
-    url = None
-    if request.method == "GET":
-        try:
-            url = request.args.get("url")
-        except:
+    try:
+        url = None
+        if request.method == "GET":
+            try:
+                url = request.args.get("url")
+            except:
+                return "error args"
+        # TODO POST请求有问题
+        elif request.method == "POST":
+            try:
+                url = request.json.get("url")
+            except:
+                return "error args"
+            else:
+                return "error method"
+        if url is None:
             return "error args"
-    # TODO POST请求有问题
-    elif request.method == "POST":
-        try:
-            url = request.json.get("url")
-        except:
-            return "error args"
-        else:
-            return "error method"
-    if url is None:
+        if re.match(r'(http|https|ss|ssr|vmess)://[\43-\176]*', url):
+            logger.info("new url will be add {}".format(url))
+            data = session.query(SubscribeCrawl).filter(SubscribeCrawl.url == url).first()
+            if data is None:
+                new_data = SubscribeCrawl(
+                    url=url,
+                    type=1,
+                    is_closed=False,
+                    interval=3600,
+                    created_at=int(time.time())
+                )
+                session.add(new_data)
+                session.commit()
+            return "success"
         return "error args"
-    if re.match(r'(http|https|ss|ssr|vmess)://[\43-\176]*', url):
-        logger.info("new url will be add {}".format(url))
-        data = session.query(SubscribeCrawl).filter(SubscribeCrawl.url == url).first()
-        if data is None:
-            new_data = SubscribeCrawl(
-                url=url,
-                type=1,
-                is_closed=False,
-                interval=3600,
-                created_at=int(time.time())
-            )
-            session.add(new_data)
-            session.commit()
-        return "success"
-    return "error args"
+    except:
+        return traceback.format_exc()
 
 
 update = Thread(None, update_new_node, None, )
