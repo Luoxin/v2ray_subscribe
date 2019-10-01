@@ -73,7 +73,11 @@ def check_by_v2ray_url(url: str) -> int:
 def check_link_alive():
     while True:
         try:
-            data_list = session.query(SubscribeVmss).filter(SubscribeVmss.next_time < int(time.time())).filter(SubscribeVmss.health_points >= 0).all()
+            data_list = session.query(SubscribeVmss).\
+                filter(SubscribeVmss.next_time < int(time.time())).\
+                filter(SubscribeVmss.health_points >= 0).\
+                order_by(SubscribeVmss.speed.desc()).\
+                all()
             if len(data_list) <= 0:
                 # logger.info("暂时没有待检测节点")
                 time.sleep(20)
