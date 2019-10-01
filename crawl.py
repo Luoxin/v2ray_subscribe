@@ -32,8 +32,15 @@ def add_new_vmess(v2ray_url) -> bool:
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
 
-            new_data = SubscribeVmss(url=v2ray_url, speed=0, health_points=HEALTH_POINTS, next_time=0, interval=60 * 60,
-                                     created_at=int(time.time()), updated_at=int(time.time()), type=url_type)
+            new_data = SubscribeVmss(
+                url=v2ray_url,
+                speed=0,
+                health_points=HEALTH_POINTS,
+                next_time=0, interval=60 * 60,
+                created_at=int(time.time()),
+                updated_at=int(time.time()),
+                type=url_type
+            )
             session.add(new_data)
             session.commit()
             return True
@@ -62,7 +69,7 @@ def crawl_by_subscribe_url(url: str):
 
         for v2ray_url in data.split("\n"):
             add_new_vmess(v2ray_url)
-            
+
         re.close()
     except:
         logger.error("结果解码失败 {}".format(re_text))
@@ -73,7 +80,7 @@ def crawl_by_subscribe():
     data_list = session.query(SubscribeCrawl). \
         filter(SubscribeCrawl.next_time <= int(time.time())). \
         filter(SubscribeCrawl.is_closed == False). \
-        filter(SubscribeCrawl.type == 1).\
+        filter(SubscribeCrawl.type == 1). \
         all()
 
     for data in data_list:

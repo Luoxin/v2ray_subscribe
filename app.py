@@ -1,5 +1,6 @@
 import base64
 import re
+import time
 import traceback
 from threading import Thread
 
@@ -9,7 +10,7 @@ from check_alive import check_link_alive
 from conf.conf import *
 from crawl import update_new_node, add_new_vmess
 from log import logger
-from orm import session, SubscribeVmss
+from orm import session, SubscribeVmss, SubscribeCrawl
 
 app = Flask(__name__)
 
@@ -126,6 +127,41 @@ def share_by_subscription():
     if success_count == 0:
         return "all is add already"
     return "add new node {}".format(success_count)
+
+
+@app.route("/add")
+def add_subscribe_url():
+    url = None
+    if request.method == "GET":
+        try:
+            url = request.args.get("url")
+        except:
+            return "error args"
+        # TODO POST请求有问题
+    elif request.method == "POST":
+        try:
+            url = request.json.get("url")
+        except:
+            return "error args"
+        else:
+            return "error method"
+    if url is None:
+        return "error args"
+    if re.match(r'(http|https|ss|ssr|vmess)://[\43-\176]*', url):
+        logger.info("new url will be add {}".format(url))
+        data = session.query(SubscribeCrawl).filter(SubscribeCrawl.url == url).first()
+        if data is None:
+            new_data = SubscribeCrawl(
+                url=url,
+                type=1,
+                is_closed=False,
+                interval=3600,
+                created_at=int(time.time())
+            )
+            session.add(new_data)
+            session.commit()
+        return "success"
+    return "error args"
 
 
 update = Thread(None, update_new_node, None, )
