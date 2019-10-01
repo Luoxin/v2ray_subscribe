@@ -154,7 +154,7 @@ def add_subscribe_url():
             if data is None:
                 new_data = SubscribeCrawl(
                     id=int(time.time()),
-                    url=url,
+                    url=url.replace(" ", ""),
                     type=1,
                     is_closed=False,
                     interval=3600,
