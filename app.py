@@ -15,7 +15,11 @@ app = Flask(__name__)
 
 
 def get_alive_url_list_by_speed(speed:(int, float)):
-    data_list = session.query(SubscribeVmss).filter(SubscribeVmss.speed > speed).filter(SubscribeVmss.health_points >= 0).all()
+    data_list = session.query(SubscribeVmss).\
+        filter(SubscribeVmss.speed > speed).\
+        filter(SubscribeVmss.health_points >= 0).\
+        order_by(SubscribeVmss.speed.desc()).\
+        all()
     return data_list
 
 
