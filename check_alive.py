@@ -75,7 +75,7 @@ def check_link_alive():
         try:
             data_list = session.query(SubscribeVmss).\
                 filter(SubscribeVmss.next_time < int(time.time())).\
-                filter(SubscribeVmss.health_points >= 0).\
+                filter(SubscribeVmss.health_points > 0).\
                 order_by(SubscribeVmss.speed.desc()).\
                 all()
             if len(data_list) <= 0:
