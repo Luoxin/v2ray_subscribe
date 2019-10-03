@@ -15,12 +15,20 @@ from orm import session, SubscribeVmss, SubscribeCrawl
 app = Flask(__name__)
 
 
-def get_alive_url_list_by_speed(speed:(int, float)):
-    data_list = session.query(SubscribeVmss).\
-        filter(SubscribeVmss.speed > speed).\
-        filter(SubscribeVmss.health_points >= 0).\
-        order_by(SubscribeVmss.speed.desc()).\
-        all()
+def get_alive_url_list_by_speed(speed: (int, float)):
+    if speed <= 0:
+        data_list = session.query(SubscribeVmss). \
+            filter(SubscribeVmss.speed > speed). \
+            filter(SubscribeVmss.health_points >= 0). \
+            filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+            order_by(SubscribeVmss.speed.desc()). \
+            all()
+    else:
+        data_list = session.query(SubscribeVmss). \
+            filter(SubscribeVmss.speed > speed). \
+            filter(SubscribeVmss.health_points >= 0). \
+            order_by(SubscribeVmss.speed.desc()). \
+            all()
     return data_list
 
 
@@ -55,7 +63,12 @@ def get_all_link_by_max_speed_by_mobile_phone():
     base_speed = BASE_SPEED
     can_be_used = []
     while (base_speed >= 0) and (can_be_used.__len__() <= 0):
-        can_be_used = session.query(SubscribeVmss).filter(SubscribeVmss.speed > base_speed).filter(SubscribeVmss.health_points >= 0).filter(SubscribeVmss.type == "ws").all()
+        can_be_used = session.query(SubscribeVmss). \
+            filter(SubscribeVmss.speed > base_speed). \
+            filter(SubscribeVmss.health_points >= 0). \
+            filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+            filter(SubscribeVmss.type == "ws"). \
+            all()
         base_speed -= 1000
 
     vmss_list = []
@@ -63,6 +76,7 @@ def get_all_link_by_max_speed_by_mobile_phone():
         vmss_list.append(subscribeVmss.url)
 
     return base64.b64encode(("\n".join(vmss_list)).encode()).decode()
+
 
 @app.route("/maxspeed")
 def max_speed():
