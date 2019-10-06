@@ -78,6 +78,17 @@ def get_all_link_by_max_speed_by_mobile_phone():
     return base64.b64encode(("\n".join(vmss_list)).encode()).decode()
 
 
+@app.route("/subscriptionnc")
+def get_all_link_by_max_speed_by_no_check():
+    can_be_used = session.query(SubscribeVmss). \
+        filter(SubscribeVmss.speed >= 0). \
+        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+        filter(SubscribeVmss.type == "ws"). \
+        all()
+
+    return base64.b64encode(("\n".join(can_be_used)).encode()).decode()
+
+
 @app.route("/maxspeed")
 def max_speed():
     data = session.query(SubscribeVmss).order_by(SubscribeVmss.speed.desc()).first()
