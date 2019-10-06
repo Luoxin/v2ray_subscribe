@@ -86,7 +86,11 @@ def get_all_link_by_max_speed_by_no_check():
         filter(SubscribeVmss.type == "ws"). \
         all()
 
-    return base64.b64encode(("\n".join(can_be_used)).encode()).decode()
+    vmss_list = []
+    for subscribeVmss in can_be_used:
+        vmss_list.append(subscribeVmss.url)
+
+    return base64.b64encode(("\n".join(vmss_list)).encode()).decode()
 
 
 @app.route("/maxspeed")
