@@ -49,7 +49,10 @@ def get_all_link_by_max_speed():
     while (base_speed >= 0) and (can_be_used.__len__() <= 0):
         can_be_used = get_alive_url_list_by_speed(base_speed)
         base_speed -= 1000
-
+    
+    if can_be_used.__len__() == 0:
+        return get_all_link_by_max_speed_by_no_check()
+    
     vmss_list = []
     for subscribeVmss in can_be_used:
         vmss_list.append(subscribeVmss.url)
