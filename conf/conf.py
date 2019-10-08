@@ -35,3 +35,6 @@ REDIS_PORT = 6379
 
 # 错误码文件路径
 ERROR_ENUM_PATH = "./conf/error.yaml"
+
+# 数据库地址
+DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"

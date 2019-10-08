@@ -6,9 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
 from sqlalchemy.orm import sessionmaker
 
-from conf.conf import LOG_DEBUG
+from conf.conf import LOG_DEBUG, DB_URL
 
-engine = create_engine('postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev', echo=LOG_DEBUG,
+engine = create_engine(DB_URL, echo=LOG_DEBUG,
                        client_encoding="utf8")
 
 # 基本类

@@ -5,13 +5,12 @@ import time
 import traceback
 
 import requests
-from lxml import etree
 
 import utils
 from conf.conf import HEALTH_POINTS
 from log import logger
 from memory_cache import MemoryCache
-from orm import session, SubscribeVmss, SubscribeCrawl, SubscribeCrawlType
+from orm import session, SubscribeVmss, SubscribeCrawl
 
 
 def add_new_vmess(v2ray_url) -> bool:
