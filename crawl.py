@@ -73,6 +73,7 @@ def crawl_by_subscribe_url(url: str):
         re.close()
     except:
         logger.error("结果解码失败 {}".format(re_text))
+        logger.error("抓取的地址为 {}".format(url))
         logger.error(traceback.format_exc())
 
 
