@@ -12,18 +12,9 @@ from log import logger
 from memory_cache import MemoryCache
 from orm import session, SubscribeVmss, SubscribeCrawl
 
-import fake_useragent
+from fake_useragent import UserAgent
 
-ua = fake_useragent.UserAgent()
-
-UA = []
-
-for key, value in ua.data.items():
-    if isinstance(value, (list, set, tuple)):
-        for item in value:
-            UA.append(item)
-
-del ua
+ua = UserAgent()
 
 
 def add_new_vmess(v2ray_url) -> bool:
@@ -68,7 +59,7 @@ def add_new_vmess(v2ray_url) -> bool:
 
 def crawl_by_subscribe_url(url: str):
     headers = {
-        "User-Agent": random.choice(UA),
+        "User-Agent": ua.random,
     }
     re_text = ""
     try:

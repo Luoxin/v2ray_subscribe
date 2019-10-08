@@ -76,7 +76,7 @@ def get_all_link_by_max_speed_by_mobile_phone():
 
     if can_be_used.__len__() == 0:
         return get_all_link_by_max_speed_by_no_check()
-    
+
     vmss_list = []
     for subscribeVmss in can_be_used:
         vmss_list.append(subscribeVmss.url)
