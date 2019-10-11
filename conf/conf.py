@@ -7,7 +7,7 @@ MODEL_NAME = "v2ray_subscribe"
 # 日志级别
 LOG_DEBUG = False
 # 日志路径
-LOG_PATH = "v2ray_subscribe.log"
+LOG_PATH = "/root/log/v2ray_subscribe.log"
 
 V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
 TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
