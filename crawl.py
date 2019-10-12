@@ -7,7 +7,7 @@ import traceback
 import requests
 
 import utils
-from conf.conf import HEALTH_POINTS
+from conf.conf import HEALTH_POINTS, Interval
 from log import logger
 from memory_cache import MemoryCache
 from orm import session, SubscribeVmss, SubscribeCrawl
@@ -39,7 +39,8 @@ def add_new_vmess(v2ray_url) -> bool:
                 url=v2ray_url,
                 speed=0,
                 health_points=HEALTH_POINTS,
-                next_time=0, interval=60 * 60,
+                next_time=0,
+                interval=Interval,
                 created_at=int(time.time()),
                 updated_at=int(time.time()),
                 type=url_type
@@ -47,13 +48,19 @@ def add_new_vmess(v2ray_url) -> bool:
             session.add(new_data)
             session.commit()
             return True
-        elif (data.health_points < HEALTH_POINTS) and (data.speed >= 0):
+        elif data.health_points < HEALTH_POINTS:
+            # 如果速度小于0，则更正其速度为 0 以加入测速列表
+            if data.speed < 0:
+                data.speed = 0
+
             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                 SubscribeVmss.health_points: HEALTH_POINTS,
                 SubscribeVmss.updated_at: int(time.time()),
+                SubscribeVmss.speed: data.speed,
             })
     except:
         logger.error(traceback.format_exc())
+        logger.error()
     return False
 
 
