@@ -53,7 +53,7 @@ def check_by_v2ray_url(url: str) -> int:
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
         json.dump(node.formatConfig(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        subprocess.call('systemctl restart v2ray.service', shell=True)
+        # subprocess.call('systemctl restart v2ray.service', shell=True)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
             time.sleep(10)
