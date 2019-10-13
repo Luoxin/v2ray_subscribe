@@ -4,9 +4,7 @@ import subprocess
 import time
 import traceback
 import urllib
-
 import requests
-
 import utils
 from conf.conf import V2RAY_CONFIG_LOCAL, TEST_FILE_URL, HEALTH_POINTS, PROXIES_TEST
 from log import logger
@@ -66,8 +64,9 @@ def check_by_v2ray_url(url: str) -> int:
             speed = r.elapsed.microseconds/1000
             logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
             r.close()
-        except BaseException:
+        except:
             speed = -1
+            logger.error(traceback.format_exc())
 
         logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
         # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
