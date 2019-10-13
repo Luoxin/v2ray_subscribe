@@ -8,6 +8,7 @@ MODEL_NAME = "v2ray_subscribe"
 LOG_DEBUG = False
 # 日志路径
 LOG_PATH = "/root/log/v2ray_subscribe.log"
+# LOG_PATH = "v2ray_subscribe.log"
 
 V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
 TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
@@ -37,7 +38,8 @@ REDIS_PORT = 6379
 ERROR_ENUM_PATH = "./conf/error.yaml"
 
 # 数据库地址
-DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
+DB_URL = "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
+# DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
 
 # 默认检测间隔
 Interval = 60*60*4

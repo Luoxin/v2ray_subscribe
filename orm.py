@@ -1,15 +1,12 @@
 from enum import Enum, unique
 
-from sqlalchemy import Column, Integer, String, Boolean, JSON, func
+from sqlalchemy import Column, Integer, String, Boolean, JSON
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
 from sqlalchemy.orm import sessionmaker
 
 from conf.conf import LOG_DEBUG, DB_URL
-
-engine = create_engine(DB_URL, echo=LOG_DEBUG,
-                       client_encoding="utf8")
 
 # 基本类
 Base = declarative_base()
@@ -21,14 +18,15 @@ class SubscribeVmss(Base):
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
+    created_at = Column(Integer)  # 开始时间
+    updated_at = Column(Integer)  # 更新时间
+
     url = Column(String, unique=True)  # 地址
     speed = Column(Integer)  # 速度
     type = Column(String, index=True)  # 类型
     health_points = Column(Integer)  # 生命值
     next_time = Column(Integer)  # 下一次的测速时间
     interval = Column(Integer)  # 间隔
-    created_at = Column(Integer)  # 开始时间
-    updated_at = Column(Integer)  # 更新时间
 
 
 # 抓取的配置表
@@ -37,14 +35,33 @@ class SubscribeCrawl(Base):
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
+    created_at = Column(Integer)  # 开始时间
+    updated_at = Column(Integer)  # 更新时间
+
     url = Column(String, unique=True)  # 地址
     type = Column(Integer)  # 类型
     rule = Column(JSON)  # 规则
     is_closed = Column(Boolean)  # 是否关闭
     next_time = Column(Integer)  # 下一次的测速时间
     interval = Column(Integer)  # 间隔
-    created_at = Column(Integer)  # 开始时间
-    updated_at = Column(Integer)  # 更新时间
+
+    note = Column(String)  # 备注信息
+
+
+class SubscribeAuthentication(Base):
+    __tablename__ = 'subscribe_authentication'  # 表的名字
+
+    # 定义各字段
+    id = Column(Integer, primary_key=True)  # id
+
+    secret_key = Column(String, unique=True)  # 秘钥
+
+    uuid = Column(String, unique=True)  # 秘钥
+
+    level = Column(Integer)  # 级别
+    rule = Column(JSON)  # 限制规则
+
+    note = Column(String)  # 备注信息
 
 
 @unique
@@ -54,8 +71,20 @@ class SubscribeCrawlType(Enum):
     Xpath = 2
 
 
+@unique
+class SubscribeAuthenticationLevel(Enum):
+    Nil = 0
+    SuperAdmin = 1
+
+
+engine = create_engine(DB_URL, echo=LOG_DEBUG,
+                       client_encoding="utf8",
+                       pool_pre_ping=True,
+                       pool_recycle=3600)
+
 # 创建表
 Base.metadata.create_all(engine)
+
 
 session = sessionmaker(bind=engine)()
 

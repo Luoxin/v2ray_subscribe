@@ -1,12 +1,13 @@
 import json
 import random
-import subprocess
 import time
 import traceback
 import urllib
+
 import requests
+
 import utils
-from conf.conf import V2RAY_CONFIG_LOCAL, TEST_FILE_URL, HEALTH_POINTS, PROXIES_TEST
+from conf.conf import V2RAY_CONFIG_LOCAL, HEALTH_POINTS, PROXIES_TEST
 from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss

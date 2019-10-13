@@ -2,13 +2,12 @@ import base64
 import re
 import time
 import traceback
-from threading import Thread
 
 from flask import Flask, request
 
-from check_alive import check_link_alive
+from authentication import get_authentication
 from conf.conf import *
-from crawl import update_new_node, add_new_vmess
+from crawl import add_new_vmess
 from log import logger
 from orm import session, SubscribeVmss, SubscribeCrawl
 
@@ -42,17 +41,23 @@ def count():
 
 
 # 所有的高速节点
-@app.route("/subscription")
+@app.route("/subscription", methods=["GET"])
 def get_all_link_by_max_speed():
+    print("开始")
+
+    state, authentication = get_authentication(None, None)
+    if not state:
+        return authentication
+
     base_speed = BASE_SPEED
     can_be_used = []
     while (base_speed >= 0) and (can_be_used.__len__() <= 0):
         can_be_used = get_alive_url_list_by_speed(base_speed)
         base_speed -= 1000
-    
+
     if can_be_used.__len__() == 0:
         return get_all_link_by_max_speed_by_no_check()
-    
+
     vmss_list = []
     for subscribeVmss in can_be_used:
         vmss_list.append(subscribeVmss.url)
@@ -63,6 +68,10 @@ def get_all_link_by_max_speed():
 # 手机使用的连接
 @app.route("/subscriptionmp")
 def get_all_link_by_max_speed_by_mobile_phone():
+    state, authentication = get_authentication(None, None)
+    if not state:
+        return authentication
+
     base_speed = BASE_SPEED
     can_be_used = []
     while (base_speed >= 0) and (can_be_used.__len__() <= 0):
@@ -86,6 +95,10 @@ def get_all_link_by_max_speed_by_mobile_phone():
 
 @app.route("/subscriptionnc")
 def get_all_link_by_max_speed_by_no_check():
+    state, authentication = get_authentication(None, None)
+    if not state:
+        return authentication
+
     can_be_used = session.query(SubscribeVmss). \
         filter(SubscribeVmss.speed >= 0). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
@@ -102,7 +115,7 @@ def get_all_link_by_max_speed_by_no_check():
 @app.route("/maxspeed")
 def max_speed():
     data = session.query(SubscribeVmss).order_by(SubscribeVmss.speed.desc()).first()
-    return "当前最大的速度为：{}kb/s</br>{}".format(data.speed, data.url)
+    return "当前最大的速度为：{}kb/s".format(data.speed)
 
 
 @app.route("/share")
@@ -203,11 +216,19 @@ def add_subscribe_url():
         return traceback.format_exc()
 
 
-update = Thread(None, update_new_node, None, )
-update.daemon = True
-update.start()
-check_alive = Thread(None, check_link_alive, None, )
-check_alive.daemon = True
-check_alive.start()
+@app.before_request
+def before_request():
+    logger.info("Path: {}  Method: {} RemoteAddr: {} application/json: {} "
+                "application/x-www-form-urlencoded: {} GetParameter: {}   {}"
+                .format(request.path, request.method, request.remote_addr,
+                        request.json, request.form, request.args, request.headers.to_wsgi_list()))
+
+
+# update = Thread(None, update_new_node, None, )
+# update.daemon = True
+# update.start()
+# check_alive = Thread(None, check_link_alive, None, )
+# check_alive.daemon = True
+# check_alive.start()
 if __name__ == '__main__':
     app.run(host=HOST, port=PORT, debug=FLASK_DEBUG)

@@ -1,4 +1,3 @@
-import os
 import sys
 sys.path.append("../")
 from conf.conf import LOG_DEBUG, MODEL_NAME, LOG_PATH
