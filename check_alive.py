@@ -5,8 +5,10 @@ import time
 import traceback
 import urllib
 
+import requests
+
 import utils
-from conf.conf import V2RAY_CONFIG_LOCAL, TEST_FILE_URL, HEALTH_POINTS
+from conf.conf import V2RAY_CONFIG_LOCAL, TEST_FILE_URL, HEALTH_POINTS, PROXIES_TEST
 from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss
@@ -53,18 +55,22 @@ def check_by_v2ray_url(url: str) -> int:
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
         json.dump(node.formatConfig(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        subprocess.call('systemctl restart v2ray.service', shell=True)
+        # subprocess.call('systemctl restart v2ray.service', shell=True)
+        subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
             time.sleep(5)
-            output = subprocess.check_output(
-                'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
-                shell=True)
+            # output = subprocess.check_output(
+            #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
+            #     shell=True)
+            r = requests.get("http://cachefly.cachefly.net/1mb.test", proxies=PROXIES_TEST,  timeout=60)
+            speed = r.elapsed.microseconds/1000
+            r.close()
         except BaseException:
-            output = -1
+            speed = -1
 
-        logger.info("\t{}kb/s\t连接\t{}".format(float(output), url))
+        logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
         # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
-        return int(float(output))
+        return int(speed)
     except:
         logger.error(traceback.format_exc())
         return -1
