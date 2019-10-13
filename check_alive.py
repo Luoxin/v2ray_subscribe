@@ -55,10 +55,10 @@ def check_by_v2ray_url(url: str) -> int:
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
         json.dump(node.formatConfig(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        # subprocess.call('systemctl restart v2ray.service', shell=True)
-        subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
+        subprocess.call('systemctl restart v2ray.service', shell=True)
+        # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
-            time.sleep(5)
+            time.sleep(10)
             # output = subprocess.check_output(
             #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
             #     shell=True)
