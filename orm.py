@@ -28,6 +28,8 @@ class SubscribeVmss(Base):
     next_time = Column(Integer)  # 下一次的测速时间
     interval = Column(Integer)  # 间隔
 
+    crawl_id = Column(Integer)  # 关联的 SubscribeCrawl 的 id
+
 
 # 抓取的配置表
 class SubscribeCrawl(Base):

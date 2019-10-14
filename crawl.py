@@ -17,7 +17,7 @@ from fake_useragent import UserAgent
 ua = UserAgent()
 
 
-def add_new_vmess(v2ray_url) -> bool:
+def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
     try:
         if v2ray_url == "":
             return
@@ -43,7 +43,8 @@ def add_new_vmess(v2ray_url) -> bool:
                 interval=Interval,
                 created_at=int(time.time()),
                 updated_at=int(time.time()),
-                type=url_type
+                type=url_type,
+                crawl_id=crawl_id,
             )
             session.add(new_data)
             session.commit()
@@ -57,6 +58,7 @@ def add_new_vmess(v2ray_url) -> bool:
                 SubscribeVmss.health_points: HEALTH_POINTS,
                 SubscribeVmss.updated_at: int(time.time()),
                 SubscribeVmss.speed: data.speed,
+                SubscribeVmss.crawl_id: crawl_id,
             })
     except:
         logger.error(traceback.format_exc())
@@ -64,7 +66,7 @@ def add_new_vmess(v2ray_url) -> bool:
     return False
 
 
-def crawl_by_subscribe_url(url: str):
+def crawl_by_subscribe_url(url: str, crawl_id=0):
     headers = {
         "User-Agent": ua.random,
     }
@@ -78,7 +80,7 @@ def crawl_by_subscribe_url(url: str):
             data = utils.decode(re_text)
 
         for v2ray_url in data.split("\n"):
-            add_new_vmess(v2ray_url)
+            add_new_vmess(v2ray_url, crawl_id)
 
         re.close()
     except:
@@ -96,7 +98,7 @@ def crawl_by_subscribe():
 
     for data in data_list:
         try:
-            crawl_by_subscribe_url(data.url)
+            crawl_by_subscribe_url(data.url, data.id)
             session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
                 SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(time.time()),
                 SubscribeCrawl.updated_at: int(time.time()),
