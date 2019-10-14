@@ -1,6 +1,6 @@
 from enum import Enum, unique
 
-from sqlalchemy import Column, Integer, String, Boolean, JSON
+from sqlalchemy import Column, Integer, String, Boolean, JSON, Float
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
@@ -22,7 +22,7 @@ class SubscribeVmss(Base):
     updated_at = Column(Integer)  # 更新时间
 
     url = Column(String, unique=True)  # 地址
-    speed = Column(Integer)  # 速度
+    speed = Column(Float)  # 速度
     type = Column(String, index=True)  # 类型
     health_points = Column(Integer)  # 生命值
     next_time = Column(Integer)  # 下一次的测速时间

@@ -46,7 +46,7 @@ def get_node_by_url(url: str != ""):
         return node, type
 
 
-def check_by_v2ray_url(url: str) -> int:
+def check_by_v2ray_url(url: str) -> float:
     try:
         node, type = get_node_by_url(url)
         if node is None:
@@ -63,7 +63,6 @@ def check_by_v2ray_url(url: str) -> int:
             #     shell=True)
             r = requests.get("http://cachefly.cachefly.net/1mb.test", proxies=PROXIES_TEST,  timeout=60*1000)
             speed = r.elapsed.microseconds/100
-            logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
             r.close()
         except:
             speed = -1
@@ -71,7 +70,7 @@ def check_by_v2ray_url(url: str) -> int:
 
         logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
         # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
-        return int(speed)
+        return float(speed)
     except:
         logger.error(traceback.format_exc())
         return -1
