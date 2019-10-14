@@ -2,12 +2,14 @@ import base64
 import re
 import time
 import traceback
+from threading import Thread
 
-from flask import Flask, request
+from flask import Flask, request, current_app
 
 from authentication import get_authentication
+from check_alive import check_link_alive
 from conf.conf import *
-from crawl import add_new_vmess
+from crawl import add_new_vmess, update_new_node
 from log import logger
 from orm import session, SubscribeVmss, SubscribeCrawl
 
@@ -224,11 +226,16 @@ def before_request():
                         request.json, request.form, request.args, request.headers.to_wsgi_list()))
 
 
-# update = Thread(None, update_new_node, None, )
-# update.daemon = True
-# update.start()
-# check_alive = Thread(None, check_link_alive, None, )
-# check_alive.daemon = True
-# check_alive.start()
+@app.route('/favicon.ico')
+def favicon():
+    return current_app.send_static_file('static/favicon.ico')
+
+
+update = Thread(None, update_new_node, None, )
+update.daemon = True
+update.start()
+check_alive = Thread(None, check_link_alive, None, )
+check_alive.daemon = True
+check_alive.start()
 if __name__ == '__main__':
     app.run(host=HOST, port=PORT, debug=FLASK_DEBUG)
