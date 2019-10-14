@@ -62,7 +62,7 @@ def check_by_v2ray_url(url: str) -> float:
             #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
             #     shell=True)
             r = requests.get("http://cachefly.cachefly.net/1mb.test", proxies=PROXIES_TEST,  timeout=60*1000)
-            speed = 1 / (r.elapsed.microseconds/1000/1000)
+            speed = r.elapsed.microseconds/100
             r.close()
         except:
             speed = -1
