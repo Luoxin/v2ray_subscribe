@@ -84,7 +84,6 @@ def check_by_v2ray_url(url: str) -> float:
             logger.warning("connect time out")
             speed = -2
         except requests.exceptions.ConnectionError:
-            r.status_code = "Connection refused"
             logger.warning("connect error")
             speed = -3
         except:
