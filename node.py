@@ -17,7 +17,7 @@ class Node:
 
 
 class V2ray(Node):
-    uuid = ''+
+    uuid = ''
     alterId = 0
     network = ''
     camouflageType = ''
