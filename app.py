@@ -16,20 +16,13 @@ from orm import session, SubscribeVmss, SubscribeCrawl
 app = Flask(__name__)
 
 
-def get_alive_url_list_by_speed(speed: (int, float)):
-    if speed <= 0:
-        data_list = session.query(SubscribeVmss). \
-            filter(SubscribeVmss.speed > speed). \
-            filter(SubscribeVmss.health_points >= 0). \
-            filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
-            order_by(SubscribeVmss.speed.desc()). \
-            all()
-    else:
-        data_list = session.query(SubscribeVmss). \
-            filter(SubscribeVmss.speed > speed). \
-            filter(SubscribeVmss.health_points >= 0). \
-            order_by(SubscribeVmss.speed.desc()). \
-            all()
+def get_alive_url():
+    data_list = session.query(SubscribeVmss). \
+        filter(SubscribeVmss.speed > 0). \
+        filter(SubscribeVmss.health_points >= 0). \
+        order_by(SubscribeVmss.speed.desc()). \
+        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+        all()
     return data_list
 
 
@@ -45,17 +38,11 @@ def count():
 # 所有的高速节点
 @app.route("/subscription", methods=["GET"])
 def get_all_link_by_max_speed():
-    print("开始")
-
     state, authentication = get_authentication(None, None)
     if not state:
         return authentication
 
-    base_speed = BASE_SPEED
-    can_be_used = []
-    while (base_speed >= 0) and (can_be_used.__len__() <= 0):
-        can_be_used = get_alive_url_list_by_speed(base_speed)
-        base_speed -= 1000
+    can_be_used = get_alive_url()
 
     if can_be_used.__len__() == 0:
         return get_all_link_by_max_speed_by_no_check()
@@ -74,16 +61,12 @@ def get_all_link_by_max_speed_by_mobile_phone():
     if not state:
         return authentication
 
-    base_speed = BASE_SPEED
-    can_be_used = []
-    while (base_speed >= 0) and (can_be_used.__len__() <= 0):
-        can_be_used = session.query(SubscribeVmss). \
-            filter(SubscribeVmss.speed > base_speed). \
-            filter(SubscribeVmss.health_points >= 0). \
-            filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
-            filter(SubscribeVmss.type == "ws"). \
-            all()
-        base_speed -= 1000
+    can_be_used = session.query(SubscribeVmss). \
+        filter(SubscribeVmss.speed > 0). \
+        filter(SubscribeVmss.health_points >= 0). \
+        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+        filter(SubscribeVmss.type == "ws"). \
+        all()
 
     if can_be_used.__len__() == 0:
         return get_all_link_by_max_speed_by_no_check()
