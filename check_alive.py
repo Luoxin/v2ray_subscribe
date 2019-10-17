@@ -67,6 +67,9 @@ def check_by_v2ray_url(url: str) -> float:
             else:
                 speed = 0
             r.close()
+        except requests.exceptions.Timeout:
+            logger.warning("connect time out")
+            speed = -2
         except:
             speed = -1
             logger.error(traceback.format_exc())
@@ -101,18 +104,21 @@ def check_link_alive():
                                 SubscribeVmss.health_points: HEALTH_POINTS if data.health_points < HEALTH_POINTS else data.health_points + 1,
                                 SubscribeVmss.next_time: int(random.uniform(0.5, 1.5)*data.interval) + int(time.time()),
                                 SubscribeVmss.updated_at: int(time.time()),
+                                SubscribeVmss.last_state: 0,
                             })
                         elif speed == 0:
                             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                                 SubscribeVmss.health_points: data.health_points - 1,
                                 SubscribeVmss.next_time: int(random.uniform(0.5, 1.5)*data.interval) + int(time.time()),
                                 SubscribeVmss.updated_at: int(time.time()),
+                                SubscribeVmss.last_state: 0,
                             })
                         else:
                             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                                 SubscribeVmss.speed: speed,
                                 SubscribeVmss.health_points: -1,
-                                SubscribeVmss.updated_at: int(time.time()),
+                                SubscribeVmss.updated_at: int(time.time()),                                SubscribeVmss.last_state: 0
+                                SubscribeVmss.last_state: int(-1 * speed),
                             })
                         session.commit()
                     except:

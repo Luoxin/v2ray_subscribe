@@ -30,6 +30,8 @@ class SubscribeVmss(Base):
 
     crawl_id = Column(Integer)  # 关联的 SubscribeCrawl 的 id
 
+    last_state = Column(Integer, default=0)  # 最后一次测试的状态
+
 
 # 抓取的配置表
 class SubscribeCrawl(Base):
@@ -79,6 +81,13 @@ class SubscribeAuthenticationLevel(Enum):
     SuperAdmin = 1
 
 
+@unique
+class SubscribeLastVmssState(Enum):
+    Nil = 0  # 默认正常
+    SysError = 1  # 系统错误
+    TimeoutError = 2  # 超时
+
+
 engine = create_engine(DB_URL, echo=LOG_DEBUG,
                        client_encoding="utf8",
                        pool_pre_ping=True,
@@ -86,7 +95,6 @@ engine = create_engine(DB_URL, echo=LOG_DEBUG,
 
 # 创建表
 Base.metadata.create_all(engine)
-
 
 session = sessionmaker(bind=engine)()
 
