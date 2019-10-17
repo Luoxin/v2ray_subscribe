@@ -69,6 +69,7 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
 def crawl_by_subscribe_url(url: str, crawl_id=0):
     headers = {
         "User-Agent": ua.random,
+        'Connection': 'close',
     }
     re_text = ""
     try:

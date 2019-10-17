@@ -13,6 +13,10 @@ from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss
 
+from fake_useragent import UserAgent
+
+ua = UserAgent()
+
 
 def get_node_by_url(url: str != ""):
     node = None
@@ -63,7 +67,8 @@ def check_by_v2ray_url(url: str) -> float:
             #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
             #     shell=True)
             headers = {
-                'Connection': 'close'
+                'Connection': 'close',
+                "User-Agent": ua.random,
             }
             r = requests.get(TEST_FILE_URL,
                              proxies=PROXIES_TEST,
