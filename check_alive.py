@@ -117,7 +117,7 @@ def check_link_alive():
                             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                                 SubscribeVmss.speed: speed,
                                 SubscribeVmss.health_points: -1,
-                                SubscribeVmss.updated_at: int(time.time()),                                SubscribeVmss.last_state: 0
+                                SubscribeVmss.updated_at: int(time.time()),
                                 SubscribeVmss.last_state: int(-1 * speed),
                             })
                         session.commit()
