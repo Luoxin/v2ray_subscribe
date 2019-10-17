@@ -42,7 +42,7 @@ DB_URL = "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
 # DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
 
 # 默认检测间隔
-Interval = 60*60*4
+Interval = 60*60
 
 PROXIES_TEST = {
     "http": "socks5://127.0.0.1:1086",
