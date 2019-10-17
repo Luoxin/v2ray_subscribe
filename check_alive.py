@@ -85,6 +85,8 @@ def check_by_v2ray_url(url: str) -> float:
         except:
             speed = -1
             logger.error(traceback.format_exc())
+        finally:
+            time.sleep(10)
 
         logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
         # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
