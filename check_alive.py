@@ -8,7 +8,7 @@ import urllib
 import requests
 
 import utils
-from conf.conf import V2RAY_CONFIG_LOCAL, HEALTH_POINTS, PROXIES_TEST
+from conf.conf import V2RAY_CONFIG_LOCAL, HEALTH_POINTS, PROXIES_TEST, TEST_FILE_URL
 from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss
@@ -62,7 +62,14 @@ def check_by_v2ray_url(url: str) -> float:
             # output = subprocess.check_output(
             #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
             #     shell=True)
-            r = requests.get("http://cachefly.cachefly.net/1mb.test", proxies=PROXIES_TEST, timeout=60 * 1000)
+            headers = {
+                'Connection': 'close'
+            }
+            r = requests.get(TEST_FILE_URL,
+                             proxies=PROXIES_TEST,
+                             timeout=60 * 1000,
+                             headers=headers
+                             )
             if r.status_code == 200:
                 speed = r.elapsed.microseconds / 1000
             else:
@@ -72,6 +79,7 @@ def check_by_v2ray_url(url: str) -> float:
             logger.warning("connect time out")
             speed = -2
         except requests.exceptions.ConnectionError:
+            r.status_code = "Connection refused"
             logger.warning("connect error")
             speed = -3
         except:
