@@ -191,7 +191,8 @@ def add_subscribe_url():
                     type=1,
                     is_closed=False,
                     interval=3600,
-                    created_at=int(time.time())
+                    created_at=int(time.time()),
+                    next_time=0,
                 )
                 session.add(new_data)
                 session.commit()
