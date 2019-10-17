@@ -86,6 +86,7 @@ class SubscribeLastVmssState(Enum):
     Nil = 0  # 默认正常
     SysError = 1  # 系统错误
     TimeoutError = 2  # 超时
+    ConnectionError = 3  # 连接失败
 
 
 engine = create_engine(DB_URL, echo=LOG_DEBUG,
