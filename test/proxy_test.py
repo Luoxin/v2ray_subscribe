@@ -6,7 +6,7 @@ proxies = {
     "https": "socks5://127.0.0.1:1086",
 }
 
-url = "https://www.google.com"
+url = "http://www.google.com"
 
 r = requests.get(url,
                  proxies=proxies,
