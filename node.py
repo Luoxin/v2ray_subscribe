@@ -94,7 +94,7 @@ class V2ray(Node):
                     "StatsService"
                 ]
             },
-            "dns": None,
+            # "dns": None,
             "routing": {
                 "domainStrategy": "IPIfNonMatch",
                 "rules": [
