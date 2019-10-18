@@ -4,7 +4,7 @@ sys.path.append("..")
 sys.path.append("../..")
 
 import json
-import .utils
+import utils
 from node import V2ray
 
 url = "vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIiIsDQogICJhZGQiOiAiNDcuNzUuNDkuMyIsDQogICJwb3J0IjogIjM2NjQ0IiwNCiAgImlkIjogIjdmMTg5YWQ2LTE2MGYtNGExZi1hODgwLWVhN2Y4NzZhZWFmYiIsDQogICJhaWQiOiAiMjMzIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIiLA0KICAidGxzIjogIiINCn0="
