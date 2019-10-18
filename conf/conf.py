@@ -12,7 +12,7 @@ LOG_PATH = "/root/log/v2ray_subscribe.log"
 
 V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
 # TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
-TEST_FILE_URL = "https://www.google.com"
+TEST_FILE_URL = "http://www.google.com"
 
 # host
 HOST = "0.0.0.0"
@@ -46,6 +46,6 @@ DB_URL = "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
 Interval = 60*60
 
 PROXIES_TEST = {
-    "http": "socks://127.0.0.1:1086",
-    "https": "socks://127.0.0.1:1086",
+    "http": "socks5://127.0.0.1:1088",
+    "https": "socks5://127.0.0.1:1088",
 }
