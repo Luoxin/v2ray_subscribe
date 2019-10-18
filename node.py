@@ -54,36 +54,7 @@ class V2ray(Node):
                 },
                 'streamSettings': None
             },
-            'outbound': {
-                'tag': 'agentout',
-                'protocol': 'vmess',
-                'settings': {
-                    'vnext': [
-                        {
-                            'address': '213.213.213.213',
-                            'port': 23333,
-                            'users': [
-                                {
-                                    'id': 'dddda000-bbbb-4444-2222-fffff6666666',
-                                    'alterId': 100,
-                                    'security': 'aes-128-gcm'
-                                }
-                            ]
-                        }
-                    ],
-                    'servers': None
-                },
-                'streamSettings': {
-                    'network': None,
-                    'security': None,
-                    'tcpSettings': None,
-                    'kcpSettings': None,
-                    'wsSettings': None
-                },
-                'mux': {
-                    'enabled': False
-                }
-            },
+            'outbounds': [],
             'inboundDetour': None,
             'outboundDetour': [
                 {
