@@ -63,7 +63,7 @@ def check_by_v2ray_url(url: str) -> float:
         subprocess.call('systemctl restart v2ray.service', shell=True)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
-            output = subprocess.check_output(
+            speed = subprocess.check_output(
                 'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
                 shell=True)
             # headers = {
