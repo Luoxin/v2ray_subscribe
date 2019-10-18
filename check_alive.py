@@ -63,29 +63,29 @@ def check_by_v2ray_url(url: str) -> float:
         subprocess.call('systemctl restart v2ray.service', shell=True)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
-            speed = subprocess.check_output(
-                'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
-                shell=True)
-            # headers = {
-            #     'Connection': 'close',
-            #     "User-Agent": ua.random,
-            # }
-            # r = requests.get(TEST_FILE_URL,
-            #                  proxies=PROXIES_TEST,
-            #                  timeout=60 * 1000,
-            #                  headers=headers
-            #                  )
-            # if r.status_code == 200:
-            #     speed = r.elapsed.microseconds / 1000
-            # else:
-            #     speed = 0
-            # r.close()
-        # except requests.exceptions.Timeout:
-        #     logger.warning("connect time out")
-        #     speed = -2
-        # except requests.exceptions.ConnectionError:
-        #     logger.warning("connect error")
-        #     speed = -3
+            # speed = subprocess.check_output(
+            #     'curl -o /dev/null -s -w %{speed_download} -x socks://127.0.0.1:1086 ' + TEST_FILE_URL, timeout=30,
+            #     shell=True)
+            headers = {
+                'Connection': 'close',
+                "User-Agent": ua.random,
+            }
+            r = requests.get(TEST_FILE_URL,
+                             proxies=PROXIES_TEST,
+                             timeout=60 * 1000,
+                             headers=headers
+                             )
+            if r.status_code == 200:
+                speed = r.elapsed.microseconds / 1000
+            else:
+                speed = 0
+            r.close()
+        except requests.exceptions.Timeout:
+            logger.warning("connect time out")
+            speed = -2
+        except requests.exceptions.ConnectionError:
+            logger.warning("connect error")
+            speed = -3
         except:
             speed = -1
             logger.error(traceback.format_exc())

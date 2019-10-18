@@ -31,7 +31,7 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
                 except:
                     pass
             elif v2ray_url.startswith('ss://'):
-                pass
+                return False
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
 
