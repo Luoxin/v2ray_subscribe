@@ -18,4 +18,4 @@ v2node = V2ray(server_node['add'], int(server_node['port']), server_node['ps'], 
                server_node['path'], server_node['tls'])
 node = v2node
 
-print(json.dumps(node.formatConfig()))
+print(json.dumps(node.format_config()))
