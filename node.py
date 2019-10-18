@@ -70,21 +70,21 @@ class V2ray(Node):
                     },
                     "streamSettings": None
                 },
-                {
-                    "tag": "api",
-                    "port": 1090,
-                    "listen": "127.0.0.1",
-                    "protocol": "dokodemo-door",
-                    "sniffing": None,
-                    "settings": {
-                        "auth": None,
-                        "udp": False,
-                        "ip": None,
-                        "address": "127.0.0.1",
-                        "clients": None
-                    },
-                    "streamSettings": None
-                }
+                # {
+                #     "tag": "api",
+                #     "port": 1090,
+                #     "listen": "127.0.0.1",
+                #     "protocol": "dokodemo-door",
+                #     "sniffing": None,
+                #     "settings": {
+                #         "auth": None,
+                #         "udp": False,
+                #         "ip": None,
+                #         "address": "127.0.0.1",
+                #         "clients": None
+                #     },
+                #     "streamSettings": None
+                # }
             ],
             "outbounds": [],
             "stats": {},
