@@ -20,8 +20,8 @@ def get_alive_url():
     data_list = session.query(SubscribeVmss). \
         filter(SubscribeVmss.speed > 0). \
         filter(SubscribeVmss.health_points >= 0). \
-        order_by(SubscribeVmss.speed.desc()). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+        order_by(SubscribeVmss.speed.desc()). \
         all()
     return data_list
 
@@ -66,6 +66,7 @@ def get_all_link_by_max_speed_by_mobile_phone():
         filter(SubscribeVmss.health_points >= 0). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
         filter(SubscribeVmss.type == "ws"). \
+        order_by(SubscribeVmss.speed.desc()). \
         all()
 
     if can_be_used.__len__() == 0:
@@ -88,6 +89,7 @@ def get_all_link_by_max_speed_by_no_check():
         filter(SubscribeVmss.speed >= 0). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
         filter(SubscribeVmss.type == "ws"). \
+        order_by(SubscribeVmss.speed.desc()). \
         all()
 
     vmss_list = []
@@ -129,7 +131,6 @@ def share_new_node():
 
 @app.route("/shares")
 def share_by_subscription():
-    urls = []
     if request.method == "GET":
         try:
             subscription = request.args.get("s")
