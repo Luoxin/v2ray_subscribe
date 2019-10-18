@@ -51,13 +51,13 @@ class V2ray(Node):
             "inbounds": [
                 {
                     "port": 1086,
-                    "listen": "0.0.0.0",
+                    "listen": "127.0.0.1",
                     "protocol": "socks",
                     "settings": {
                         "auth": "noauth",
                         "udp": True,
                     },
-                    "tag": "in"
+                    "tag": "proxy"
                 }
             ],
             "outbounds": [
@@ -457,12 +457,12 @@ class Shadowsocks(Node):
             "inbounds": [
                 {
                     "port": 1086,
-                    "listen": "0.0.0.0",
+                    "listen": "127.0.0.1",
                     "protocol": "socks",
                     "settings": {
                         "udp": True
                     },
-                    "tag": "in"
+                    "tag": "proxy"
                 }
             ],
             "outbounds": [

@@ -9,7 +9,6 @@ from node import V2ray
 
 url = "vmess://ew0KICAidiI6ICIyIiwNCiAgInBzIjogIiIsDQogICJhZGQiOiAiNDcuNzUuNDkuMyIsDQogICJwb3J0IjogIjM2NjQ0IiwNCiAgImlkIjogIjdmMTg5YWQ2LTE2MGYtNGExZi1hODgwLWVhN2Y4NzZhZWFmYiIsDQogICJhaWQiOiAiMjMzIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIiLA0KICAidGxzIjogIiINCn0="
 
-type = "v2ray"
 base64_str = url.replace('vmess://', '')
 jsonstr = utils.decode(base64_str)
 
