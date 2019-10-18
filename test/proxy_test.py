@@ -2,11 +2,11 @@ import requests
 
 
 proxies = {
-    "http": "socks5://127.0.0.1:1088",
-    "https": "socks5://127.0.0.1:1088",
+    "http": "socks://127.0.0.1:1088",
+    "https": "socks://127.0.0.1:1088",
 }
 
-url = "http://www.google.com"
+url = "https://www.google.com"
 
 r = requests.get(url,
                  proxies=proxies,

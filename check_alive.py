@@ -59,8 +59,8 @@ def check_by_v2ray_url(url: str) -> float:
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
         json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        time.sleep(10)
         subprocess.call('systemctl restart v2ray.service', shell=True)
+        time.sleep(5)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
             # speed = subprocess.check_output(
@@ -89,8 +89,6 @@ def check_by_v2ray_url(url: str) -> float:
         except:
             speed = -1
             logger.error(traceback.format_exc())
-        finally:
-            time.sleep(10)
 
         logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
         # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
