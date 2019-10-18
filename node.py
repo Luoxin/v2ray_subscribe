@@ -57,7 +57,14 @@ class V2ray(Node):
                         "auth": "noauth",
                         "udp": True,
                     },
-                    "tag": "proxy"
+                    "tag": "proxy",
+                    "sniffing": {
+                        "enabled": True,
+                        "destOverride": [
+                            "http",
+                            "tls"
+                        ]
+                    },
                 }
             ],
             "outbounds": [
