@@ -1,6 +1,7 @@
 import json
 import random
 import subprocess
+import sys
 import time
 import traceback
 import urllib
@@ -80,7 +81,8 @@ def check_by_v2ray_url(url: str) -> float:
                 # speed = r.elapsed.microseconds / 1000// 请求的延时
                 request_time = time.time() - start_time
                 del start_time
-
+                size = sys.getsizeof(r.content)/1024
+                speed = size/request_time
             else:
                 speed = 0
             r.close()

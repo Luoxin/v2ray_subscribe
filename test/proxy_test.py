@@ -20,7 +20,7 @@ r = requests.get(url,
 # speed = r.elapsed.microseconds / 1000
 request_time = time.time() - start_time
 del start_time
-size = sys.getsizeof(r.content)
+size = sys.getsizeof(r.content)/1024
 print(size)
 
 speed = size/request_time
