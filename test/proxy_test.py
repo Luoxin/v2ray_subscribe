@@ -5,8 +5,8 @@ import requests
 
 
 proxies = {
-    "http": "socks5://127.0.0.1:1086",
-    "https": "socks5://127.0.0.1:1086",
+    "http": "socks5://127.0.0.1:1088",
+    "https": "socks5://127.0.0.1:1088",
 }
 
 url = "http://www.google.com"
