@@ -74,7 +74,7 @@ def check_by_v2ray_url(url: str) -> float:
             start_time = time.time()
             r = requests.get(TEST_FILE_URL,
                              proxies=PROXIES_TEST,
-                             timeout=5 * 1000,
+                             timeout=1 * 1000,
                              headers=headers
                              )
             if r.status_code == 200:
