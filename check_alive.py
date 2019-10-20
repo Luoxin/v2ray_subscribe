@@ -130,7 +130,7 @@ def check_link_alive():
                             })
                         elif speed == 0 or (state != 0 and speed < 0):
                             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
-                                SubscribeVmss.health_points: data.health_points - 1,
+                                SubscribeVmss.health_points: HEALTH_POINTS if data.health_points > HEALTH_POINTS else data.health_points - 1,
                                 SubscribeVmss.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(
                                     time.time()),
                                 SubscribeVmss.updated_at: int(time.time()),
