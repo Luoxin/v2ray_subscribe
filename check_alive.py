@@ -61,7 +61,7 @@ def check_by_v2ray_url(url: str) -> float:
 
         json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
         subprocess.call('systemctl restart v2ray.service', shell=True)
-        time.sleep(5)
+        # time.sleep(5)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
             # speed = subprocess.check_output(
@@ -74,7 +74,7 @@ def check_by_v2ray_url(url: str) -> float:
             start_time = time.time()
             r = requests.get(TEST_FILE_URL,
                              proxies=PROXIES_TEST,
-                             timeout=1 * 1000,
+                             timeout=10 * 1000,
                              headers=headers
                              )
             if r.status_code == 200:
