@@ -19,7 +19,7 @@ app = Flask(__name__)
 def get_alive_url():
     data_list = session.query(SubscribeVmss). \
         filter(SubscribeVmss.speed > 0). \
-        filter(SubscribeVmss.health_points >= 0). \
+        filter(SubscribeVmss.health_points > HEALTH_POINTS). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
         order_by(SubscribeVmss.speed.desc()). \
         all()
@@ -63,7 +63,7 @@ def get_all_link_by_max_speed_by_mobile_phone():
 
     can_be_used = session.query(SubscribeVmss). \
         filter(SubscribeVmss.speed > 0). \
-        filter(SubscribeVmss.health_points >= 0). \
+        filter(SubscribeVmss.health_points > HEALTH_POINTS). \
         filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
         filter(SubscribeVmss.type == "ws"). \
         order_by(SubscribeVmss.speed.desc()). \
