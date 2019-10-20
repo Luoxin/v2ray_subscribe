@@ -9,7 +9,8 @@ proxies = {
     "https": "socks5://127.0.0.1:1088",
 }
 
-url = "http://www.google.com"
+url = "http://cachefly.cachefly.net/1mb.test"
+# url = "http://www.google.com"
 
 start_time = time.time()
 r = requests.get(url,
@@ -21,8 +22,6 @@ r = requests.get(url,
 request_time = time.time() - start_time
 del start_time
 size = sys.getsizeof(r.content)/1024
-print(size)
-
 speed = size/request_time
 
-print(speed)
+print("size: {} time: {} speed: {}".format(size, request_time, speed))
