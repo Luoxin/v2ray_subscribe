@@ -11,8 +11,8 @@ LOG_PATH = "/root/log/v2ray_subscribe.log"
 # LOG_PATH = "v2ray_subscribe.log"
 
 V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
-# TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
-TEST_FILE_URL = "http://www.google.com"
+TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
+# TEST_FILE_URL = "http://www.google.com"
 
 # host
 HOST = "0.0.0.0"
