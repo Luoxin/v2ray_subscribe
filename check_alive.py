@@ -70,13 +70,17 @@ def check_by_v2ray_url(url: str) -> float:
                 'Connection': 'close',
                 "User-Agent": ua.random,
             }
+            start_time = time.time()
             r = requests.get(TEST_FILE_URL,
                              proxies=PROXIES_TEST,
                              timeout=1 * 1000,
                              headers=headers
                              )
             if r.status_code == 200:
-                speed = r.elapsed.microseconds / 1000
+                # speed = r.elapsed.microseconds / 1000// 请求的延时
+                request_time = time.time() - start_time
+                del start_time
+
             else:
                 speed = 0
             r.close()
