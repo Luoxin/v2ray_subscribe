@@ -86,6 +86,7 @@ def check_by_v2ray_url(url: str) -> float:
             else:
                 speed = 0
             r.close()
+            del r
         except requests.exceptions.Timeout:
             logger.warning("connect time out")
             speed = -2
