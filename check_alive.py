@@ -78,11 +78,11 @@ def check_by_v2ray_url(url: str) -> float:
                              headers=headers
                              )
             if r.status_code == 200:
-                # speed = r.elapsed.microseconds / 1000// 请求的延时
+                # speed = r.elapsed.microseconds / 1000 / 1000 // 请求的延时
                 request_time = time.time() - start_time
                 del start_time
                 size = sys.getsizeof(r.content)/1024
-                speed = size/request_time - r.elapsed.microseconds / 100
+                speed = size/request_time - r.elapsed.microseconds / 1000 / 1000
             else:
                 speed = 0
             r.close()
