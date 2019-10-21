@@ -1,7 +1,10 @@
 import json
+import os
 import random
+import signal
 import subprocess
 import sys
+import threading
 import time
 import traceback
 import urllib
@@ -19,12 +22,49 @@ from fake_useragent import UserAgent
 ua = UserAgent()
 
 
+class V2rayServer:
+    def __init__(self, path, conf):
+        self.cmd = "{} -c {}".format(path, conf)
+        self.pid = 0
+
+    def run_server(self):
+        try:
+            run = threading.Thread(None, self.__run_server(), None, )
+            run.daemon = True
+            run.start()
+        except:
+            logger.error(traceback.format_exc())
+
+    def __run_server(self):
+        try:
+            if self.pid == 0:
+                ps = subprocess.Popen(self.cmd)
+                self.pid = ps.pid
+        except:
+            logger.error(traceback.format_exc())
+
+    def kill(self):
+        try:
+            if self != 0:
+                os.kill(self.pid, signal.SIGTERM)
+                self.pid = 0
+        except:
+            logger.error(traceback.format_exc())
+
+    def restart(self):
+        # 如果存在已有的服务，再kill
+        if self.pid != 0:
+            self.kill()
+
+        self.run_server()
+
+
 def get_node_by_url(url: str != ""):
     node = None
-    type = ""
+    node_type = ""
     try:
         if url.startswith('ss://'):  # ss node
-            type = "ss"
+            node_type = "ss"
             base64_str = url.replace('ss://', '')
             base64_str = urllib.parse.unquote(base64_str)
 
@@ -38,7 +78,7 @@ def get_node_by_url(url: str != ""):
             ssode = Shadowsocks(ip, port, remark, security, password)
             node = ssode
         elif url.startswith('vmess://'):  # vmess
-            type = "v2ray"
+            node_type = "v2ray"
             base64_str = url.replace('vmess://', '')
             jsonstr = utils.decode(base64_str)
 
@@ -47,9 +87,8 @@ def get_node_by_url(url: str != ""):
                            int(server_node['aid']), server_node['net'], server_node['type'], server_node['host'],
                            server_node['path'], server_node['tls'])
             node = v2node
-        return node, type
     finally:
-        return node, type
+        return node, node_type
 
 
 def check_by_v2ray_url(url: str) -> float:
@@ -81,8 +120,8 @@ def check_by_v2ray_url(url: str) -> float:
                 # speed = r.elapsed.microseconds / 1000 / 1000 // 请求的延时
                 request_time = time.time() - start_time
                 del start_time
-                size = sys.getsizeof(r.content)/1024
-                speed = size/request_time - r.elapsed.microseconds / 1000 / 1000
+                size = sys.getsizeof(r.content) / 1024
+                speed = size / request_time - r.elapsed.microseconds / 1000 / 1000
             else:
                 speed = 0
             r.close()
