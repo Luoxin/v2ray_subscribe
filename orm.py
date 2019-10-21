@@ -1,6 +1,6 @@
 from enum import Enum, unique
 
-from sqlalchemy import Column, Integer, String, Boolean, JSON, Float, func
+from sqlalchemy import Column, Integer, String, Boolean, Float, func
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
@@ -89,10 +89,20 @@ class SubscribeLastVmssState(Enum):
     ConnectionError = 3  # 连接失败
 
 
-engine = create_engine(DB_URL, echo=LOG_DEBUG,
-                       client_encoding="utf8",
-                       pool_pre_ping=True,
-                       pool_recycle=3600)
+if DB_URL.startswith("sqlite"):
+    engine = create_engine(DB_URL, echo=LOG_DEBUG,
+                           pool_pre_ping=True,
+                           pool_recycle=3600,
+                           # pool_size=10,
+                           # pool_timeout=5
+                           )
+else:
+    engine = create_engine(DB_URL, echo=LOG_DEBUG,
+                           pool_pre_ping=True,
+                           pool_recycle=3600,
+                           pool_size=10,
+                           pool_timeout=5
+                           )
 
 # 创建表
 Base.metadata.create_all(engine)
