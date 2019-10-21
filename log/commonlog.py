@@ -37,7 +37,7 @@ class Logger(logging.Logger):
         if debug:
             handler = logging.StreamHandler(sys.stdout)
         else:
-            handler = logging.FileHandler(filename=log_path)
+            handler = logging.FileHandler(filename=log_path, encoding="utf-8")
         handler.setFormatter(self.formatter)
         self.addHandler(handler)
 

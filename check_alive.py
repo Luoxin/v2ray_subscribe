@@ -9,6 +9,7 @@ import time
 import traceback
 import urllib
 
+import psutil
 import requests
 
 import utils
@@ -52,11 +53,33 @@ class V2rayServer:
             logger.error(traceback.format_exc())
 
     def restart(self):
+        # 如果未记录这个，需要重新获取一遍pid
+        if self.pid == 0:
+            self.__find_pid()
+
         # 如果存在已有的服务，再kill
         if self.pid != 0:
             self.kill()
 
         self.run_server()
+
+    def __find_pid(self):
+        pid_list = psutil.pids()
+
+        for pid in pid_list:
+            try:
+                p = psutil.Process(pid)
+                cmd = p.cmdline()
+                cmd = " ".join(cmd)
+                # print(cmd)
+                if cmd == self.cmd:
+                    self.pid = pid
+                    return
+            except:
+                pass
+
+
+# v2ray_server = V2rayServer("C:/Users/Luoxin/Desktop/v2ray/v2ray.exe", V2RAY_CONFIG_LOCAL)
 
 
 def get_node_by_url(url: str != ""):
@@ -98,7 +121,8 @@ def check_by_v2ray_url(url: str) -> float:
             return 0
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
-        json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
+        # json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
+        # v2ray_server.restart()
         subprocess.call('systemctl restart v2ray.service', shell=True)
         time.sleep(5)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
