@@ -24,7 +24,7 @@ ua = UserAgent()
 
 class V2rayServer:
     def __init__(self, path, conf):
-        self.cmd = "{} -c {}".format(path, conf)
+        self.cmd = "{} -config {}".format(path, conf)
         self.pid = 0
 
     def run_server(self):

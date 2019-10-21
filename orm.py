@@ -1,6 +1,6 @@
 from enum import Enum, unique
 
-from sqlalchemy import Column, Integer, String, Boolean, JSON, Float
+from sqlalchemy import Column, Integer, String, Boolean, JSON, Float, func
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
