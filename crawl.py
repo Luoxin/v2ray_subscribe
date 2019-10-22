@@ -41,8 +41,6 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
                 health_points=HEALTH_POINTS,
                 next_time=0,
                 interval=Interval,
-                created_at=int(time.time()),
-                updated_at=int(time.time()),
                 type=url_type,
                 crawl_id=crawl_id,
             )
@@ -56,7 +54,6 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
 
             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                 SubscribeVmss.health_points: HEALTH_POINTS,
-                SubscribeVmss.updated_at: int(time.time()),
                 SubscribeVmss.speed: data.speed,
                 SubscribeVmss.crawl_id: crawl_id,
             })
@@ -102,7 +99,6 @@ def crawl_by_subscribe():
             crawl_by_subscribe_url(data.url, data.id)
             session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
                 SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(time.time()),
-                SubscribeCrawl.updated_at: int(time.time()),
             })
             session.commit()
         except:

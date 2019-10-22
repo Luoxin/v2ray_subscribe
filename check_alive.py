@@ -13,7 +13,7 @@ import psutil
 import requests
 
 import utils
-from conf.conf import V2RAY_CONFIG_LOCAL, HEALTH_POINTS, PROXIES_TEST, TEST_FILE_URL
+from conf.conf import V2RAY_CONFIG_LOCAL, HEALTH_POINTS, PROXIES_TEST, TEST_FILE_URL, V2RAY_SERVICE_PATH
 from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss
@@ -79,7 +79,7 @@ class V2rayServer:
                 pass
 
 
-# v2ray_server = V2rayServer("C:/Users/Luoxin/Desktop/v2ray/v2ray.exe", V2RAY_CONFIG_LOCAL)
+v2ray_server = V2rayServer(V2RAY_SERVICE_PATH, V2RAY_CONFIG_LOCAL)
 
 
 def get_node_by_url(url: str != ""):
@@ -121,9 +121,9 @@ def check_by_v2ray_url(url: str) -> float:
             return 0
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
-        # json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        # v2ray_server.restart()
-        subprocess.call('systemctl restart v2ray.service', shell=True)
+        json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
+        v2ray_server.restart()
+        # subprocess.call('systemctl restart v2ray.service', shell=True)
         time.sleep(5)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
@@ -195,7 +195,6 @@ def check_link_alive():
                                 SubscribeVmss.health_points: HEALTH_POINTS + 1 if data.health_points < HEALTH_POINTS else data.health_points + 1,
                                 SubscribeVmss.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(
                                     time.time()),
-                                SubscribeVmss.updated_at: int(time.time()),
                                 SubscribeVmss.last_state: state,
                             })
                         elif speed == 0 or (state != 0 and speed < 0):
@@ -203,14 +202,12 @@ def check_link_alive():
                                 SubscribeVmss.health_points: HEALTH_POINTS if data.health_points > HEALTH_POINTS else data.health_points - 1,
                                 SubscribeVmss.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(
                                     time.time()),
-                                SubscribeVmss.updated_at: int(time.time()),
                                 SubscribeVmss.last_state: state,
                             })
                         else:
                             session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
                                 SubscribeVmss.speed: speed,
                                 SubscribeVmss.health_points: -1,
-                                SubscribeVmss.updated_at: int(time.time()),
                                 SubscribeVmss.last_state: state,
                             })
                         session.commit()
