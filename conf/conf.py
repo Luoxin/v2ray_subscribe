@@ -44,8 +44,8 @@ ERROR_ENUM_PATH = "./conf/error.yaml"
 # 数据库地址
 # 如果使用 `sqlite` 请加上 ?check_same_thread=False
 DB_URL = "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
-# DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
 # DB_URL = "sqlite:///D:/v2ray_subscribe/subscribe.vdb?check_same_thread=False"
+# DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
 
 # 默认检测间隔
 Interval = 60 * 60

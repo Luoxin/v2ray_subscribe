@@ -5,6 +5,7 @@ import traceback
 from threading import Thread
 
 from flask import Flask, request, current_app
+from sqlalchemy import func
 
 from authentication import get_authentication
 from check_alive import check_link_alive
@@ -87,7 +88,7 @@ def get_all_link_by_max_speed_by_no_check():
 
     can_be_used = session.query(SubscribeVmss). \
         filter(SubscribeVmss.speed >= 0). \
-        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
+        filter(SubscribeVmss.updated_at >= int(time.time() - 60*60*24)). \
         filter(SubscribeVmss.type == "ws"). \
         order_by(SubscribeVmss.speed.desc()). \
         all()
