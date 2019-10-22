@@ -22,6 +22,9 @@ PORT = 1084
 # flask debug
 FLASK_DEBUG = False
 
+# sqlalchemy debug
+SQLALCHEMY_DEBUG = False
+
 # shelve save path
 SHELVE_PATH = "/root/app/v2ray_subscribe/WallBuffer.dbm"
 

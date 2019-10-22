@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
 from sqlalchemy.orm import sessionmaker
 
-from conf.conf import LOG_DEBUG, DB_URL
+from conf.conf import DB_URL, SQLALCHEMY_DEBUG
 
 # 基本类
 Base = declarative_base()
@@ -90,14 +90,14 @@ class SubscribeLastVmssState(Enum):
 
 
 if DB_URL.startswith("sqlite"):
-    engine = create_engine(DB_URL, echo=LOG_DEBUG,
+    engine = create_engine(DB_URL, echo=SQLALCHEMY_DEBUG,
                            pool_pre_ping=True,
                            pool_recycle=3600,
                            # pool_size=10,
                            # pool_timeout=5
                            )
 else:
-    engine = create_engine(DB_URL, echo=LOG_DEBUG,
+    engine = create_engine(DB_URL, echo=SQLALCHEMY_DEBUG,
                            pool_pre_ping=True,
                            pool_recycle=3600,
                            pool_size=10,
