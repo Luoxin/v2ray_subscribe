@@ -1,6 +1,6 @@
 from enum import Enum, unique
 
-from sqlalchemy import Column, Integer, String, Boolean, Float, func, JSON
+from sqlalchemy import Column, Integer, String, Boolean, Float, func, JSON, TIMESTAMP
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 # 连接数据库
@@ -18,8 +18,8 @@ class SubscribeVmss(Base):
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
-    created_at = Column(Integer, server_default=func.now())  # 开始时间
-    updated_at = Column(Integer, server_default=func.now(), onupdate=func.now())  # 更新时间
+    created_at = Column(TIMESTAMP, server_default=func.now())  # 开始时间
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())  # 更新时间
 
     url = Column(String, unique=True)  # 地址
     speed = Column(Float)  # 速度
@@ -39,8 +39,8 @@ class SubscribeCrawl(Base):
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
-    created_at = Column(Integer, server_default=func.now())  # 开始时间
-    updated_at = Column(Integer, server_default=func.now(), onupdate=func.now())  # 更新时间
+    created_at = Column(TIMESTAMP, server_default=func.now())  # 开始时间
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())  # 更新时间
 
     url = Column(String, unique=True)  # 地址
     type = Column(Integer)  # 类型
