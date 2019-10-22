@@ -7,7 +7,7 @@ import traceback
 import requests
 
 import utils
-from conf.conf import HEALTH_POINTS, Interval
+from conf.conf import HEALTH_POINTS, Interval, PROXIES_CRAWLER
 from log import logger
 from memory_cache import MemoryCache
 from orm import session, SubscribeVmss, SubscribeCrawl
@@ -57,20 +57,26 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
                 SubscribeVmss.speed: data.speed,
                 SubscribeVmss.crawl_id: crawl_id,
             })
+            session.commit()
     except:
         logger.error(traceback.format_exc())
         logger.error()
     return False
 
 
-def crawl_by_subscribe_url(url: str, crawl_id=0):
+def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
     headers = {
         "User-Agent": ua.random,
         'Connection': 'close',
     }
     re_text = ""
     try:
-        re = requests.get(url, headers=headers, timeout=10)
+        proxies = {}
+        if isinstance(rule, dict):
+            if rule.get("need_proxy"):
+                proxies = PROXIES_CRAWLER
+
+        re = requests.get(url, headers=headers, timeout=10, proxies=proxies)
         re_text = re.text
         try:
             data = base64.b64decode(re_text.encode()).decode()
