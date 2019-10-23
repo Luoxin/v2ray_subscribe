@@ -79,7 +79,7 @@ class V2rayServer:
                 pass
 
 
-# v2ray_server = V2rayServer(V2RAY_SERVICE_PATH, V2RAY_CONFIG_LOCAL)
+v2ray_server = V2rayServer(V2RAY_SERVICE_PATH, V2RAY_CONFIG_LOCAL)
 
 
 def get_node_by_url(url: str != ""):
@@ -116,14 +116,14 @@ def get_node_by_url(url: str != ""):
 
 def check_by_v2ray_url(url: str) -> float:
     try:
-        node, type = get_node_by_url(url)
+        node, node_type = get_node_by_url(url)
         if node is None:
             return 0
         # subprocess.call('cp ' + V2RAY_CONFIG_LOCAL + ' ' + V2RAY_CONFIG_LOCAL + '.bak', shell=False)
 
         json.dump(node.format_config(), open(V2RAY_CONFIG_LOCAL, 'w'), indent=2)
-        # v2ray_server.restart()
-        subprocess.call('systemctl restart v2ray.service', shell=True)
+        v2ray_server.restart()
+        # subprocess.call('systemctl restart v2ray.service', shell=True)
         time.sleep(5)
         # subprocess.call('supervisorctl restart v2ray_speed_measurement', shell=True)
         try:
