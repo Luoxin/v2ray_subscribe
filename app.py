@@ -212,6 +212,11 @@ def share_by_subscription():
 #         return traceback.format_exc()
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return current_app.send_static_file("static/favicon.ico")
+
+
 @app.before_request
 def before_request():
     method = request.method
@@ -243,9 +248,10 @@ def before_request():
     )
 
 
-@app.route("/favicon.ico")
-def favicon():
-    return current_app.send_static_file("static/favicon.ico")
+@app.after_request
+def after_request(rsp):
+    logger.info("Response is {}".format(rsp.response[0].decode("utf-8")))
+    return rsp
 
 
 update = Thread(None, update_new_node, None,)
