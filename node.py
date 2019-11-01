@@ -1,12 +1,12 @@
 class Node:
     # ip
-    ip = ''
+    ip = ""
     # port
     port = 0
     # beiz
-    remark = ''
+    remark = ""
     # jiamiafangshi
-    security = ''
+    security = ""
 
     def __init__(self, ip, port, remark, security):
         self.ip = ip
@@ -16,16 +16,28 @@ class Node:
 
 
 class V2ray(Node):
-    uuid = ''
+    uuid = ""
     alterId = 0
-    network = ''
-    camouflageType = ''
-    camouflageHost = ''
-    camouflagePath = ''
-    camouflageTls = ''
+    network = ""
+    camouflageType = ""
+    camouflageHost = ""
+    camouflagePath = ""
+    camouflageTls = ""
 
-    def __init__(self, ip, port, remark, security, uuid, alterId, network, camouflageType, camouflageHost,
-                 camouflagePath, camouflageTls):
+    def __init__(
+        self,
+        ip,
+        port,
+        remark,
+        security,
+        uuid,
+        alterId,
+        network,
+        camouflageType,
+        camouflageHost,
+        camouflagePath,
+        camouflageTls,
+    ):
         super(V2ray, self).__init__(ip, port, remark, security)
         self.uuid = uuid
         self.alterId = alterId
@@ -38,37 +50,24 @@ class V2ray(Node):
     def format_config(self):
         v2ray_conf = {
             "policy": {
-                "system": {
-                    "statsInboundUplink": True,
-                    "statsInboundDownlink": True
-                }
+                "system": {"statsInboundUplink": True, "statsInboundDownlink": True}
             },
-            "log": {
-                "access": "",
-                "error": "",
-                "loglevel": "warning"
-            },
+            "log": {"access": "", "error": "", "loglevel": "warning"},
             "inbounds": [
                 {
                     "tag": "proxy",
                     "port": 1086,
                     "listen": "0.0.0.0",
                     "protocol": "socks",
-                    "sniffing": {
-                        "enabled": True,
-                        "destOverride": [
-                            "http",
-                            "tls"
-                        ]
-                    },
+                    "sniffing": {"enabled": True, "destOverride": ["http", "tls"]},
                     "settings": {
                         "auth": "noauth",
                         "udp": True,
                         "ip": None,
                         "address": None,
-                        "clients": None
+                        "clients": None,
                     },
-                    "streamSettings": None
+                    "streamSettings": None,
                 },
                 # {
                 #     "tag": "api",
@@ -88,12 +87,7 @@ class V2ray(Node):
             ],
             "outbounds": [],
             "stats": {},
-            "api": {
-                "tag": "api",
-                "services": [
-                    "StatsService"
-                ]
-            },
+            "api": {"tag": "api", "services": ["StatsService"]},
             # "dns": None,
             "routing": {
                 "domainStrategy": "IPIfNonMatch",
@@ -104,7 +98,7 @@ class V2ray(Node):
                         "inboundTag": "api",
                         "outboundTag": "api",
                         "ip": None,
-                        "domain": None
+                        "domain": None,
                     },
                     {
                         "type": "field",
@@ -125,8 +119,8 @@ class V2ray(Node):
                             "domain:textnow.com",
                             "domain:twitch.tv",
                             "domain:wikileaks.org",
-                            "domain:naver.com"
-                        ]
+                            "domain:naver.com",
+                        ],
                     },
                     {
                         "type": "field",
@@ -148,9 +142,9 @@ class V2ray(Node):
                             "173.194.0.0/16",
                             "172.217.0.0/16",
                             "216.58.200.0/24",
-                            "216.58.220.0/24"
+                            "216.58.220.0/24",
                         ],
-                        "domain": None
+                        "domain": None,
                     },
                     {
                         "type": "field",
@@ -291,8 +285,8 @@ class V2ray(Node):
                             "domain:zimuzu.tv",
                             "domain:zmz002.com",
                             "domain:pinquest.com",
-                            "domain:samsungdm.com"
-                        ]
+                            "domain:samsungdm.com",
+                        ],
                     },
                     {
                         "type": "field",
@@ -300,29 +294,23 @@ class V2ray(Node):
                         "inboundTag": None,
                         "outboundTag": "block",
                         "ip": None,
-                        "domain": [
-                            "geosite:category-ads"
-                        ]
+                        "domain": ["geosite:category-ads"],
                     },
                     {
                         "type": "field",
                         "port": None,
                         "inboundTag": None,
                         "outboundTag": "direct",
-                        "ip": [
-                            "geoip:private"
-                        ],
-                        "domain": None
+                        "ip": ["geoip:private"],
+                        "domain": None,
                     },
                     {
                         "type": "field",
                         "port": None,
                         "inboundTag": None,
                         "outboundTag": "direct",
-                        "ip": [
-                            "geoip:cn"
-                        ],
-                        "domain": None
+                        "ip": ["geoip:cn"],
+                        "domain": None,
                     },
                     {
                         "type": "field",
@@ -330,138 +318,120 @@ class V2ray(Node):
                         "inboundTag": None,
                         "outboundTag": "direct",
                         "ip": None,
-                        "domain": [
-                            "geosite:cn"
-                        ]
-                    }
-                ]
-            }
+                        "domain": ["geosite:cn"],
+                    },
+                ],
+            },
         }
 
-        if self.network == 'tcp' or self.network == 'auto':
+        if self.network == "tcp" or self.network == "auto":
             # tcp下
-            v2ray_conf['outbounds'].append({
-                "protocol": "vmess",
-                "settings": {
-                    "vnext": [{
-                        "address": self.ip,
-                        "port": int(self.port),
-                        "users": [
+            v2ray_conf["outbounds"].append(
+                {
+                    "protocol": "vmess",
+                    "settings": {
+                        "vnext": [
                             {
-                                "id": self.uuid,
-                                "alterId": self.alterId
+                                "address": self.ip,
+                                "port": int(self.port),
+                                "users": [{"id": self.uuid, "alterId": self.alterId}],
                             }
                         ]
-                    }]
-                },
-                "streamSettings": {
-                    "network": "tcp"
-                },
-                "tag": "out"
-            })
-            return v2ray_conf
-        elif self.network == 'kcp':
-            # kcp 下
-            v2ray_conf['outbounds'].append({
-                "protocol": "vmess",
-                "settings": {
-                    "vnext": [{
-                        "address": self.ip,
-                        "port": int(self.port),
-                        "users": [
-                            {
-                                "id": self.uuid,
-                                "alterId": self.alterId
-                            }
-                        ]
-                    }]
-                },
-                "streamSettings": {
-                    "network": "kcp",
-                    "kcpSettings": {
-                        "mtu": 1350,
-                        "tti": 50,
-                        "uplinkCapacity": 12,
-                        "downlinkCapacity": 100,
-                        "congestion": False,
-                        "readBufferSize": 2,
-                        "writeBufferSize": 2,
-                        "header": {
-                            "type": self.camouflageType,
-                        }
-                    }
-                },
-                "tag": "out"
-            })
-            return v2ray_conf
-        elif self.network == 'ws':
-            # ws
-            v2ray_conf['outbounds'].append({
-                "protocol": "vmess",
-                "settings": {
-                    "vnext": [{
-                        "address": self.ip,
-                        "port": int(self.port),
-                        "users": [
-                            {
-                                "id": self.uuid,
-                                "alterId": self.alterId
-                            }
-                        ]
-                    }]
-                },
-                "streamSettings": {
-                    "network": "ws",
-                    "security": self.camouflageTls,
-                    "tlsSettings": {
-                        "allowInsecure": True,
                     },
-                    "wsSettings": {
-                        "path": self.camouflagePath,
-                        "headers": {
-                            "Host": self.camouflageHost
-                        }
-                    }
-                },
-                "tag": "out"
-            })
+                    "streamSettings": {"network": "tcp"},
+                    "tag": "out",
+                }
+            )
+            return v2ray_conf
+        elif self.network == "kcp":
+            # kcp 下
+            v2ray_conf["outbounds"].append(
+                {
+                    "protocol": "vmess",
+                    "settings": {
+                        "vnext": [
+                            {
+                                "address": self.ip,
+                                "port": int(self.port),
+                                "users": [{"id": self.uuid, "alterId": self.alterId}],
+                            }
+                        ]
+                    },
+                    "streamSettings": {
+                        "network": "kcp",
+                        "kcpSettings": {
+                            "mtu": 1350,
+                            "tti": 50,
+                            "uplinkCapacity": 12,
+                            "downlinkCapacity": 100,
+                            "congestion": False,
+                            "readBufferSize": 2,
+                            "writeBufferSize": 2,
+                            "header": {"type": self.camouflageType,},
+                        },
+                    },
+                    "tag": "out",
+                }
+            )
+            return v2ray_conf
+        elif self.network == "ws":
+            # ws
+            v2ray_conf["outbounds"].append(
+                {
+                    "protocol": "vmess",
+                    "settings": {
+                        "vnext": [
+                            {
+                                "address": self.ip,
+                                "port": int(self.port),
+                                "users": [{"id": self.uuid, "alterId": self.alterId}],
+                            }
+                        ]
+                    },
+                    "streamSettings": {
+                        "network": "ws",
+                        "security": self.camouflageTls,
+                        "tlsSettings": {"allowInsecure": True,},
+                        "wsSettings": {
+                            "path": self.camouflagePath,
+                            "headers": {"Host": self.camouflageHost},
+                        },
+                    },
+                    "tag": "out",
+                }
+            )
             return v2ray_conf
         else:
             # h2
-            v2ray_conf['outbounds'].append({
-                "protocol": "vmess",
-                "settings": {
-                    "vnext": [{
-                        "address": self.ip,
-                        "port": int(self.port),
-                        "users": [
+            v2ray_conf["outbounds"].append(
+                {
+                    "protocol": "vmess",
+                    "settings": {
+                        "vnext": [
                             {
-                                "id": self.uuid,
-                                "alterId": self.alterId
+                                "address": self.ip,
+                                "port": int(self.port),
+                                "users": [{"id": self.uuid, "alterId": self.alterId}],
                             }
                         ]
-                    }]
-                },
-                "streamSettings": {
-                    "network": "ws",
-                    "security": self.camouflageTls,
-                    "tlsSettings": {
-                        "allowInsecure": True,
                     },
-                    "httpSettings": {
-                        "path": self.camouflagePath,
-                        "host": [
-                            self.camouflageHost
-                        ]
-                    }
-                },
-                "tag": "out"
-            })
+                    "streamSettings": {
+                        "network": "ws",
+                        "security": self.camouflageTls,
+                        "tlsSettings": {"allowInsecure": True,},
+                        "httpSettings": {
+                            "path": self.camouflagePath,
+                            "host": [self.camouflageHost],
+                        },
+                    },
+                    "tag": "out",
+                }
+            )
             return v2ray_conf
 
 
 class Shadowsocks(Node):
-    password = ''
+    password = ""
 
     def __init__(self, ip, port, remark, security, password):
         super(Shadowsocks, self).__init__(ip, port, remark, security)
@@ -472,30 +442,20 @@ class Shadowsocks(Node):
             "log": {
                 "access": "/var/log/v2ray/access.log",
                 "error": "/var/log/v2ray/error.log",
-                "logLevel": "none"
+                "logLevel": "none",
             },
             "inbounds": [
                 {
                     "port": 1086,
                     "listen": "127.0.0.1",
                     "protocol": "socks",
-                    "settings": {
-                        "udp": True
-                    },
-                    "tag": "proxy"
+                    "settings": {"udp": True},
+                    "tag": "proxy",
                 }
             ],
             "outbounds": [
-                {
-                    "settings": {},
-                    "protocol": "freedom",
-                    "tag": "direct"
-                },
-                {
-                    "settings": {},
-                    "protocol": "blackhole",
-                    "tag": "blocked"
-                }
+                {"settings": {}, "protocol": "freedom", "tag": "direct"},
+                {"settings": {}, "protocol": "blackhole", "tag": "blocked"},
             ],
             "routing": {
                 "strategy": "rules",
@@ -504,41 +464,32 @@ class Shadowsocks(Node):
                     "rules": [
                         {
                             "type": "field",
-                            "ip": [
-                                "geoip:cn",
-                                "geoip:private"
-                            ],
-                            "outboundTag": "direct"
+                            "ip": ["geoip:cn", "geoip:private"],
+                            "outboundTag": "direct",
                         },
+                        {"type": "field", "inboundTag": ["in"], "outboundTag": "out"},
+                    ],
+                },
+            },
+        }
+        ss_config["outbounds"].append(
+            {
+                "tag": "out",
+                "protocol": "shadowsocks",
+                "settings": {
+                    "servers": [
                         {
-                            "type": "field",
-                            "inboundTag": ["in"],
-                            "outboundTag": "out"
+                            "address": self.ip,
+                            "method": self.security,
+                            "ota": False,
+                            "password": self.password,
+                            "port": int(self.port),
+                            "level": 1,
                         }
                     ]
-                }
+                },
+                "streamSettings": {"network": "tcp"},
+                "mux": {"enabled": False},
             }
-        }
-        ss_config['outbounds'].append({
-            "tag": "out",
-            "protocol": "shadowsocks",
-            "settings": {
-                "servers": [
-                    {
-                        "address": self.ip,
-                        "method": self.security,
-                        "ota": False,
-                        "password": self.password,
-                        "port": int(self.port),
-                        "level": 1
-                    }
-                ]
-            },
-            "streamSettings": {
-                "network": "tcp"
-            },
-            "mux": {
-                "enabled": False
-            }
-        })
+        )
         return ss_config

@@ -21,16 +21,22 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
     try:
         if v2ray_url == "":
             return
-        data = session.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+        data = (
+            session.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+        )
         if data is None:
             url_type = ""
-            if v2ray_url.startswith('vmess://'):  # vmess
+            if v2ray_url.startswith("vmess://"):  # vmess
                 try:
-                    v = json.loads(base64.b64decode(v2ray_url.replace('vmess://', '').encode()).decode())
+                    v = json.loads(
+                        base64.b64decode(
+                            v2ray_url.replace("vmess://", "").encode()
+                        ).decode()
+                    )
                     url_type = "" if v.get("net") is None else v.get("net")
                 except:
                     pass
-            elif v2ray_url.startswith('ss://'):
+            elif v2ray_url.startswith("ss://"):
                 return False
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
@@ -52,11 +58,13 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
             if data.speed < 0:
                 data.speed = 0
 
-            session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update({
-                SubscribeVmss.health_points: HEALTH_POINTS,
-                SubscribeVmss.speed: data.speed,
-                SubscribeVmss.crawl_id: crawl_id,
-            })
+            session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+                {
+                    SubscribeVmss.health_points: HEALTH_POINTS,
+                    SubscribeVmss.speed: data.speed,
+                    SubscribeVmss.crawl_id: crawl_id,
+                }
+            )
             session.commit()
     except:
         logger.error(traceback.format_exc())
@@ -67,7 +75,7 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
 def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
     headers = {
         "User-Agent": ua.random,
-        'Connection': 'close',
+        "Connection": "close",
     }
     re_text = ""
     try:
@@ -94,18 +102,25 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
 
 
 def crawl_by_subscribe():
-    data_list = session.query(SubscribeCrawl). \
-        filter(SubscribeCrawl.next_time <= int(time.time())). \
-        filter(SubscribeCrawl.is_closed == False). \
-        filter(SubscribeCrawl.type == 1). \
-        all()
+    data_list = (
+        session.query(SubscribeCrawl)
+        .filter(SubscribeCrawl.next_time <= int(time.time()))
+        .filter(SubscribeCrawl.is_closed == False)
+        .filter(SubscribeCrawl.type == 1)
+        .all()
+    )
 
     for data in data_list:
         try:
             crawl_by_subscribe_url(data.url, data.id)
-            session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update({
-                SubscribeCrawl.next_time: int(random.uniform(0.5, 1.5) * data.interval) + int(time.time()),
-            })
+            session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
+                {
+                    SubscribeCrawl.next_time: int(
+                        random.uniform(0.5, 1.5) * data.interval
+                    )
+                    + int(time.time()),
+                }
+            )
             session.commit()
         except:
             traceback.print_exc()
@@ -114,7 +129,7 @@ def crawl_by_subscribe():
 
 
 # TODO 迁移cache的update_node到数据库
-cache = MemoryCache(ttl=7 * 24 * 60 * 60, max_size=5 * 1024 * 1024)
+# cache = MemoryCache(ttl=7 * 24 * 60 * 60, max_size=5 * 1024 * 1024)
 
 
 # def init():

@@ -14,15 +14,12 @@ url = "https://qiaomenzhuanfx.netlify.com/"
 # url = "http://www.google.com"
 
 start_time = time.time()
-r = requests.get(url,
-                 proxies=proxies,
-                 timeout=60 * 1000,
-                 )
+r = requests.get(url, proxies=proxies, timeout=60 * 1000,)
 
 # speed = r.elapsed.microseconds / 1000 / 1000
 request_time = time.time() - start_time
 del start_time
-size = sys.getsizeof(r.content)/1024
-speed = size/(request_time - r.elapsed.microseconds / 1000 / 1000)
+size = sys.getsizeof(r.content) / 1024
+speed = size / (request_time - r.elapsed.microseconds / 1000 / 1000)
 
 print("size: {} time: {} speed: {}".format(size, request_time, speed))

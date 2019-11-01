@@ -4,7 +4,7 @@ import socket
 import sys
 
 # import coloredlogs
-sys.path.append('../')
+sys.path.append("../")
 # coloredlogs.auto_install()
 
 
@@ -12,14 +12,18 @@ class Logger(logging.Logger):
     _instance = None
     _first = True
     # 什么时间什么级别在哪个模块的哪个文件的哪个方法 哪个行号做了什么事情
-    formatter = logging.Formatter('pid: %(process)d  level: %(levelname)s  ts: %(asctime)s  '
-                                  'filename: %(filename)s  module: %(module)s  method: '
-                                  '%(funcName)s  lineno: %(lineno)d  msg:%(message)s')
+    formatter = logging.Formatter(
+        "pid: %(process)d  level: %(levelname)s  ts: %(asctime)s  "
+        "filename: %(filename)s  module: %(module)s  method: "
+        "%(funcName)s  lineno: %(lineno)d  msg:%(message)s"
+    )
 
-    def __init__(self, name='logger', debug=False, log_path=None, toaddrs=[], level=logging.INFO):
-        '''
+    def __init__(
+        self, name="logger", debug=False, log_path=None, toaddrs=[], level=logging.INFO
+    ):
+        """
         :param name: 日志管理器的名字
-        '''
+        """
         self._start = None
         self._end = None
 
@@ -49,10 +53,19 @@ class PushLogger(logging.Logger):
     hostname = None
     _instance = None
     _first = True
-    formatter = logging.Formatter('')
-    _logger = Logger(name=settings['name'], debug=settings['debug'], log_path=settings['log_path'], )
+    formatter = logging.Formatter("")
+    _logger = Logger(
+        name=settings["name"], debug=settings["debug"], log_path=settings["log_path"],
+    )
 
-    def __init__(self, name='logger_push', debug=False, log_path=None, toaddrs=[], level=logging.INFO):
+    def __init__(
+        self,
+        name="logger_push",
+        debug=False,
+        log_path=None,
+        toaddrs=[],
+        level=logging.INFO,
+    ):
         """
         :param name: 日志管理器的名字
         """
@@ -73,15 +86,15 @@ class PushLogger(logging.Logger):
         if debug:
             handler = logging.StreamHandler(sys.stdout)
         else:
-            handler = logging.FileHandler(filename=log_path, encoding="utf-8", )
+            handler = logging.FileHandler(filename=log_path, encoding="utf-8",)
         handler.setFormatter(self.formatter)
         self.addHandler(handler)
 
     def __to_string(self, *args, **kwargs):
         _msg = []
         for m in args:
-            _msg.append('{}'.format(m))
-        return '\t'.join(_msg)
+            _msg.append("{}".format(m))
+        return "\t".join(_msg)
 
     def info(self, *msg):
         self._logger._log(logging.INFO, self.__to_string(*msg), None)
@@ -110,4 +123,6 @@ class PushLogger(logging.Logger):
         return self.hostname
 
 
-logger = PushLogger(name=settings['name'], debug=settings['debug'], log_path=settings['log_path'])
+logger = PushLogger(
+    name=settings["name"], debug=settings["debug"], log_path=settings["log_path"]
+)

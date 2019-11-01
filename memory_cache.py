@@ -6,7 +6,12 @@ import threading
 
 
 class MemoryCache:
-    def __init__(self, ttl: int = 5 * 60, max_size: int = 10 * 1024 * 1024, persistent_path: str = ""):
+    def __init__(
+        self,
+        ttl: int = 5 * 60,
+        max_size: int = 10 * 1024 * 1024,
+        persistent_path: str = "",
+    ):
         """
          :param ttl: The effective time
                         unit: s
@@ -16,7 +21,9 @@ class MemoryCache:
                         default: 10 Mb
         """
         self.__cache = {}  # Specific cached data
-        self.__ttl_cache = {}  # A list of all keys that should be cleared for each end time
+        self.__ttl_cache = (
+            {}
+        )  # A list of all keys that should be cleared for each end time
         self.__lock = threading.Lock
         self.__size = 0
 
@@ -33,19 +40,31 @@ class MemoryCache:
             try:
                 if not os.path.exists(persistent_path):
                     shelve.open(persistent_path).close()
-                self.__db = shelve.open(persistent_path, flag="c", protocol=2, writeback=True)
+                self.__db = shelve.open(
+                    persistent_path, flag="c", protocol=2, writeback=True
+                )
                 for key in self.__db.keys():
                     try:
                         node = self.__db[key]
                         if isinstance(node, dict):
-                            value = "" if node.get("value") is None else node.get("value")
-                            dead_time = 0 if node.get("dead_time") is None else node.get("dead_time")
-                            self.add_node_with_dead_time(key=key, value=value, dead_time=dead_time)
+                            value = (
+                                "" if node.get("value") is None else node.get("value")
+                            )
+                            dead_time = (
+                                0
+                                if node.get("dead_time") is None
+                                else node.get("dead_time")
+                            )
+                            self.add_node_with_dead_time(
+                                key=key, value=value, dead_time=dead_time
+                            )
                     except:
                         pass
                 self.__need_persistent = True
             except:
-                raise FileNotFoundError(" No such file or directory: {}".format(persistent_path))
+                raise FileNotFoundError(
+                    " No such file or directory: {}".format(persistent_path)
+                )
 
         # Periodically clean up stale data
         clean_timer = threading.Thread(None, self.__clean_timer, None)
@@ -74,7 +93,9 @@ class MemoryCache:
         if self.__size > self.__max_size:
             self.clean_by_dead()
 
-    def add_node(self, key: (int, float, str), value, ttl: int = 0, dead_time: int = 0) -> bool:
+    def add_node(
+        self, key: (int, float, str), value, ttl: int = 0, dead_time: int = 0
+    ) -> bool:
         """
         Add a cache node
         :param key:
@@ -114,7 +135,9 @@ class MemoryCache:
         except:
             return False
 
-    def add_node_with_dead_time(self, key: (int, float, str), value, dead_time: int = 0) -> bool:
+    def add_node_with_dead_time(
+        self, key: (int, float, str), value, dead_time: int = 0
+    ) -> bool:
         return self.add_node(key, value, 0, dead_time)
 
     def add_node_with_ttl(self, key: (int, float, str), value, ttl: int = 0) -> bool:

@@ -18,12 +18,14 @@ app = Flask(__name__)
 
 
 def get_alive_url():
-    data_list = session.query(SubscribeVmss). \
-        filter(SubscribeVmss.speed > 0). \
-        filter(SubscribeVmss.health_points > HEALTH_POINTS). \
-        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
-        order_by(SubscribeVmss.speed.desc()). \
-        all()
+    data_list = (
+        session.query(SubscribeVmss)
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
+        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
+    )
     return data_list
 
 
@@ -32,7 +34,10 @@ def count():
     return "当前节点数量为 {}</br>其中高速节点数量为 {}</br>可供手机使用的高速节点数量为 {}".format(
         session.query(SubscribeVmss).count(),
         session.query(SubscribeVmss).filter(SubscribeVmss.speed > 0).count(),
-        session.query(SubscribeVmss).filter(SubscribeVmss.speed > 0).filter(SubscribeVmss.type == "ws").count()
+        session.query(SubscribeVmss)
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.type == "ws")
+        .count(),
     )
 
 
@@ -62,13 +67,15 @@ def get_all_link_by_max_speed_by_mobile_phone():
     if not state:
         return authentication
 
-    can_be_used = session.query(SubscribeVmss). \
-        filter(SubscribeVmss.speed > 0). \
-        filter(SubscribeVmss.health_points > HEALTH_POINTS). \
-        filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60)). \
-        filter(SubscribeVmss.type == "ws"). \
-        order_by(SubscribeVmss.speed.desc()). \
-        all()
+    can_be_used = (
+        session.query(SubscribeVmss)
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
+        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .filter(SubscribeVmss.type == "ws")
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
+    )
 
     if can_be_used.__len__() == 0:
         return get_all_link_by_max_speed_by_no_check()
@@ -86,12 +93,14 @@ def get_all_link_by_max_speed_by_no_check():
     if not state:
         return authentication
 
-    can_be_used = session.query(SubscribeVmss). \
-        filter(SubscribeVmss.speed >= 0). \
-        filter(SubscribeVmss.updated_at >= int(time.time() - 60*60*24)). \
-        filter(SubscribeVmss.type == "ws"). \
-        order_by(SubscribeVmss.speed.desc()). \
-        all()
+    can_be_used = (
+        session.query(SubscribeVmss)
+        .filter(SubscribeVmss.speed >= 0)
+        .filter(SubscribeVmss.updated_at >= int(time.time() - 60 * 60 * 24))
+        .filter(SubscribeVmss.type == "ws")
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
+    )
 
     vmss_list = []
     for subscribeVmss in can_be_used:
@@ -123,7 +132,7 @@ def share_new_node():
         return "error method"
     if url is None:
         return "error args"
-    if re.match(r'(http|https|ss|ssr|vmess)://[\43-\176]*', url):
+    if re.match(r"(http|https|ss|ssr|vmess)://[\43-\176]*", url):
         logger.info("new url will be add {}".format(url))
         add_new_vmess(url)
         return "success"
@@ -153,7 +162,7 @@ def share_by_subscription():
     success_count = 0
     for url in urls:
         try:
-            if re.match(r'(http|https|ss|ssr|vmess)://[\43-\176]*', url):
+            if re.match(r"(http|https|ss|ssr|vmess)://[\43-\176]*", url):
                 logger.info("new url will be add {}".format(url))
                 if add_new_vmess(url):
                     success_count += 1
@@ -205,22 +214,45 @@ def share_by_subscription():
 
 @app.before_request
 def before_request():
-    logger.info("Path: {}  Method: {} RemoteAddr: {} application/json: {} "
-                "application/x-www-form-urlencoded: {} GetParameter: {}   {}"
-                .format(request.path, request.method, request.remote_addr,
-                        request.json, request.form, request.args, request.headers.to_wsgi_list()))
+    method = request.method
+
+    # 获取请求参数
+    request_message = ""
+    if method == "GET":
+        request_message = request.args.to_dict()
+    elif method == "POST":
+        if request.json is not None:
+            request_message = request.json
+        elif request.form is not None:
+            request_message = request.form
+
+    # 获取请求用户的真实ip地址
+    real_ip = request.remote_addr
+    if request.headers.get("X-Forwarded-For") is not None:
+        real_ip = request.headers.get("X-Forwarded-For")
+
+    logger.info(
+        "Path: {}  Method: {} RemoteAddr: {} headers: {} request_message: {}  ".format(
+            request.path,
+            request.method,
+            real_ip,
+            request.headers.to_wsgi_list(),
+            request_message
+            # , request.__dict__
+        )
+    )
 
 
-@app.route('/favicon.ico')
+@app.route("/favicon.ico")
 def favicon():
-    return current_app.send_static_file('static/favicon.ico')
+    return current_app.send_static_file("static/favicon.ico")
 
 
-update = Thread(None, update_new_node, None, )
+update = Thread(None, update_new_node, None,)
 update.daemon = True
 update.start()
-check_alive = Thread(None, check_link_alive, None, )
+check_alive = Thread(None, check_link_alive, None,)
 check_alive.daemon = True
 check_alive.start()
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host=HOST, port=PORT, debug=FLASK_DEBUG)

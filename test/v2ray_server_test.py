@@ -8,7 +8,9 @@ sys.path.append("../..")
 
 from check_alive import V2rayServer
 
-vs = V2rayServer("C:/Users/Luoxin/Desktop/v2ray/v2ray.exe", "C:/Users/Luoxin/Desktop/v2ray/c.json")
+vs = V2rayServer(
+    "C:/Users/Luoxin/Desktop/v2ray/v2ray.exe", "C:/Users/Luoxin/Desktop/v2ray/c.json"
+)
 vs.find_pid()
 # vs.restart()
 #

@@ -15,8 +15,8 @@ url = ""
 # session.add(new_data)
 
 
-session.query(SubscribeCrawl).filter(SubscribeCrawl.id == 1571721122).update({
-    SubscribeCrawl.rule: {"need_proxy": True}
-})
+session.query(SubscribeCrawl).filter(SubscribeCrawl.id == 1571721122).update(
+    {SubscribeCrawl.rule: {"need_proxy": True}}
+)
 
 session.commit()

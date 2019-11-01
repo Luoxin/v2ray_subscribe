@@ -20,10 +20,12 @@ def get_authentication(secret_key: (str, None), uuid: (str, None)):
         # uuid大写，避免不必要的错误
         uuid = uuid.upper()
 
-        authentication = session.query(SubscribeAuthentication). \
-            filter(SubscribeAuthentication.secret_key == secret_key). \
-            filter(SubscribeAuthentication.uuid == uuid) \
+        authentication = (
+            session.query(SubscribeAuthentication)
+            .filter(SubscribeAuthentication.secret_key == secret_key)
+            .filter(SubscribeAuthentication.uuid == uuid)
             .first()
+        )
 
         if authentication is None:
             return False, "权限不够"

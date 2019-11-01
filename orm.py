@@ -4,6 +4,7 @@ from enum import Enum, unique
 from sqlalchemy import Column, Integer, String, Boolean, Float, func, JSON, TIMESTAMP
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+
 # 连接数据库
 from sqlalchemy.orm import sessionmaker
 
@@ -14,12 +15,14 @@ Base = declarative_base()
 
 # 连接的表
 class SubscribeVmss(Base):
-    __tablename__ = 'subscribe_vmss'  # 表的名字
+    __tablename__ = "subscribe_vmss"  # 表的名字
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
     created_at = Column(Integer, server_default=str(int(time.time())))  # 开始时间
-    updated_at = Column(Integer, server_default=str(int(time.time())), onupdate=str(int(time.time())))  # 更新时间
+    updated_at = Column(
+        Integer, server_default=str(int(time.time())), onupdate=str(int(time.time()))
+    )  # 更新时间
 
     url = Column(String, unique=True)  # 地址
     speed = Column(Float)  # 速度
@@ -35,12 +38,14 @@ class SubscribeVmss(Base):
 
 # 抓取的配置表
 class SubscribeCrawl(Base):
-    __tablename__ = 'subscribe_crawl'  # 表的名字
+    __tablename__ = "subscribe_crawl"  # 表的名字
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
     created_at = Column(Integer, server_default=str(int(time.time())))  # 开始时间
-    updated_at = Column(Integer, server_default=str(int(time.time())), onupdate=str(int(time.time())))  # 更新时间
+    updated_at = Column(
+        Integer, server_default=str(int(time.time())), onupdate=str(int(time.time()))
+    )  # 更新时间
 
     url = Column(String, unique=True)  # 地址
     type = Column(Integer)  # 类型
@@ -53,7 +58,7 @@ class SubscribeCrawl(Base):
 
 
 class SubscribeAuthentication(Base):
-    __tablename__ = 'subscribe_authentication'  # 表的名字
+    __tablename__ = "subscribe_authentication"  # 表的名字
 
     # 定义各字段
     id = Column(Integer, primary_key=True)  # id
@@ -90,19 +95,23 @@ class SubscribeLastVmssState(Enum):
 
 
 if DB_URL.startswith("sqlite"):
-    engine = create_engine(DB_URL, echo=SQLALCHEMY_DEBUG,
-                           pool_pre_ping=True,
-                           pool_recycle=3600,
-                           # pool_size=10,
-                           # pool_timeout=5
-                           )
+    engine = create_engine(
+        DB_URL,
+        echo=SQLALCHEMY_DEBUG,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        # pool_size=10,
+        # pool_timeout=5
+    )
 else:
-    engine = create_engine(DB_URL, echo=SQLALCHEMY_DEBUG,
-                           pool_pre_ping=True,
-                           pool_recycle=3600,
-                           # pool_size=10,
-                           # pool_timeout=5
-                           )
+    engine = create_engine(
+        DB_URL,
+        echo=SQLALCHEMY_DEBUG,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        # pool_size=10,
+        # pool_timeout=5
+    )
 
 # 创建表
 Base.metadata.create_all(engine)
