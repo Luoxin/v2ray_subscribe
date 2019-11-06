@@ -36,8 +36,8 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
                     url_type = "" if v.get("net") is None else v.get("net")
                 except:
                     pass
-            elif v2ray_url.startswith("ss://"):
-                return False
+            # elif v2ray_url.startswith("ss://"):
+            #     return False
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
 
@@ -79,7 +79,7 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
     }
     re_text = ""
     try:
-        proxies = {}
+        proxies = None
         if isinstance(rule, dict):
             if rule.get("need_proxy"):
                 proxies = PROXIES_CRAWLER
@@ -98,6 +98,8 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
     except:
         logger.error("结果解码失败 {}".format(re_text))
         logger.error("抓取的地址为 {}".format(url))
+        if proxies is not None:
+            logger.error("使用了代理 {}".format(proxies))
         logger.error(traceback.format_exc())
 
 

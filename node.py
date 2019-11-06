@@ -57,7 +57,7 @@ class V2ray(Node):
                 {
                     "tag": "proxy",
                     "port": 1086,
-                    "listen": "0.0.0.0",
+                    "listen": "127.0.0.1",
                     "protocol": "socks",
                     "sniffing": {"enabled": True, "destOverride": ["http", "tls"]},
                     "settings": {
