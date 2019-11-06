@@ -24,64 +24,9 @@ from conf.conf import (
 from log import logger
 from node import V2ray, Shadowsocks
 from orm import session, SubscribeVmss
+from proxy_server import V2rayServer
 
 ua = UserAgent()
-
-
-class V2rayServer:
-    def __init__(self, path, conf):
-        self.cmd = "{} -config {}".format(path, conf)
-        self.pid = 0
-
-    def run_server(self):
-        try:
-            run = threading.Thread(None, self.__run_server(), None,)
-            run.daemon = True
-            run.start()
-        except:
-            logger.error(traceback.format_exc())
-
-    def __run_server(self):
-        try:
-            if self.pid == 0:
-                ps = subprocess.Popen(self.cmd)
-                self.pid = ps.pid
-        except:
-            logger.error(traceback.format_exc())
-
-    def kill(self):
-        try:
-            if self != 0:
-                os.kill(self.pid, signal.SIGTERM)
-                self.pid = 0
-        except:
-            logger.error(traceback.format_exc())
-
-    def restart(self):
-        # 如果未记录这个，需要重新获取一遍pid
-        if self.pid == 0:
-            self.__find_pid()
-
-        # 如果存在已有的服务，再kill
-        if self.pid != 0:
-            self.kill()
-
-        self.run_server()
-
-    def __find_pid(self):
-        pid_list = psutil.pids()
-
-        for pid in pid_list:
-            try:
-                p = psutil.Process(pid)
-                cmd = p.cmdline()
-                cmd = " ".join(cmd)
-                # print(cmd)
-                if cmd == self.cmd:
-                    self.pid = pid
-                    return
-            except:
-                pass
 
 
 v2ray_server = V2rayServer(V2RAY_SERVICE_PATH, V2RAY_CONFIG_LOCAL)
