@@ -33,6 +33,7 @@ class V2rayServer:
     def kill(self):
         try:
             if self.pid != 0:
+                # logger.debug("wil kill old progress, pid is {}".format(self.pid))
                 os.kill(self.pid, signal.SIGTERM)
                 self.pid = 0
         except:
