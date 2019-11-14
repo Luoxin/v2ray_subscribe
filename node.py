@@ -1,3 +1,6 @@
+from conf.conf import CHECK_PORT
+
+
 class Node:
     # ip
     ip = ""
@@ -56,7 +59,7 @@ class V2ray(Node):
             "inbounds": [
                 {
                     "tag": "proxy",
-                    "port": 1086,
+                    "port": CHECK_PORT,
                     "listen": "127.0.0.1",
                     "protocol": "socks",
                     "sniffing": {"enabled": True, "destOverride": ["http", "tls"]},
@@ -446,7 +449,7 @@ class Shadowsocks(Node):
             },
             "inbounds": [
                 {
-                    "port": 1086,
+                    "port": CHECK_PORT,
                     "listen": "127.0.0.1",
                     "protocol": "socks",
                     "settings": {"udp": True},
