@@ -11,7 +11,8 @@ LOG_DEBUG = True
 # LOG_PATH = "/root/log/v2ray_subscribe.log"
 LOG_PATH = "v2ray_subscribe.log"
 
-TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
+# TEST_FILE_URL = "http://cachefly.cachefly.net/1mb.test"
+TEST_FILE_URL = "http://speedtest-sfo2.digitalocean.com/1mb.test "
 # TEST_FILE_URL = "http://www.google.com"
 
 # host
