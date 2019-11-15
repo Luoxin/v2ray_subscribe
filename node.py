@@ -119,6 +119,7 @@ class V2ray(Node):
                             "geosite:speedtest",
                             "geosite:bbc",
                             "domain:gvt1.com",
+                            "domain:cachefly.net",
                             "domain:textnow.com",
                             "domain:twitch.tv",
                             "domain:wikileaks.org",
@@ -228,6 +229,7 @@ class V2ray(Node):
                             "domain:moji.com",
                             "domain:moke.com",
                             "domain:mtalk.google.com",
+                            "domain:cachefly.net",
                             "domain:mxhichina.com",
                             "domain:myqcloud.com",
                             "domain:myunlu.com",
@@ -439,6 +441,7 @@ class Shadowsocks(Node):
     def __init__(self, ip, port, remark, security, password):
         super(Shadowsocks, self).__init__(ip, port, remark, security)
         self.password = password
+
 
     def format_config(self):
         ss_config = {
