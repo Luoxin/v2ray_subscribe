@@ -51,6 +51,7 @@ def check_time_consistent() -> bool:
 
 # 保持系统时间一致性
 def keep_time_consistent():
+    need_start = False
     logger.info("时间校验服务启动")
     while True:
         if not check_time_consistent():

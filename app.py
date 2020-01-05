@@ -19,11 +19,11 @@ app = Flask(__name__)
 def get_alive_url():
     data_list = (
         session.query(SubscribeVmss)
-            .filter(SubscribeVmss.speed > 0)
-            .filter(SubscribeVmss.health_points > HEALTH_POINTS)
-            .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
-            .order_by(SubscribeVmss.speed.desc())
-            .all()
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
+        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
     )
     return data_list
 
@@ -34,9 +34,9 @@ def count():
         session.query(SubscribeVmss).count(),
         session.query(SubscribeVmss).filter(SubscribeVmss.speed > 0).count(),
         session.query(SubscribeVmss)
-            .filter(SubscribeVmss.speed > 0)
-            .filter(SubscribeVmss.type == "ws")
-            .count(),
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.type == "ws")
+        .count(),
     )
 
 
@@ -68,12 +68,12 @@ def get_all_link_by_max_speed_by_mobile_phone():
 
     can_be_used = (
         session.query(SubscribeVmss)
-            .filter(SubscribeVmss.speed > 0)
-            .filter(SubscribeVmss.health_points > HEALTH_POINTS)
-            .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
-            .filter(SubscribeVmss.type == "ws")
-            .order_by(SubscribeVmss.speed.desc())
-            .all()
+        .filter(SubscribeVmss.speed > 0)
+        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
+        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .filter(SubscribeVmss.type == "ws")
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
     )
 
     if can_be_used.__len__() == 0:
@@ -94,11 +94,11 @@ def get_all_link_by_max_speed_by_no_check():
 
     can_be_used = (
         session.query(SubscribeVmss)
-            .filter(SubscribeVmss.speed >= 0)
-            .filter(SubscribeVmss.updated_at >= int(time.time() - 60 * 60 * 24))
-            .filter(SubscribeVmss.type == "ws")
-            .order_by(SubscribeVmss.speed.desc())
-            .all()
+        .filter(SubscribeVmss.speed >= 0)
+        .filter(SubscribeVmss.updated_at >= int(time.time() - 60 * 60 * 24))
+        .filter(SubscribeVmss.type == "ws")
+        .order_by(SubscribeVmss.speed.desc())
+        .all()
     )
 
     vmss_list = []
@@ -253,10 +253,10 @@ def after_request(rsp):
     return rsp
 
 
-update = Thread(None, update_new_node, None, )
+update = Thread(None, update_new_node, None,)
 update.daemon = True
 update.start()
-check_alive = Thread(None, check_link_alive, None, )
+check_alive = Thread(None, check_link_alive, None,)
 check_alive.daemon = True
 check_alive.start()
 if __name__ == "__main__":

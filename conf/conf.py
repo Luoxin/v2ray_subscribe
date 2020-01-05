@@ -44,7 +44,7 @@ ERROR_ENUM_PATH = "./conf/error.yaml"
 # 数据库地址
 # 如果使用 `sqlite` 请加上 ?check_same_thread=False
 # DB_URL = "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
-DB_URL = "sqlite:///D:/v2ray_subscribe/subscribe.vdb?check_same_thread=False"
+DB_URL = "sqlite:///subscribe.vdb?check_same_thread=False"
 # DB_URL = "postgresql+psycopg2://postgres:postgres@106.12.107.126:5432/dev"
 
 # 默认检测间隔
@@ -66,9 +66,11 @@ V2RAY_SERVICE_PATH = "C:/Users/Luoxin/Desktop/v2ray/v2ray.exe"
 # V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
 V2RAY_CONFIG_LOCAL = "C:/Users/Luoxin/Desktop/v2ray/c.json"
 
+# 是否开启NTP自动校时服务
+NTP_SERVER_ENABLE = True
 # ntp server
 NTP_HOST = "ntp.aliyun.com"
+# ntp 服务端口
 NTP_PORT = 123
-
 # ntp 请求间隔
-NTP_INTERVAL = 32
+NTP_INTERVAL = 64
