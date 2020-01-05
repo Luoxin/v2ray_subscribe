@@ -3,10 +3,10 @@ import sys
 sys.path.append("../")
 
 # 模块名
-MODEL_NAME = "v2ray_subscribe"
+SERVER_NAME = "v2ray_subscribe"
 
 # 日志级别
-LOG_DEBUG = True
+LOG_DEBUG = False
 # 日志路径
 # LOG_PATH = "/root/log/v2ray_subscribe.log"
 LOG_PATH = "v2ray_subscribe.log"
@@ -65,3 +65,10 @@ V2RAY_SERVICE_PATH = "C:/Users/Luoxin/Desktop/v2ray/v2ray.exe"
 
 # V2RAY_CONFIG_LOCAL = "/etc/v2ray/config.json"
 V2RAY_CONFIG_LOCAL = "C:/Users/Luoxin/Desktop/v2ray/c.json"
+
+# ntp server
+NTP_HOST = "ntp.aliyun.com"
+NTP_PORT = 123
+
+# ntp 请求间隔
+NTP_INTERVAL = 32
