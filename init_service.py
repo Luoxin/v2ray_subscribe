@@ -6,11 +6,7 @@ import threading
 
 from api.time_info import keep_time_consistent
 
-task_func_map = {
-    keep_time_consistent: {
-        "startup_mode": "thread",
-    }
-}
+task_func_map = {keep_time_consistent: {"startup_mode": "thread", "enable": False}}
 
 
 # process_pool = multiprocessing.Pool(3)
@@ -18,8 +14,10 @@ task_func_map = {
 
 def start_task():
     for task, rule in task_func_map.items():
-        startup_mode = "thread" if rule.get("startup_mode") is None else rule.get("startup_mode")
-        enable = False if rule.get("enable") is not None else rule.get("enable")
+        startup_mode = (
+            "thread" if rule.get("startup_mode") is None else rule.get("startup_mode")
+        )
+        enable = True if rule.get("enable") is None else rule.get("enable")
 
         # 如果不开启这个任务，就直接查找下一个任务
         if not enable:

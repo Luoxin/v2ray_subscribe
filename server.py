@@ -1,14 +1,21 @@
+"""
+    主服务
+"""
+from conf.conf import init_state
+
+init_state()
+
+
 import traceback
 
 from flask import Flask, ctx, jsonify
-from flask_sqlalchemy import SQLAlchemy
 
-from conf.conf import init_state
 from conntext import JSONResponse, before_request
 from error_exception import InternalException
 from init_service import init_service
 from route_list import ROUTE_LIST
 from utils import logger
+
 
 app = Flask(__name__)
 
@@ -23,7 +30,6 @@ def init_route_list():
         app.register_blueprint(ROUTE)
 
 
-init_state()
 init_route_list()
 init_service()
 

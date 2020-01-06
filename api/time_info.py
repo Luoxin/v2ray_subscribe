@@ -10,6 +10,7 @@ import traceback
 import ntplib
 from flask import Blueprint
 
+from conf.conf import get_conf
 from utils import logger  # 日志
 
 time_info = Blueprint("time_info", __name__)
@@ -21,9 +22,9 @@ def time_info_index():
 
 
 # 校验系统时间
-def check_time_consistent() -> bool:
+def check_time_consistent(host, port) -> bool:
     try:
-        rsp = ntplib.NTPClient().request(host=NTP_HOST, port=NTP_PORT)
+        rsp = ntplib.NTPClient().request(host=host, port=port)
         now = rsp.tx_time
         if sys.platform == "win32":
             subprocess.check_output(
@@ -49,7 +50,10 @@ def check_time_consistent() -> bool:
 def keep_time_consistent():
     need_start = False
     logger.info("时间校验服务启动")
+    ntp_interval = get_conf("NTP_INTERVAL")
+    ntp_host = get_conf("NTP_HOST")
+    ntp_port = get_conf("NTP_PORT")
     while True:
-        if not check_time_consistent():
+        if not check_time_consistent(ntp_host, ntp_port):
             break
-        time.sleep(NTP_INTERVAL)
+        time.sleep(ntp_interval)

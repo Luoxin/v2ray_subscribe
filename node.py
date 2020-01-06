@@ -442,7 +442,6 @@ class Shadowsocks(Node):
         super(Shadowsocks, self).__init__(ip, port, remark, security)
         self.password = password
 
-
     def format_config(self):
         ss_config = {
             "log": {
