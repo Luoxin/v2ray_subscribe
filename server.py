@@ -1,7 +1,7 @@
 """
     主服务
 """
-from conf.conf import init_state
+from conf.conf import init_state, get_conf
 
 init_state()
 
@@ -71,4 +71,4 @@ def favicon():
 
 
 if __name__ == "__main__":
-    app.run(HOST, port=PORT, threaded=True)
+    app.run(get_conf("HOST"), port=get_conf("PORT"), threaded=True)

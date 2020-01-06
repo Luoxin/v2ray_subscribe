@@ -4,7 +4,7 @@ SERVER_NAME: "v2ray_subscribe"
 # host
 HOST: "0.0.0.0"
 # port
-PORT: 1084
+PORT: 1800
 
 # 日志级别
 LOG_DEBUG: false
