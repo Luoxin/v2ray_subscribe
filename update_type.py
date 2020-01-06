@@ -1,9 +1,9 @@
 import base64
 import json
 
-from orm import session, SubscribeVmss
+from orm import session, subscribe_vmss
 
-data_list = session.query(SubscribeVmss).all()
+data_list = session.query(subscribe_vmss).all()
 for i, data in enumerate(data_list):
     try:
         v2ray_url = data.url
@@ -16,8 +16,8 @@ for i, data in enumerate(data_list):
                 )
                 url_type = "" if v.get("net") is None else v.get("net")
                 print(url_type)
-                session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
-                    {SubscribeVmss.type: url_type,}
+                session.query(subscribe_vmss).filter(subscribe_vmss.id == data.id).update(
+                    {subscribe_vmss.type: url_type, }
                 )
             except:
                 pass

@@ -23,7 +23,7 @@ from conf.conf import (
 )
 from log import logger
 from node import V2ray, Shadowsocks
-from orm import session, SubscribeVmss
+from orm import session, subscribe_vmss
 from proxy_server import V2rayServer
 
 ua = UserAgent()
@@ -129,10 +129,10 @@ def check_link_alive():
     while True:
         try:
             data_list = (
-                session.query(SubscribeVmss)
-                .filter(SubscribeVmss.next_time < int(time.time()))
-                .filter(SubscribeVmss.health_points > 0)
-                .order_by(SubscribeVmss.speed.desc())
+                session.query(subscribe_vmss)
+                .filter(subscribe_vmss.next_time < int(time.time()))
+                .filter(subscribe_vmss.health_points > 0)
+                .order_by(subscribe_vmss.speed.desc())
                 .all()
             )
             # filter(SubscribeVmss.last_state.notin_(1)). \
@@ -149,44 +149,44 @@ def check_link_alive():
                             state = int(-1 * speed)
 
                         if speed > 0:
-                            session.query(SubscribeVmss).filter(
-                                SubscribeVmss.id == data.id
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
                             ).update(
                                 {
-                                    SubscribeVmss.speed: speed,
-                                    SubscribeVmss.health_points: HEALTH_POINTS + 1
+                                    subscribe_vmss.speed: speed,
+                                    subscribe_vmss.health_points: HEALTH_POINTS + 1
                                     if data.health_points < HEALTH_POINTS
                                     else data.health_points + 1,
-                                    SubscribeVmss.next_time: int(
+                                    subscribe_vmss.next_time: int(
                                         random.uniform(0.5, 1.5) * data.interval
                                     )
-                                    + int(time.time()),
-                                    SubscribeVmss.last_state: state,
+                                                              + int(time.time()),
+                                    subscribe_vmss.last_state: state,
                                 }
                             )
                         elif speed == 0 or (state != 0 and speed < 0):
-                            session.query(SubscribeVmss).filter(
-                                SubscribeVmss.id == data.id
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
                             ).update(
                                 {
-                                    SubscribeVmss.health_points: HEALTH_POINTS
+                                    subscribe_vmss.health_points: HEALTH_POINTS
                                     if data.health_points > HEALTH_POINTS
                                     else data.health_points - 1,
-                                    SubscribeVmss.next_time: int(
+                                    subscribe_vmss.next_time: int(
                                         random.uniform(0.5, 1.5) * data.interval
                                     )
-                                    + int(time.time()),
-                                    SubscribeVmss.last_state: state,
+                                                              + int(time.time()),
+                                    subscribe_vmss.last_state: state,
                                 }
                             )
                         else:
-                            session.query(SubscribeVmss).filter(
-                                SubscribeVmss.id == data.id
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
                             ).update(
                                 {
-                                    SubscribeVmss.speed: speed,
-                                    SubscribeVmss.health_points: -1,
-                                    SubscribeVmss.last_state: state,
+                                    subscribe_vmss.speed: speed,
+                                    subscribe_vmss.health_points: -1,
+                                    subscribe_vmss.last_state: state,
                                 }
                             )
                         session.commit()

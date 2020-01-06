@@ -10,7 +10,7 @@ import utils
 from conf.conf import HEALTH_POINTS, Interval, PROXIES_CRAWLER
 from log import logger
 from memory_cache import MemoryCache
-from orm import session, SubscribeVmss, SubscribeCrawl
+from orm import session, subscribe_vmss, SubscribeCrawl
 
 from fake_useragent import UserAgent
 
@@ -22,7 +22,7 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
         if v2ray_url == "":
             return
         data = (
-            session.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+            session.query(subscribe_vmss).filter(subscribe_vmss.url == v2ray_url).first()
         )
         if data is None:
             url_type = ""
@@ -41,7 +41,7 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
             else:  # 把不能被 v2ray 客户端使用的链接过滤掉
                 return False
 
-            new_data = SubscribeVmss(
+            new_data = subscribe_vmss(
                 url=v2ray_url,
                 speed=0,
                 health_points=HEALTH_POINTS,
@@ -58,11 +58,11 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
             if data.speed < 0:
                 data.speed = 0
 
-            session.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+            session.query(subscribe_vmss).filter(subscribe_vmss.id == data.id).update(
                 {
-                    SubscribeVmss.health_points: HEALTH_POINTS,
-                    SubscribeVmss.speed: data.speed,
-                    SubscribeVmss.crawl_id: crawl_id,
+                    subscribe_vmss.health_points: HEALTH_POINTS,
+                    subscribe_vmss.speed: data.speed,
+                    subscribe_vmss.crawl_id: crawl_id,
                 }
             )
             session.commit()
