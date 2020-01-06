@@ -32,12 +32,8 @@ def get_alive_url():
 def count():
     return "当前节点数量为 {}</br>其中高速节点数量为 {}</br>可供手机使用的高速节点数量为 {}".format(
         session.query(SubscribeVmss).count(),
+        session.query(SubscribeVmss).filter(SubscribeVmss.speed > 0).count(),
         session.query(SubscribeVmss)
-        .filter(SubscribeVmss.speed > 0)
-        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
-        .count(),
-        session.query(SubscribeVmss)
-        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
         .filter(SubscribeVmss.speed > 0)
         .filter(SubscribeVmss.type == "ws")
         .count(),
