@@ -5,7 +5,6 @@ from conf.conf import init_state
 
 init_state()
 
-
 import traceback
 
 from flask import Flask, ctx, jsonify
@@ -15,7 +14,6 @@ from error_exception import InternalException
 from init_service import init_service
 from route_list import ROUTE_LIST
 from utils import logger
-
 
 app = Flask(__name__)
 
