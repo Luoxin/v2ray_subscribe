@@ -3,7 +3,6 @@ import yaml
 from enum import Enum
 from utils.instrument import Instrument
 from utils import logger  # 日志
-from conf.conf import ERROR_ENUM_PATH
 
 
 # 错误的处理

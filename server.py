@@ -3,7 +3,7 @@ import traceback
 from flask import Flask, ctx, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
-from conf.conf import HOST, PORT
+from conf.conf import init_state
 from conntext import JSONResponse, before_request
 from error_exception import InternalException
 from init_service import init_service
@@ -16,9 +16,6 @@ app.response_class = JSONResponse
 app.before_request(before_request)
 app.logger = logger
 
-app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
-db = SQLAlchemy(app)
-
 
 def init_route_list():
     for ROUTE in ROUTE_LIST:
@@ -26,6 +23,7 @@ def init_route_list():
         app.register_blueprint(ROUTE)
 
 
+init_state()
 init_route_list()
 init_service()
 

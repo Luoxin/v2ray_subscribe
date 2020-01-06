@@ -5,7 +5,6 @@ import multiprocessing
 import threading
 
 from api.time_info import keep_time_consistent
-from conf.conf import NTP_SERVER_ENABLE
 
 task_func_map = {
     keep_time_consistent: {

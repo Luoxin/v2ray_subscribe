@@ -1,19 +1,15 @@
 """
     时间服务，只要包括了校时以及时间戳的返回
 """
+import datetime
 import subprocess
 import sys
 import time
-
-import datetime
+import traceback
 
 import ntplib
-import requests
-import traceback
-from flask import Blueprint, request, redirect
+from flask import Blueprint
 
-from conf.conf import NTP_HOST, NTP_PORT, NTP_INTERVAL
-from error_exception import create_error_with_msg
 from utils import logger  # 日志
 
 time_info = Blueprint("time_info", __name__)
