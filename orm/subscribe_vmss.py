@@ -10,23 +10,27 @@ class SubscribeVmss(Model):
     updated_at = IntegerField(default=time.time(), verbose_name="更新时间")
 
     url = CharField(verbose_name="地址")
-    speed = FloatField(verbose_name="速度")
-
     network_protocol_type = CharField(max_length=50, verbose_name="网络协议类型")
-    health_points = IntegerField(verbose_name="生命值")
+
+    # 各个维度的速度测试
+    speed_google = FloatField(verbose_name="google访问速度")
+    network_delay_google = FloatField(verbose_name="google访问延时")
+
+    speed_youtube = FloatField(verbose_name="youtube访问速度")
+    network_delay_youtube = FloatField(verbose_name="youtube访问延时")
+
+    speed_internet = FloatField(verbose_name="测速网站 测速速度")
+    network_delay_internet = FloatField(verbose_name="测速网站 访问延时")
+
     next_time = IntegerField(verbose_name="下一次的测速时间")
     interval = IntegerField(verbose_name="间隔")
-
     crawl_id = IntegerField(verbose_name="关联的 SubscribeCrawl 的 id")
-
-    last_state = IntegerField(verbose_name="最后一次测试的状态")
 
     class Meta:
         # database = db
         primary_key = CompositeKey("id")  # 主键
         indexes = (
             ("url", True),
-            ("last_state", False),
             ("network_protocol_type", False),
         )  # 索引
 
