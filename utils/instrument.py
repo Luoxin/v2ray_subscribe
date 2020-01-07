@@ -1,3 +1,4 @@
+import hashlib
 import json
 import uuid as uu
 
@@ -27,3 +28,9 @@ class Instrument:
         :return: uuid
         """
         return uu.uuid4().hex
+
+    @staticmethod
+    def md5(s) -> str:
+        hl = hashlib.md5()
+        hl.update(s.encode(encoding='utf-8'))
+        return hl.hexdigest()
