@@ -21,7 +21,7 @@ class Instrument:
         return data.encode().decode("utf-8")
 
     @staticmethod
-    def uuid() -> str:
+    def gen_uuid() -> str:
         """
             获取uuid
         :return: uuid
