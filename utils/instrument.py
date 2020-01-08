@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import uuid as uu
 
 
 def is_json(data: (bytes, str)) -> bool:
