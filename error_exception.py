@@ -1,7 +1,6 @@
 import yaml
 
 from enum import Enum
-from utils.instrument import Instrument
 from utils import logger  # 日志
 
 

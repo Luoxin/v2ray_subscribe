@@ -10,7 +10,7 @@ import utils
 from conf.conf import HEALTH_POINTS, Interval, PROXIES_CRAWLER
 from log import logger
 from memory_cache import MemoryCache
-from orm import session, subscribe_vmss, SubscribeCrawl
+from orm import session, subscribe_vmss, subscribe_crawl
 
 from fake_useragent import UserAgent
 
@@ -105,22 +105,22 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
 
 def crawl_by_subscribe():
     data_list = (
-        session.query(SubscribeCrawl)
-        .filter(SubscribeCrawl.next_time <= int(time.time()))
-        .filter(SubscribeCrawl.is_closed == False)
-        .filter(SubscribeCrawl.type == 1)
+        session.query(subscribe_crawl)
+        .filter(subscribe_crawl.next_time <= int(time.time()))
+        .filter(subscribe_crawl.is_closed == False)
+        .filter(subscribe_crawl.type == 1)
         .all()
     )
 
     for data in data_list:
         try:
             crawl_by_subscribe_url(data.url, data.id)
-            session.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
+            session.query(subscribe_crawl).filter(subscribe_crawl.id == data.id).update(
                 {
-                    SubscribeCrawl.next_time: int(
+                    subscribe_crawl.next_time: int(
                         random.uniform(0.5, 1.5) * data.interval
                     )
-                    + int(time.time()),
+                                               + int(time.time()),
                 }
             )
             session.commit()

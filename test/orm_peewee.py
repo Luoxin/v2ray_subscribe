@@ -1,5 +1,7 @@
 # https://www.jianshu.com/p/84e667320ab3
 from datetime import date
+from playhouse.shortcuts import model_to_dict, dict_to_model
+
 
 from peewee import *
 
@@ -48,3 +50,8 @@ print(grandma)
 query = Person.select().where(Person.name == 'Bob').order_by(Person.name)
 for person in query:
     print(person.name, person.birthday)
+
+# 把数据对象转成字典
+user = Person.create(name='jack')
+u = model_to_dict(user)
+print(u)
