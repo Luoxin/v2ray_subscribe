@@ -4,7 +4,7 @@ class SubscribeCrawl(Model):
     """
        抓取的配置表
     """
-    id = IntegerField()  # id
+    id = IntegerField(primary_key=True)  # id
     created_at = Column(Integer, server_default=str(int(time.time())))  # 开始时间
     updated_at = Column(
         Integer, server_default=str(int(time.time())), onupdate=str(int(time.time()))
