@@ -1,9 +1,8 @@
+import json
 from datetime import date
-
 from peewee import *
 
 db = SqliteDatabase("people.db")
-
 
 #
 # class SubscribeAuthentication(Base):

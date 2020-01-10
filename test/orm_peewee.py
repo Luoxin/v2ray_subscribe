@@ -2,7 +2,6 @@
 from datetime import date
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-
 from peewee import *
 
 db = SqliteDatabase('people.db')

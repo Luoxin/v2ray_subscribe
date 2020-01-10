@@ -106,10 +106,10 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
 def crawl_by_subscribe():
     data_list = (
         session.query(subscribe_crawl)
-        .filter(subscribe_crawl.next_time <= int(time.time()))
-        .filter(subscribe_crawl.is_closed == False)
-        .filter(subscribe_crawl.type == 1)
-        .all()
+            .filter(subscribe_crawl.next_time <= int(time.time()))
+            .filter(subscribe_crawl.is_closed == False)
+            .filter(subscribe_crawl.type == 1)
+            .all()
     )
 
     for data in data_list:

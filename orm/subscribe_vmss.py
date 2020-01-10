@@ -1,18 +1,19 @@
 import time
-from peewee import *
 from orm import db
+from peewee import *
 
 
 class SubscribeVmss(Model):
     """
         抓取到的数据表
     """
+
     id = IntegerField(primary_key=True)
 
     created_at = IntegerField(default=time.time(), verbose_name="创建时间")
     updated_at = IntegerField(default=time.time(), verbose_name="更新时间")
 
-    url = CharField(verbose_name="地址", max_length=1000, null=False, unique=True)
+    url = CharField(max_length=1000, null=False, unique=True, verbose_name="节点分享地址")
     network_protocol_type = CharField(max_length=50, verbose_name="网络协议类型")
 
     # 各个维度的速度测试
