@@ -1,6 +1,6 @@
 from datetime import time
 
-from orm import SubscribeCrawl, session
+from orm import subscribe_crawl, session
 
 url = ""
 
@@ -15,8 +15,8 @@ url = ""
 # session.add(new_data)
 
 
-session.query(SubscribeCrawl).filter(SubscribeCrawl.id == 1571721122).update(
-    {SubscribeCrawl.rule: {"need_proxy": True}}
+session.query(subscribe_crawl).filter(subscribe_crawl.id == 1571721122).update(
+    {subscribe_crawl.rule: {"need_proxy": True}}
 )
 
 session.commit()

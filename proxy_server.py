@@ -35,9 +35,11 @@ class V2rayServer:
             if self.pid != 0:
                 # logger.debug("wil kill old progress, pid is {}".format(self.pid))
                 os.kill(self.pid, signal.SIGTERM)
-                self.pid = 0
         except:
             logger.error(traceback.format_exc())
+            logger.error("进程pid为 {}".format(self.pid))
+        finally:
+            self.pid = 0
 
     def restart(self):
         # 如果未记录这个，需要重新获取一遍pid

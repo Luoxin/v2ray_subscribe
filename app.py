@@ -11,18 +11,18 @@ from check_alive import check_link_alive
 from conf.conf import *
 from crawl import add_new_vmess, update_new_node
 from log import logger
-from orm import session, SubscribeVmss
+from orm import session, subscribe_vmss
 
 app = Flask(__name__)
 
 
 def get_alive_url():
     data_list = (
-        session.query(SubscribeVmss)
-        .filter(SubscribeVmss.speed > 0)
-        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
-        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
-        .order_by(SubscribeVmss.speed.desc())
+        session.query(subscribe_vmss)
+        .filter(subscribe_vmss.speed > 0)
+        .filter(subscribe_vmss.health_points > HEALTH_POINTS)
+        .filter(subscribe_vmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .order_by(subscribe_vmss.speed.desc())
         .all()
     )
     return data_list
@@ -31,11 +31,11 @@ def get_alive_url():
 @app.route("/count")
 def count():
     return "当前节点数量为 {}</br>其中高速节点数量为 {}</br>可供手机使用的高速节点数量为 {}".format(
-        session.query(SubscribeVmss).count(),
-        session.query(SubscribeVmss).filter(SubscribeVmss.speed > 0).count(),
-        session.query(SubscribeVmss)
-        .filter(SubscribeVmss.speed > 0)
-        .filter(SubscribeVmss.type == "ws")
+        session.query(subscribe_vmss).count(),
+        session.query(subscribe_vmss).filter(subscribe_vmss.speed > 0).count(),
+        session.query(subscribe_vmss)
+        .filter(subscribe_vmss.speed > 0)
+        .filter(subscribe_vmss.type == "ws")
         .count(),
     )
 
@@ -67,12 +67,12 @@ def get_all_link_by_max_speed_by_mobile_phone():
         return authentication
 
     can_be_used = (
-        session.query(SubscribeVmss)
-        .filter(SubscribeVmss.speed > 0)
-        .filter(SubscribeVmss.health_points > HEALTH_POINTS)
-        .filter(SubscribeVmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
-        .filter(SubscribeVmss.type == "ws")
-        .order_by(SubscribeVmss.speed.desc())
+        session.query(subscribe_vmss)
+        .filter(subscribe_vmss.speed > 0)
+        .filter(subscribe_vmss.health_points > HEALTH_POINTS)
+        .filter(subscribe_vmss.updated_at >= int(int(time.time()) - 24 * 60 * 60))
+        .filter(subscribe_vmss.type == "ws")
+        .order_by(subscribe_vmss.speed.desc())
         .all()
     )
 
@@ -93,11 +93,11 @@ def get_all_link_by_max_speed_by_no_check():
         return authentication
 
     can_be_used = (
-        session.query(SubscribeVmss)
-        .filter(SubscribeVmss.speed >= 0)
-        .filter(SubscribeVmss.updated_at >= int(time.time() - 60 * 60 * 24))
-        .filter(SubscribeVmss.type == "ws")
-        .order_by(SubscribeVmss.speed.desc())
+        session.query(subscribe_vmss)
+        .filter(subscribe_vmss.speed >= 0)
+        .filter(subscribe_vmss.updated_at >= int(time.time() - 60 * 60 * 24))
+        .filter(subscribe_vmss.type == "ws")
+        .order_by(subscribe_vmss.speed.desc())
         .all()
     )
 
@@ -110,7 +110,7 @@ def get_all_link_by_max_speed_by_no_check():
 
 @app.route("/maxspeed")
 def max_speed():
-    data = session.query(SubscribeVmss).order_by(SubscribeVmss.speed.desc()).first()
+    data = session.query(subscribe_vmss).order_by(subscribe_vmss.speed.desc()).first()
     return "当前最大的速度为：{}kb/s".format(data.speed)
 
 

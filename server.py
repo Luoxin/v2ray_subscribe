@@ -1,9 +1,14 @@
+"""
+    主服务
+"""
+from conf.conf import init_state, get_conf
+
+init_state()
+
 import traceback
 
 from flask import Flask, ctx, jsonify
-from flask_sqlalchemy import SQLAlchemy
 
-from conf.conf import HOST, PORT
 from conntext import JSONResponse, before_request
 from error_exception import InternalException
 from init_service import init_service
@@ -15,9 +20,6 @@ app = Flask(__name__)
 app.response_class = JSONResponse
 app.before_request(before_request)
 app.logger = logger
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
-db = SQLAlchemy(app)
 
 
 def init_route_list():
@@ -69,4 +71,4 @@ def favicon():
 
 
 if __name__ == "__main__":
-    app.run(HOST, port=PORT, threaded=True)
+    app.run(get_conf("HOST"), port=get_conf("PORT"), threaded=True)
