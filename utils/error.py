@@ -62,8 +62,8 @@ class Error:
         elif isinstance(obj, Error):
             return self.errcode == obj.errcode
         elif isinstance(obj, dict):
-            return self.errcode == 0 if obj.get("errcode") is None else obj.get("errcode")
+            return (
+                self.errcode == 0 if obj.get("errcode") is None else obj.get("errcode")
+            )
         else:
             return self.errcode == 0
-
-

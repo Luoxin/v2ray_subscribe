@@ -48,12 +48,12 @@ class Logger(logging.Logger):
     )
 
     def __init__(
-            self,
-            name=SERVER_NAME,
-            debug=False,
-            log_path=None,
-            toaddrs=[],
-            level=logging.INFO,
+        self,
+        name=SERVER_NAME,
+        debug=False,
+        log_path=None,
+        toaddrs=[],
+        level=logging.INFO,
     ):
         """
         :param name: 日志管理器的名字
@@ -91,12 +91,12 @@ class PushLogger(logging.Logger):
     )
 
     def __init__(
-            self,
-            name="logger_push",
-            debug=False,
-            log_path=None,
-            toaddrs=[],
-            level=logging.INFO,
+        self,
+        name="logger_push",
+        debug=False,
+        log_path=None,
+        toaddrs=[],
+        level=logging.INFO,
     ):
         """
         :param name: 日志管理器的名字

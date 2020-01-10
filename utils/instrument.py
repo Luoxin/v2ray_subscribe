@@ -31,7 +31,7 @@ def gen_uuid() -> str:
 
 def md5(s) -> str:
     hl = hashlib.md5()
-    hl.update(s.encode(encoding='utf-8'))
+    hl.update(s.encode(encoding="utf-8"))
     return hl.hexdigest()
 
 
@@ -44,6 +44,7 @@ def base64_encode(s: (str, int, float, dict)) -> str:
         s = json.dumps(s)
 
     return base64.b64encode(s.encode()).decode("utf-8")
+
 
 def base64_decode(base64_str):
     base64_str = base64_str.replace("\n", "").replace("-", "+").replace("_", "/")
