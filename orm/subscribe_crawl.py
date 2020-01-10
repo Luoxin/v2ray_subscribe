@@ -20,10 +20,9 @@ class SubscribeCrawl(Model):
     crawl_type = IntegerField(verbose_name="抓取类型")
     rule = JSONField(verbose_name="抓取规则")
     is_closed = BooleanField(verbose_name="是否禁用规则")
-    next_time = Column(Integer)  # 下一次的测速时间
-    interval = Column(Integer)  # 间隔
-
-    note = Column(String)  # 备注信息
+    next_time = IntegerField(verbose_name="下一次的测速时间")
+    interval = IntegerField(verbose_name="间隔")
+    note = TextField(verbose_name="备注信息")
 
 
 # @unique
