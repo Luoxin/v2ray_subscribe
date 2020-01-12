@@ -1,7 +1,9 @@
 import time
+from enum import unique, Enum
 
-from playhouse.sqlite_ext import *
+from orm import *
 
+# from playhouse.sqlite_ext import *
 # from playhouse.mysql_ext import *
 # from playhouse.postgres_ext import *
 
@@ -24,9 +26,23 @@ class SubscribeCrawl(Model):
     interval = IntegerField(verbose_name="间隔")
     note = TextField(verbose_name="备注信息")
 
+    class Meta:
+        database = db
+        db_name = "subscribe_vmss"
 
-# @unique
-# class SubscribeCrawlType(Enum):
-#     Nil = 0
-#     Subscription = 1
-#     Xpath = 2
+    def save(self, *args, **kwargs):
+        """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
+        if self._get_pk_value() is None:
+            # this is a create operation, set the date_created field
+            self.created_at = time.time()
+
+        self.updated_at = time.time()
+
+        return super(SubscribeCrawl, self).save(*args, **kwargs)
+
+
+@unique
+class SubscribeCrawlType(Enum):
+    Nil = 0
+    Subscription = 1
+    Xpath = 2

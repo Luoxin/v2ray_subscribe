@@ -1,10 +1,16 @@
 import json
 from datetime import date
 from peewee import *
+from playhouse.sqlite_ext import *
 
 db = SqliteDatabase("people.db")
+db.connect()
 
-#
+from orm.subscribe_crawl import SubscribeCrawl
+from orm.subscribe_vmss import SubscribeVmss
+
+db.create_tables([SubscribeCrawl, SubscribeVmss])
+
 # class SubscribeAuthentication(Base):
 #     __tablename__ = "subscribe_authentication"  # 表的名字
 #
