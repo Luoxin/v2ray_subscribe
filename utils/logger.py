@@ -145,6 +145,7 @@ class PushLogger(logging.Logger):
 
     def critical(self, *msg):
         self._logger._log(logging.CRITICAL, self.__to_string(*msg), None)
+        os._exit(-1)
 
     def debug(self, *msg):
         if self.isDebug:
