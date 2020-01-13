@@ -1,10 +1,7 @@
 """
     主服务
 """
-from conf.conf import init_state, get_conf
-
-init_state()
-
+from conf.conf import get_conf
 import traceback
 
 from flask import Flask, ctx, jsonify
@@ -12,6 +9,9 @@ from flask import Flask, ctx, jsonify
 from conntext import JSONResponse, before_request
 from error_exception import InternalException
 from init_service import init_service
+
+from orm import db
+
 from route_list import ROUTE_LIST
 from utils import logger
 

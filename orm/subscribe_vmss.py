@@ -1,10 +1,6 @@
 import time
 from orm import *
-# from playhouse.sqlite_ext import *
 
-
-# from playhouse.mysql_ext import *
-# from playhouse.postgres_ext import *
 
 class SubscribeVmss(Model):
     """
