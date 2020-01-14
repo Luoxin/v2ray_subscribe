@@ -24,7 +24,7 @@ class SubscribeCrawl(Model):
 
     class Meta:
         database = db
-        db_name = "subscribe_vmss"
+        db_name = "subscribe_crawl"
 
     def save(self, *args, **kwargs):
         """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
