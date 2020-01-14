@@ -16,8 +16,10 @@ for i, data in enumerate(data_list):
                 )
                 url_type = "" if v.get("net") is None else v.get("net")
                 print(url_type)
-                session.query(subscribe_vmss).filter(subscribe_vmss.id == data.id).update(
-                    {subscribe_vmss.type: url_type, }
+                session.query(subscribe_vmss).filter(
+                    subscribe_vmss.id == data.id
+                ).update(
+                    {subscribe_vmss.type: url_type,}
                 )
             except:
                 pass

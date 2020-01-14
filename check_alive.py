@@ -160,7 +160,7 @@ def check_link_alive():
                                     subscribe_vmss.next_time: int(
                                         random.uniform(0.5, 1.5) * data.interval
                                     )
-                                                              + int(time.time()),
+                                    + int(time.time()),
                                     subscribe_vmss.last_state: state,
                                 }
                             )
@@ -175,7 +175,7 @@ def check_link_alive():
                                     subscribe_vmss.next_time: int(
                                         random.uniform(0.5, 1.5) * data.interval
                                     )
-                                                              + int(time.time()),
+                                    + int(time.time()),
                                     subscribe_vmss.last_state: state,
                                 }
                             )

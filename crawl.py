@@ -22,7 +22,9 @@ def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
         if v2ray_url == "":
             return
         data = (
-            session.query(subscribe_vmss).filter(subscribe_vmss.url == v2ray_url).first()
+            session.query(subscribe_vmss)
+            .filter(subscribe_vmss.url == v2ray_url)
+            .first()
         )
         if data is None:
             url_type = ""
@@ -106,10 +108,10 @@ def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
 def crawl_by_subscribe():
     data_list = (
         session.query(subscribe_crawl)
-            .filter(subscribe_crawl.next_time <= int(time.time()))
-            .filter(subscribe_crawl.is_closed == False)
-            .filter(subscribe_crawl.type == 1)
-            .all()
+        .filter(subscribe_crawl.next_time <= int(time.time()))
+        .filter(subscribe_crawl.is_closed == False)
+        .filter(subscribe_crawl.type == 1)
+        .all()
     )
 
     for data in data_list:
@@ -120,7 +122,7 @@ def crawl_by_subscribe():
                     subscribe_crawl.next_time: int(
                         random.uniform(0.5, 1.5) * data.interval
                     )
-                                               + int(time.time()),
+                    + int(time.time()),
                 }
             )
             session.commit()
