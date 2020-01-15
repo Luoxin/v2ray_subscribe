@@ -20,7 +20,28 @@ else:
 
 db = connect(get_conf("DB_URL"))
 
+
+class BaseModel(Model):
+    id = IntegerField(primary_key=True)  # id
+    created_at = IntegerField(default=now(), verbose_name="创建时间")
+    updated_at = IntegerField(default=now(), verbose_name="更新时间")
+
+    class Meta:
+        database = db
+
+    def save(self, *args, **kwargs):
+        """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
+        if self._get_pk_value() is None:
+            # this is a create operation, set the date_created field
+            self.created_at = now()
+
+        self.updated_at = now()
+
+        return super(BaseModel, self).save(*args, **kwargs)
+
+
 from orm.subscribe_crawl import SubscribeCrawl
 from orm.subscribe_vmss import SubscribeVmss
 
 db.create_tables([SubscribeCrawl, SubscribeVmss])
+

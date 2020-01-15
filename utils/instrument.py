@@ -47,7 +47,7 @@ def base64_encode(s: (str, int, float, dict)) -> str:
     return base64.b64encode(s.encode()).decode("utf-8")
 
 
-def base64_decode(base64_str):
+def base64_decode(base64_str: str):
     base64_str = base64_str.replace("\n", "").replace("-", "+").replace("_", "/")
     padding = int(len(base64_str) % 4)
     if padding != 0:

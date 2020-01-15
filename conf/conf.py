@@ -1,5 +1,6 @@
 import os
 import yaml
+from fake_useragent import UserAgent
 
 s = None
 
@@ -24,3 +25,6 @@ def init_state(filename=os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml
 def get_conf(key):
     global s
     return s.get(key)
+
+
+user_agent = UserAgent()

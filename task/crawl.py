@@ -2,128 +2,108 @@ import json
 import random
 import time
 import traceback
+from utils import logger, base64_decode
+
 import requests
-from fake_useragent import UserAgent
 
 import utils
-from orm import SubscribeCrawl
+from conf.conf import get_conf, user_agent
+from orm import SubscribeCrawl, SubscribeVmss, DoesNotExist
 from orm.subscribe_crawl import SubscribeCrawlType
-from utils import logger
-
-ua = UserAgent()
 
 
-def add_new_vmess(v2ray_url, crawl_id=0) -> bool:
+def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool:
     try:
         if v2ray_url == "":
             return
-        data = (
-            session.query(subscribe_vmss)
-                .filter(subscribe_vmss.url == v2ray_url)
-                .first()
-        )
-        if data is None:
+        try:
+            SubscribeVmss.select().where(SubscribeVmss.url == v2ray_url).get()
+            return True
+        except DoesNotExist:
             url_type = ""
             if v2ray_url.startswith("vmess://"):  # vmess
                 try:
                     v = json.loads(
-                        base64.b64decode(
-                            v2ray_url.replace("vmess://", "").encode()
-                        ).decode()
+                        base64_decode(
+                            v2ray_url.replace("vmess://", "")
+                        )
                     )
-                    url_type = "" if v.get("net") is None else v.get("net")
+                    network_protocol_type = "" if v.get("net") is None else v.get("net")
+                    SubscribeVmss.insert(
+                        url=v2ray_url,
+                        network_protocol_type=network_protocol_type,
+                        interval=interval,
+                        crawl_id=crawl_id,
+                    ).execute()
                 except:
-                    pass
-            # elif v2ray_url.startswith("ss://"):
-            #     return False
-            else:  # 把不能被 v2ray 客户端使用的链接过滤掉
-                return False
-
-            new_data = subscribe_vmss(
-                url=v2ray_url,
-                speed=0,
-                health_points=HEALTH_POINTS,
-                next_time=0,
-                interval=Interval,
-                type=url_type,
-                crawl_id=crawl_id,
-            )
-            session.add(new_data)
-            session.commit()
-            return True
-        elif data.health_points < HEALTH_POINTS:
-            # 如果速度小于0，则更正其速度为 0 以加入测速列表
-            if data.speed < 0:
-                data.speed = 0
-
-            session.query(subscribe_vmss).filter(subscribe_vmss.id == data.id).update(
-                {
-                    subscribe_vmss.health_points: HEALTH_POINTS,
-                    subscribe_vmss.speed: data.speed,
-                    subscribe_vmss.crawl_id: crawl_id,
-                }
-            )
-            session.commit()
+                    logger.error("err: {}".format(traceback.format_exc()))
+                    return False
+        except:
+            logger.error("err: {}".format(traceback.format_exc()))
+            return False
     except:
-        logger.error(traceback.format_exc())
-        logger.error()
+        logger.error("err: {}".format(traceback.format_exc()))
     return False
 
 
-def crawl_by_subscribe_url(url: str, crawl_id=0, rule=None):
-    headers = {
-        "User-Agent": ua.random,
-        "Connection": "close",
-    }
-    re_text = ""
+def crawl_by_subscribe_url(data: SubscribeCrawl):
     try:
         proxies = None
-        if isinstance(rule, dict):
-            if rule.get("need_proxy"):
-                proxies = PROXIES_CRAWLER
+        if isinstance(data.rule, dict):
+            if data.rule.get("need_proxy"):
+                proxies = get_conf("PROXIES_CRAWLER")
 
-        re = requests.get(url, headers=headers, timeout=10, proxies=proxies)
-        re_text = re.text
         try:
-            data = base64.b64decode(re_text.encode()).decode()
+            headers = {
+                "User-Agent": user_agent.random,
+                "Connection": "close",
+            }
+            v2ray_url_list = (
+                base64_decode(
+                    requests.get(
+                        data.crawl_url, headers=headers, timeout=10, proxies=proxies
+                    ).text
+                )
+                .split("\n")
+            )
+            for v2ray_url in v2ray_url_list:
+                add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
+        except (
+            requests.exceptions.RequestException,
+            requests.exceptions.RequestsWarning,
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+        ):
+            return
         except:
-            data = utils.decode(re_text)
+            logger.error("err: {}".format(traceback.format_exc()))
 
-        for v2ray_url in data.split("\n"):
-            add_new_vmess(v2ray_url, crawl_id)
-
-        re.close()
     except:
-        logger.error("结果解码失败 {}".format(re_text))
-        logger.error("抓取的地址为 {}".format(url))
-        if proxies is not None:
-            logger.error("使用了代理 {}".format(proxies))
-        logger.error(traceback.format_exc())
+        logger.error("err: {}".format(traceback.format_exc()))
 
 
 def crawl_by_subscribe():
-    data_list = SubscribeCrawl.select().where(SubscribeCrawl.next_time <= utils.now()).where(
-        SubscribeCrawl.is_closed == False).where(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
+    data_list = (
+        SubscribeCrawl.select()
+        .where(SubscribeCrawl.next_at <= utils.now())
+        .where(SubscribeCrawl.is_closed == False)
+        .where(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
+    )
 
     for data in data_list:
         try:
-            crawl_by_subscribe_url(data.url, data.id)
-            session.query(subscribe_crawl).filter(subscribe_crawl.id == data.id).update(
-                {
-                    subscribe_crawl.next_time: int(
-                        random.uniform(0.5, 1.5) * data.interval
-                    )
-                                               + int(time.time()),
-                }
-            )
-            session.commit()
+            crawl_by_subscribe_url(data)
+            SubscribeCrawl.update(
+                next_at=random.uniform(0.5, 1.5) * data.interval + utils.now()
+            ).where(SubscribeCrawl.id == data.id).execute()
         except:
             traceback.print_exc()
 
-    logger.info("已经获取了 {} 个".format(len(data_list)))
+    logger.debug("已经完成了\t{}\t个订阅节点的更新".format(len(data_list)))
 
 
 def update_new_node():
+    logger.info("starting crawl vpn node...")
     while True:
         try:
             # 对订阅类型的进行抓取
@@ -192,7 +172,7 @@ def update_new_node():
             #         traceback.print_exc()
             #     finally:
             #         last_update_info["freev2ray"] = now + int(random.uniform(0.5, 1.5) * 60 * 60) + int(time.time())
-
+        except:
+            logger.error("err: {}".format(traceback.format_exc()))
         finally:
-            logger.info("更新节点完成")
             time.sleep(60)

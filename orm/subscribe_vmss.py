@@ -1,8 +1,7 @@
-import time
 from orm import *
 
 
-class SubscribeVmss(Model):
+class SubscribeVmss(BaseModel):
     """
         抓取到的数据表
     """
@@ -12,7 +11,7 @@ class SubscribeVmss(Model):
     created_at = IntegerField(default=now(), verbose_name="创建时间")
     updated_at = IntegerField(default=now(), verbose_name="更新时间")
 
-    url = CharField(max_length=1000, null=False, unique=True, verbose_name="节点分享地址")
+    url = CharField(max_length=1000, null=False, verbose_name="节点分享地址")
     network_protocol_type = CharField(max_length=50, verbose_name="网络协议类型")
 
     # 各个维度的速度测试
@@ -25,20 +24,11 @@ class SubscribeVmss(Model):
     speed_internet = FloatField(verbose_name="测速网站 测速速度")
     network_delay_internet = FloatField(verbose_name="测速网站 访问延时")
 
-    next_time = IntegerField(verbose_name="下一次的测速时间", index=True)
+    next_at = IntegerField(verbose_name="下一次的测速时间")
     interval = IntegerField(verbose_name="间隔")
     crawl_id = IntegerField(verbose_name="关联的 SubscribeCrawl 的 id")
 
+    is_closed = BooleanField(verbose_name="是否禁用")
+
     class Meta:
-        database = db
-        db_name = "subscribe_vmss"
-
-    def save(self, *args, **kwargs):
-        """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
-        if self._get_pk_value() is None:
-            # this is a create operation, set the date_created field
-            self.created_at = now()
-
-        self.updated_at = now()
-
-        return super(SubscribeVmss, self).save(*args, **kwargs)
+        db_table = "subscribe_vmss"

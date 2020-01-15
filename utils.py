@@ -60,11 +60,3 @@ def check_ip_port_by_url(url: str = "") -> bool:
     except:
         traceback.print_exc()
         return False
-
-
-def decode(base64_str):
-    base64_str = base64_str.replace("\n", "").replace("-", "+").replace("_", "/")
-    padding = int(len(base64_str) % 4)
-    if padding != 0:
-        base64_str += "=" * (4 - padding)
-    return str(base64.b64decode(base64_str), "utf-8")

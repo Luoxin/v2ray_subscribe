@@ -5,8 +5,12 @@ import multiprocessing
 import threading
 
 from api.time_info import keep_time_consistent
+from task import *
 
-task_func_map = {keep_time_consistent: {"startup_mode": "thread", "enable": False}}
+task_func_map = {
+    keep_time_consistent: {"startup_mode": "thread", "enable": False},
+    update_new_node: {"startup_mode": "thread", "enable": True},
+}
 
 
 # process_pool = multiprocessing.Pool(3)
