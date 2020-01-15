@@ -4,8 +4,9 @@ from playhouse.db_url import connect
 from urllib.parse import urlparse
 
 from conf.conf import get_conf
+from utils import now
 
-url = "sqlite+pool:///subscribe.vdb?check_same_thread=false"
+url = get_conf("DB_URL")
 
 scheme = urlparse(url).scheme
 if "mysql" in scheme:

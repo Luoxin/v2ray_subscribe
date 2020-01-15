@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import time
 import uuid as uu
 
 
@@ -52,3 +53,7 @@ def base64_decode(base64_str):
     if padding != 0:
         base64_str += "=" * (4 - padding)
     return str(base64.b64decode(base64_str), "utf-8")
+
+
+def now():
+    return int(time.time())

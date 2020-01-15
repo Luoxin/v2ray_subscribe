@@ -69,8 +69,12 @@ def get_file_list_by_file_path(
         return result_list
 
 
+def get_project_root_path():
+    return os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+
 if __name__ == "__main__":
     fl = get_file_list_by_file_path(
-        "C:/Program Files/JetBrains/IntelliJ IDEA 2018.3.6", show_file_path=True
+        "C:/Program Files/JetBrains/IntelliJ IDEA 2018.3.6"
     )
     print(fl)

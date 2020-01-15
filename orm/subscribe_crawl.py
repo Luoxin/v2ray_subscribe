@@ -10,8 +10,8 @@ class SubscribeCrawl(Model):
     """
 
     id = IntegerField(primary_key=True)  # id
-    created_at = IntegerField(default=time.time(), verbose_name="创建时间")
-    updated_at = IntegerField(default=time.time(), verbose_name="更新时间")
+    created_at = IntegerField(default=now(), verbose_name="创建时间")
+    updated_at = IntegerField(default=now(), verbose_name="更新时间")
 
     crawl_url = CharField(max_length=1000, unique=True, verbose_name="订阅地址/抓取源地址")
 
@@ -30,9 +30,9 @@ class SubscribeCrawl(Model):
         """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
         if self._get_pk_value() is None:
             # this is a create operation, set the date_created field
-            self.created_at = time.time()
+            self.created_at = now()
 
-        self.updated_at = time.time()
+        self.updated_at = now()
 
         return super(SubscribeCrawl, self).save(*args, **kwargs)
 
