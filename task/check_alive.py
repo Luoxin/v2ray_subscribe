@@ -11,12 +11,81 @@ from fake_useragent import UserAgent
 import utils
 from conf.conf import get_conf
 from node import V2ray, Shadowsocks
+from orm import SubscribeVmss
 from proxy_server import V2rayServer
+from utils import logger
 
-ua = UserAgent()
 
+class CheckAlive():
 
-v2ray_server = V2rayServer(get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL"))
+    def __init__(self):
+        self.v2ray_server = V2rayServer(get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL"))
+
+    def check_link_alive(self):
+        while True:
+            try:
+                data_list = SubscribeVmss.select().where(SubscribeVmss.next_at < utils.now()).where(SubscribeVmss.is_closed == False)
+                for i, data in enumerate(data_list):
+                    try:
+                        speed = check_by_v2ray_url(data.url)
+                        state = 0
+                        if speed < 0:
+                            state = int(-1 * speed)
+
+                        if speed > 0:
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
+                            ).update(
+                                {
+                                    subscribe_vmss.speed: speed,
+                                    subscribe_vmss.health_points: HEALTH_POINTS + 1
+                                    if data.health_points < HEALTH_POINTS
+                                    else data.health_points + 1,
+                                    subscribe_vmss.next_time: int(
+                                        random.uniform(0.5, 1.5) * data.interval
+                                    )
+                                                              + int(time.time()),
+                                    subscribe_vmss.last_state: state,
+                                }
+                            )
+                        elif speed == 0 or (state != 0 and speed < 0):
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
+                            ).update(
+                                {
+                                    subscribe_vmss.health_points: HEALTH_POINTS
+                                    if data.health_points > HEALTH_POINTS
+                                    else data.health_points - 1,
+                                    subscribe_vmss.next_time: int(
+                                        random.uniform(0.5, 1.5) * data.interval
+                                    )
+                                                              + int(time.time()),
+                                    subscribe_vmss.last_state: state,
+                                }
+                            )
+                        else:
+                            session.query(subscribe_vmss).filter(
+                                subscribe_vmss.id == data.id
+                            ).update(
+                                {
+                                    subscribe_vmss.speed: speed,
+                                    subscribe_vmss.health_points: -1,
+                                    subscribe_vmss.last_state: state,
+                                }
+                            )
+                        session.commit()
+                    except:
+                        logger.error(traceback.format_exc())
+                    finally:
+                        time.sleep(5)
+                        # logger.info("第{}个节点监测完成".format(i+1))
+                logger.info("{}个节点检测完成".format(i + 1))
+            except:
+                logger.error(traceback.format_exc())
+                time.sleep(10)
+            finally:
+                # logger.info("节点检测完成")
+                time.sleep(10)
 
 
 def get_node_by_url(url: str != ""):
@@ -28,13 +97,13 @@ def get_node_by_url(url: str != ""):
             base64_str = url.replace("ss://", "")
             base64_str = urllib.parse.unquote(base64_str)
 
-            origin = utils.decode(base64_str[0 : base64_str.index("#")])
-            remark = base64_str[base64_str.index("#") + 1 :]
-            security = origin[0 : origin.index(":")]
-            password = origin[origin.index(":") + 1 : origin.index("@")]
-            ipandport = origin[origin.index("@") + 1 :]
-            ip = ipandport[0 : ipandport.index(":")]
-            port = int(ipandport[ipandport.index(":") + 1 :])
+            origin = utils.decode(base64_str[0: base64_str.index("#")])
+            remark = base64_str[base64_str.index("#") + 1:]
+            security = origin[0: origin.index(":")]
+            password = origin[origin.index(":") + 1: origin.index("@")]
+            ipandport = origin[origin.index("@") + 1:]
+            ip = ipandport[0: ipandport.index(":")]
+            port = int(ipandport[ipandport.index(":") + 1:])
             ssode = Shadowsocks(ip, port, remark, security, password)
             node = ssode
         elif url.startswith("vmess://"):  # vmess
@@ -112,80 +181,4 @@ def check_by_v2ray_url(url: str) -> float:
         return -1
 
 
-def check_link_alive():
-    while True:
-        try:
-            data_list = (
-                session.query(subscribe_vmss)
-                .filter(subscribe_vmss.next_time < int(time.time()))
-                .filter(subscribe_vmss.health_points > 0)
-                .order_by(subscribe_vmss.speed.desc())
-                .all()
-            )
-            # filter(SubscribeVmss.last_state.notin_(1)). \
-            if len(data_list) <= 0:
-                # logger.info("暂时没有待检测节点")
-                time.sleep(20)
-                continue
-            else:
-                for i, data in enumerate(data_list):
-                    try:
-                        speed = check_by_v2ray_url(data.url)
-                        state = 0
-                        if speed < 0:
-                            state = int(-1 * speed)
 
-                        if speed > 0:
-                            session.query(subscribe_vmss).filter(
-                                subscribe_vmss.id == data.id
-                            ).update(
-                                {
-                                    subscribe_vmss.speed: speed,
-                                    subscribe_vmss.health_points: HEALTH_POINTS + 1
-                                    if data.health_points < HEALTH_POINTS
-                                    else data.health_points + 1,
-                                    subscribe_vmss.next_time: int(
-                                        random.uniform(0.5, 1.5) * data.interval
-                                    )
-                                    + int(time.time()),
-                                    subscribe_vmss.last_state: state,
-                                }
-                            )
-                        elif speed == 0 or (state != 0 and speed < 0):
-                            session.query(subscribe_vmss).filter(
-                                subscribe_vmss.id == data.id
-                            ).update(
-                                {
-                                    subscribe_vmss.health_points: HEALTH_POINTS
-                                    if data.health_points > HEALTH_POINTS
-                                    else data.health_points - 1,
-                                    subscribe_vmss.next_time: int(
-                                        random.uniform(0.5, 1.5) * data.interval
-                                    )
-                                    + int(time.time()),
-                                    subscribe_vmss.last_state: state,
-                                }
-                            )
-                        else:
-                            session.query(subscribe_vmss).filter(
-                                subscribe_vmss.id == data.id
-                            ).update(
-                                {
-                                    subscribe_vmss.speed: speed,
-                                    subscribe_vmss.health_points: -1,
-                                    subscribe_vmss.last_state: state,
-                                }
-                            )
-                        session.commit()
-                    except:
-                        logger.error(traceback.format_exc())
-                    finally:
-                        time.sleep(5)
-                        # logger.info("第{}个节点监测完成".format(i+1))
-                logger.info("{}个节点检测完成".format(i + 1))
-        except:
-            logger.error(traceback.format_exc())
-            time.sleep(10)
-        finally:
-            # logger.info("节点检测完成")
-            time.sleep(10)
