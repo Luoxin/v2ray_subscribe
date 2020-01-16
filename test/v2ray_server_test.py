@@ -1,12 +1,9 @@
 import sys
-import time
-
-import requests
 
 sys.path.append("..")
 sys.path.append("../..")
 
-from check_alive import V2rayServer
+from task.check_alive import V2rayServer
 
 vs = V2rayServer(
     "C:/Users/Luoxin/Desktop/v2ray/v2ray.exe", "C:/Users/Luoxin/Desktop/v2ray/c.json"

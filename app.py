@@ -7,8 +7,7 @@ from threading import Thread
 from flask import Flask, request, current_app
 
 from authentication import get_authentication
-from check_alive import check_link_alive
-from conf.conf import *
+from task.check_alive import check_link_alive
 from crawl import add_new_vmess, update_new_node
 from log import logger
 from orm import session, subscribe_vmss

@@ -15,26 +15,26 @@ from orm.subscribe_crawl import SubscribeCrawlType
 def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool:
     try:
         if v2ray_url == "":
-            return
+            return False
         try:
             SubscribeVmss.select().where(SubscribeVmss.url == v2ray_url).get()
             return True
         except DoesNotExist:
-            url_type = ""
             if v2ray_url.startswith("vmess://"):  # vmess
                 try:
-                    v = json.loads(
-                        base64_decode(
-                            v2ray_url.replace("vmess://", "")
-                        )
-                    )
+                    logger.debug("new vmess is {}".format(v2ray_url))
+                    v = json.loads(base64_decode(v2ray_url.replace("vmess://", "")))
                     network_protocol_type = "" if v.get("net") is None else v.get("net")
-                    SubscribeVmss.insert(
+                    SubscribeVmss(
                         url=v2ray_url,
                         network_protocol_type=network_protocol_type,
                         interval=interval,
                         crawl_id=crawl_id,
-                    ).execute()
+                    ).save()
+                except UnicodeDecodeError:
+                    pass
+                except json.decoder.JSONDecodeError:
+                    pass
                 except:
                     logger.error("err: {}".format(traceback.format_exc()))
                     return False
@@ -58,21 +58,18 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
                 "User-Agent": user_agent.random,
                 "Connection": "close",
             }
-            v2ray_url_list = (
-                base64_decode(
-                    requests.get(
-                        data.crawl_url, headers=headers, timeout=10, proxies=proxies
-                    ).text
-                )
-                .split("\n")
-            )
+            v2ray_url_list = base64_decode(
+                requests.get(
+                    data.crawl_url, headers=headers, timeout=10, proxies=proxies
+                ).text
+            ).split("\n")
             for v2ray_url in v2ray_url_list:
                 add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
         except (
-            requests.exceptions.RequestException,
-            requests.exceptions.RequestsWarning,
-            requests.exceptions.Timeout,
-            requests.exceptions.ConnectionError,
+                requests.exceptions.RequestException,
+                requests.exceptions.RequestsWarning,
+                requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError,
         ):
             return
         except:
@@ -85,9 +82,9 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
 def crawl_by_subscribe():
     data_list = (
         SubscribeCrawl.select()
-        .where(SubscribeCrawl.next_at <= utils.now())
-        .where(SubscribeCrawl.is_closed == False)
-        .where(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
+            .where(SubscribeCrawl.next_at <= utils.now())
+            .where(SubscribeCrawl.is_closed == False)
+            .where(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
     )
 
     for data in data_list:
@@ -176,3 +173,9 @@ def update_new_node():
             logger.error("err: {}".format(traceback.format_exc()))
         finally:
             time.sleep(60)
+
+
+if __name__ == '__main__':
+    v2ray_url = "vmess://Y2hhY2hhMjAtcG9seTEzMDU6OTUxMzc4NTctNzBmYS00YWM4LThmOTAtNGUyMGFlYjY2MmNmQHVuaS5raXRzdW5lYmkuZnVuOjQ0Mw==?network=h2&h2Path=/v2&aid=0&tls=1&allowInsecure=0&tlsServer=uni.kitsunebi.fun&mux=0&muxConcurrency=8&remark=H2%20Test%20Outbound"
+    print(base64_decode(v2ray_url.replace("vmess://", "")))
+    print(json.loads(base64_decode(v2ray_url.replace("vmess://", ""))))

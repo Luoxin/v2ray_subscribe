@@ -31,7 +31,7 @@ class BaseModel(Model):
 
     def save(self, *args, **kwargs):
         """覆写save方法, update_time字段自动更新, 实例对象需要在update成功之后调用save()"""
-        if self._get_pk_value() is None:
+        if self.id is None or self.id == 0:
             # this is a create operation, set the date_created field
             self.created_at = now()
 
@@ -44,4 +44,3 @@ from orm.subscribe_crawl import SubscribeCrawl
 from orm.subscribe_vmss import SubscribeVmss
 
 db.create_tables([SubscribeCrawl, SubscribeVmss])
-

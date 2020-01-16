@@ -1,35 +1,22 @@
 import json
-import os
-import psutil
 import random
-import requests
-import signal
-import subprocess
 import sys
-import threading
 import time
 import traceback
 import urllib
-import utils
 
+import requests
 from fake_useragent import UserAgent
 
-from conf.conf import (
-    V2RAY_CONFIG_LOCAL,
-    HEALTH_POINTS,
-    PROXIES_TEST,
-    TEST_FILE_URL,
-    V2RAY_SERVICE_PATH,
-)
-from log import logger
+import utils
+from conf.conf import get_conf
 from node import V2ray, Shadowsocks
-from orm import session, subscribe_vmss
 from proxy_server import V2rayServer
 
 ua = UserAgent()
 
 
-v2ray_server = V2rayServer(V2RAY_SERVICE_PATH, V2RAY_CONFIG_LOCAL)
+v2ray_server = V2rayServer(get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL"))
 
 
 def get_node_by_url(url: str != ""):
