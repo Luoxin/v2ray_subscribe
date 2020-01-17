@@ -1,7 +1,8 @@
-# db_url = get_conf("DB_URL")
-from playhouse.db_url import connect
+from sqlalchemy import Column, Integer, String, Boolean, Float, func, JSON, TIMESTAMP
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-from urllib.parse import urlparse
 
 from conf.conf import get_conf
 from utils import now

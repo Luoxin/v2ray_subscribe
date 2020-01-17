@@ -2,6 +2,9 @@ import json
 import random
 import time
 import traceback
+
+from playhouse.shortcuts import model_to_dict, dict_to_model
+
 from utils import logger, base64_decode
 
 import requests
@@ -30,7 +33,7 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
                         network_protocol_type=network_protocol_type,
                         interval=interval,
                         crawl_id=crawl_id,
-                        conf_details=v,
+                        conf_details=dict_to_model(v),
                     ).save()
                 except UnicodeDecodeError:
                     pass

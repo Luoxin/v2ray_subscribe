@@ -63,7 +63,7 @@
 # #     print("捕获成功")
 # # except:
 # #     traceback.print_exc()
-
+from playhouse.shortcuts import dict_to_model
 from playhouse.sqlite_ext import *
 
 db = SqliteDatabase("people.db")
@@ -71,7 +71,7 @@ db = SqliteDatabase("people.db")
 
 class Person(Model):
     name = CharField()
-    birthday = JSONField()
+    birthday = JSONField(json_dumps=json.dumps, json_loads=json.loads)
 
     class Meta:
         database = db
@@ -80,6 +80,4 @@ class Person(Model):
 db.connect()
 db.create_tables([Person])
 
-# insert
-uncle_bob = Person(name="Bob1", birthday={"aa": 1})
-uncle_bob.save()  # bob is now stored in the database
+Person.create(name="Bob1", birthday={"aa": 1})
