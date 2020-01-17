@@ -14,6 +14,8 @@ class SubscribeVmss(BaseModel):
     url = CharField(max_length=1000, null=False, verbose_name="节点分享地址")
     network_protocol_type = CharField(default="", max_length=50, verbose_name="网络协议类型")
 
+    conf_details = JSONField(verbose_name="配置的详情内容")
+
     # 各个维度的速度测试
     speed_google = FloatField(default=0, verbose_name="google访问速度")
     network_delay_google = FloatField(default=0, verbose_name="google访问延时")

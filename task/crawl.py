@@ -30,6 +30,7 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
                         network_protocol_type=network_protocol_type,
                         interval=interval,
                         crawl_id=crawl_id,
+                        conf_details=v,
                     ).save()
                 except UnicodeDecodeError:
                     pass
@@ -106,54 +107,43 @@ def update_new_node():
             # 对订阅类型的进行抓取
             crawl_by_subscribe()
 
-            # if (last_update_info.get("free-ss-443") is not None) and ((last_update_info.get("free-ss-443") > now) or (last_update_info.get("free-ss-443") == 0)):
-            #     try:
-            #         v2ray_conf = "ew0KICAidiI6ICIyIiwNCiAgInBzIjogIltmcmVlLXNzLnNpdGVdd3d3Lmtlcm5lbHMuYmlkIiwNCiAgImFkZCI6ICJ3d3cua2VybmVscy5iaWQiLA0KICAicG9ydCI6ICI0NDMiLA0KICAiaWQiOiAiYmZmNDA0YmItZTFjMy02MTU4LTY4MDAtOTRmMTk2MTQwNzY5IiwNCiAgImFpZCI6ICIwIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIvd3MiLA0KICAidGxzIjogInRscyINCn0="
-            #         v2ray_conf = base64.b64decode(v2ray_conf.encode()).decode()
+            # if (last_update_info.get("free-ss-443") is not None) and ((last_update_info.get("free-ss-443") > now)
+            # or (last_update_info.get("free-ss-443") == 0)): try: v2ray_conf =
+            # "ew0KICAidiI6ICIyIiwNCiAgInBzIjogIltmcmVlLXNzLnNpdGVdd3d3Lmtlcm5lbHMuYmlkIiwNCiAgImFkZCI6ICJ3d3cua2VybmVscy
+            # 5iaWQiLA0KICAicG9ydCI6ICI0NDMiLA0KICAiaWQiOiAiYmZmNDA0YmItZTFjMy02MTU4LTY4MDAtOTRmMTk2MTQwNzY5IiwNCiAgImFpZ
+            # CI6ICIwIiwNCiAgIm5ldCI6ICJ3cyIsDQogICJ0eXBlIjogIm5vbmUiLA0KICAiaG9zdCI6ICIiLA0KICAicGF0aCI6ICIvd3MiLA0KICAi
+            # dGxzIjogInRscyINCn0=" v2ray_conf = base64.b64decode(v2ray_conf.encode()).decode()
             #
-            #         url = "https://free-ss.site/v/443.json"
-            #         data = requests.get(url, timeout=10, proxies=proxies).json()
-            #         id = data.get("outbounds")[0].get("settings").get("vnext")[0].get("users")[0].get("id")
-            #         v2ray_url = "vmess://" + base64.b64encode(v2ray_conf.replace("bff404bb-e1c3-6158-6800-94f196140769", id).encode()).decode()
-            #         today8 = datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0).timestamp()
-            #         today20 = datetime.datetime.now().replace(hour=20, minute=0, second=0, microsecond=0).timestamp()
-            #         if now < today8:
-            #             dead_time = today8
-            #         elif now < today20:
-            #             dead_time = today20
-            #         else:
-            #             dead_time = (datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)).timestamp()
-            #         dead_time = int(dead_time)
-            #         logger.info("free-ss-443 的下次更新时间为 {}".format(dead_time))
-            #         add_new_node(v2ray_url, 0, dead_time=dead_time)
-            #         last_update_info["free-ss-443"] = dead_time
-            #     except:
-            #         traceback.print_exc()
+            # url = "https://free-ss.site/v/443.json" data = requests.get(url, timeout=10, proxies=proxies).json() id
+            # = data.get("outbounds")[0].get("settings").get("vnext")[0].get("users")[0].get("id") v2ray_url =
+            # "vmess://" + base64.b64encode(v2ray_conf.replace("bff404bb-e1c3-6158-6800-94f196140769", id).encode(
+            # )).decode() today8 = datetime.datetime.now().replace(hour=8, minute=0, second=0,
+            # microsecond=0).timestamp() today20 = datetime.datetime.now().replace(hour=20, minute=0, second=0,
+            # microsecond=0).timestamp() if now < today8: dead_time = today8 elif now < today20: dead_time = today20
+            # else: dead_time = (datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0) +
+            # datetime.timedelta(days=1)).timestamp() dead_time = int(dead_time) logger.info("free-ss-443 的下次更新时间为 {
+            # }".format(dead_time)) add_new_node(v2ray_url, 0, dead_time=dead_time) last_update_info["free-ss-443"] =
+            # dead_time except: traceback.print_exc()
             #
-            # if (last_update_info.get("free-ss-80") is not None) and ((last_update_info.get("free-ss-80") > now) or (last_update_info.get("free-ss-80") == 0)):
-            #     try:
-            #         v2ray_conf = "ew0KICAidiI6ICIyIiwNCiAgInBzIjogIltmcmVlLXNzLnNpdGVdd3d3Lmtlcm5lbHMuYmlkIiwNCiAgImFkZCI6ICJ3d3cua2VybmVscy5iaWQiLA0KICAicG9ydCI6ICI4MCIsDQogICJpZCI6ICIxMTQ2MjYxYi1kOTE4LWJjZGYtMmRiMy00YzdlZmY4Y2JmZjIiLA0KICAiYWlkIjogIjAiLA0KICAibmV0IjogIndzIiwNCiAgInR5cGUiOiAibm9uZSIsDQogICJob3N0IjogIiIsDQogICJwYXRoIjogIi93cyIsDQogICJ0bHMiOiAibm9uZSINCn0="
-            #         v2ray_conf = base64.b64decode(v2ray_conf.encode()).decode()
+            # if (last_update_info.get("free-ss-80") is not None) and ((last_update_info.get("free-ss-80") > now) or
+            # (last_update_info.get("free-ss-80") == 0)): try: v2ray_conf =
+            # "ew0KICAidiI6ICIyIiwNCiAgInBzIjogIltmcmVlLXNzLnNpdGVdd3d3Lmtlcm5lbHMuYmlkIiwNCiAgImFkZCI6ICJ3d3cua2VybmVsc
+            # y5iaWQiLA0KICAicG9ydCI6ICI4MCIsDQogICJpZCI6ICIxMTQ2MjYxYi1kOTE4LWJjZGYtMmRiMy00YzdlZmY4Y2JmZjIiLA0KICAiYWl
+            # kIjogIjAiLA0KICAibmV0IjogIndzIiwNCiAgInR5cGUiOiAibm9uZSIsDQogICJob3N0IjogIiIsDQogICJwYXRoIjogIi93cyIsDQogI
+            # CJ0bHMiOiAibm9uZSINCn0=" v2ray_conf = base64.b64decode(v2ray_conf.encode()).decode()
             #
-            #         url = "https://free-ss.site/v/80.json"
-            #         data = requests.get(url, timeout=10, proxies=proxies).json()
-            #         id = data.get("outbounds")[0].get("settings").get("vnext")[0].get("users")[0].get("id")
-            #         v2ray_url = "vmess://" + base64.b64encode(v2ray_conf.replace("1146261b-d918-bcdf-2db3-4c7eff8cbff2", id).encode()).decode()
+            # url = "https://free-ss.site/v/80.json" data = requests.get(url, timeout=10, proxies=proxies).json() id
+            # = data.get("outbounds")[0].get("settings").get("vnext")[0].get("users")[0].get("id") v2ray_url =
+            # "vmess://" + base64.b64encode(v2ray_conf.replace("1146261b-d918-bcdf-2db3-4c7eff8cbff2", id).encode(
+            # )).decode()
             #
-            #         today8 = datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0).timestamp()
-            #         today20 = datetime.datetime.now().replace(hour=20, minute=0, second=0, microsecond=0).timestamp()
-            #         if now < today8:
-            #             dead_time = today8
-            #         elif now < today20:
-            #             dead_time = today20
-            #         else:
-            #             dead_time = (datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)).timestamp()
-            #         dead_time = int(dead_time)
-            #         logger.info("free-ss-80 的下次更新时间为 {}".format(dead_time))
-            #         add_new_node(v2ray_url, 0, dead_time=dead_time)
-            #         last_update_info["free-ss-80"] = dead_time
-            #     except:
-            #         traceback.print_exc()
+            # today8 = datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0).timestamp() today20
+            # = datetime.datetime.now().replace(hour=20, minute=0, second=0, microsecond=0).timestamp() if now <
+            # today8: dead_time = today8 elif now < today20: dead_time = today20 else: dead_time = (
+            # datetime.datetime.now().replace(hour=8, minute=0, second=0, microsecond=0) + datetime.timedelta(
+            # days=1)).timestamp() dead_time = int(dead_time) logger.info("free-ss-80 的下次更新时间为 {}".format(dead_time))
+            # add_new_node(v2ray_url, 0, dead_time=dead_time) last_update_info["free-ss-80"] = dead_time except:
+            # traceback.print_exc()
 
             # if (last_update_info.get("freev2ray") is not None) and (
             #         (last_update_info.get("freev2ray") > now) or (last_update_info.get("freev2ray") == 0)):
