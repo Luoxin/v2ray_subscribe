@@ -7,9 +7,10 @@ class SubscribeCrawl(BaseModel):
     """
        抓取的配置表
     """
-    __tablename__
+    __tablename__ = "subscribe_crawl"
 
-    crawl_url = CharField(max_length=1000, verbose_name="订阅地址/抓取源地址")
+
+    crawl_url = Column(String, max_length=1000, verbose_name="订阅地址/抓取源地址")
 
     crawl_type = IntegerField(verbose_name="抓取类型")
     rule = JSONField(verbose_name="抓取规则")
