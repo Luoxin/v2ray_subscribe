@@ -7,6 +7,7 @@ class SubscribeCrawl(BaseModel):
     """
        抓取的配置表
     """
+    __tablename__
 
     crawl_url = CharField(max_length=1000, verbose_name="订阅地址/抓取源地址")
 
