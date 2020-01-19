@@ -7,13 +7,13 @@ import platform
 
 try:
     from conf.conf import get_conf, get_conf_bool
-    LOG_DEBUG = get_conf_bool("LOG_DEBUG")
+    LOG_DEBUG = False if get_conf_bool("LOG_DEBUG") is None else get_conf_bool("LOG_DEBUG")
     SERVER_NAME = "v2ray_subscribe" if get_conf("SERVER_NAME") is None else get_conf("SERVER_NAME")
     LOG_PATH = "./v2ray_subscribe.log" if get_conf("LOG_PATH") is None else get_conf("LOG_PATH")
 except:
     LOG_DEBUG = True
     SERVER_NAME = "v2ray_subscribe"
-    LOG_PATH = "./test.log"
+    LOG_PATH = "./v2ray_subscribe.log"
 
 
 sys.path.append("../")
