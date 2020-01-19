@@ -189,7 +189,7 @@ def check_link_alive():
                 .all()
             )
             if len(data_list) <= 0:
-                logger.info("暂时没有待检测节点")
+                logger.debug("暂时没有待检测节点")
                 time.sleep(20)
                 continue
 
