@@ -2,8 +2,9 @@ import traceback
 
 from flask import request
 
-from log import logger
-from orm import session, SubscribeAuthentication
+from orm import db
+from orm.orm import SubscribeAuthentication
+from utils import logger
 
 
 def get_authentication(secret_key: (str, None), uuid: (str, None)):
@@ -15,13 +16,13 @@ def get_authentication(secret_key: (str, None), uuid: (str, None)):
             uuid = request.args.get("id")
 
         if secret_key is None or uuid is None:
-            return False, "非法请求"get_authentication
+            return False, "非法请求"
 
         # uuid大写，避免不必要的错误
         uuid = uuid.upper()
 
         authentication = (
-            session.query(SubscribeAuthentication)
+            db.query(SubscribeAuthentication)
             .filter(SubscribeAuthentication.secret_key == secret_key)
             .filter(SubscribeAuthentication.uuid == uuid)
             .first()

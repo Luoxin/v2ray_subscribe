@@ -1,6 +1,3 @@
-"""
-    主服务
-"""
 from conf.conf import get_conf
 import traceback
 
@@ -15,7 +12,9 @@ from orm import db
 from route_list import ROUTE_LIST
 from utils import logger
 
-app = Flask("v2ray_subscribe" if get_conf("SERVER_NAME") is None else get_conf("SERVER_NAME"))
+app = Flask(
+    "v2ray_subscribe" if get_conf("SERVER_NAME") is None else get_conf("SERVER_NAME")
+)
 
 app.response_class = JSONResponse
 app.before_request(before_request)
