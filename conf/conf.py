@@ -8,6 +8,7 @@ s = None
 def _get_conf_file_path() -> str:
     conf_path_list = [
         os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml",
+        os.path.abspath(os.getcwd()) + "\conf.yaml",
         os.path.abspath(os.path.dirname(os.getcwd())) + "\conf.yaml",
     ]
 
@@ -46,21 +47,24 @@ def get_conf(key):
 
 def get_conf_int(key):
     try:
-        return int(get_conf(key))
+        value = get_conf(key)
+        return int(value) if value is not None else 0
     except:
         return 0
 
 
 def get_conf_float(key):
     try:
-        return float(get_conf(key))
+        value = get_conf(key)
+        return float(value) if value is not None else 0
     except:
         return 0.0
 
 
 def get_conf_bool(key):
     try:
-        return bool(get_conf(key))
+        value = get_conf(key)
+        return bool(value) if value is not None else False
     except:
         return False
 

@@ -9,7 +9,7 @@ PORT: 1800
 ## 日志级别
 # LOG_DEBUG: false
 ## 日志路径
-# LOG_PATH: ""
+# LOG_PATH: "./v2ray_subscribe"
 
 # TEST_FILE_URL: "http://cachefly.cachefly.net/1mb.test"
 TEST_FILE_URL: "http://www.google.com"
