@@ -15,7 +15,7 @@ def get_authentication(secret_key: (str, None), uuid: (str, None)):
             uuid = request.args.get("id")
 
         if secret_key is None or uuid is None:
-            return False, "非法请求"
+            return False, "非法请求"get_authentication
 
         # uuid大写，避免不必要的错误
         uuid = uuid.upper()

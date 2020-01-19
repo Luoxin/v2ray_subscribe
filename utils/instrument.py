@@ -43,6 +43,8 @@ def base64_encode(s: (str, int, float, dict)) -> str:
         s = str(s)
     elif isinstance(s, dict):
         s = json.dumps(s)
+    elif isinstance(s, bytes):
+        s = s.decode("utf-8")
 
     return base64.b64encode(s.encode()).decode("utf-8")
 

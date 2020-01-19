@@ -105,21 +105,19 @@ def check_by_v2ray_url(test_url: str):
 def check_link_alive_by_google(data: SubscribeVmss):
     try:
         speed, network_delay = check_by_v2ray_url("https://www.google.com/")
+
         new_db = db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_google: speed,
-                SubscribeVmss.network_delay_google: network_delay
-                if network_delay > 0
-                else 0,
-                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
-                + int(time.time()),
-                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count + 1,
+                SubscribeVmss.network_delay_google: network_delay,
             }
         )
         new_db.commit()
+        return True if speed >= 0 else False
     except:
         logger.error(traceback.format_exc())
+        return False
 
 
 def check_link_alive_by_youtube(data: SubscribeVmss):
@@ -129,17 +127,14 @@ def check_link_alive_by_youtube(data: SubscribeVmss):
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_youtube: speed,
-                SubscribeVmss.network_delay_youtube: network_delay
-                if network_delay > 0
-                else 0,
-                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
-                + int(time.time()),
-                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count + 1,
+                SubscribeVmss.network_delay_youtube: network_delay,
             }
         )
         new_db.commit()
+        return True if speed >= 0 else False
     except:
         logger.error(traceback.format_exc())
+        return False
 
 
 def check_link_alive_by_internet(data: SubscribeVmss):
@@ -152,17 +147,14 @@ def check_link_alive_by_internet(data: SubscribeVmss):
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_internet: speed,
-                SubscribeVmss.network_delay_internet: network_delay
-                if network_delay > 0
-                else 0,
-                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
-                + int(time.time()),
-                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count,
+                SubscribeVmss.network_delay_internet: network_delay,
             }
         )
         new_db.commit()
+        return True if speed >= 0 else False
     except:
         logger.error(traceback.format_exc())
+        return False
 
 
 def update_v2ray_conf(v2ray_url):
@@ -205,9 +197,34 @@ def check_link_alive():
                 for i, data in enumerate(data_list):
                     try:
                         update_v2ray_conf(data.url)
-                        check_link_alive_by_google(data)
-                        check_link_alive_by_youtube(data)
-                        check_link_alive_by_internet(data)
+                        death_count = data.death_count
+
+                        alive = (
+                            check_link_alive_by_google(data)
+                            + check_link_alive_by_youtube(data)
+                            + check_link_alive_by_internet(data)
+                        )
+
+                        if alive <= 0:
+                            death_count -= 3 - alive
+                        else:
+                            if death_count < 0:
+                                death_count = 0
+                            death_count += alive
+
+                        new_db = db()
+                        new_db.query(SubscribeVmss).filter(
+                            SubscribeVmss.id == data.id
+                        ).update(
+                            {
+                                SubscribeVmss.next_at: int(
+                                    random.uniform(0.5, 1.5) * data.interval
+                                )
+                                + int(time.time()),
+                                SubscribeVmss.death_count: death_count,
+                            }
+                        )
+                        new_db.commit()
                     except:
                         logger.error(traceback.format_exc())
                     finally:

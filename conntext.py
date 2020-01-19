@@ -107,7 +107,7 @@ def before_request():
 def after_request_func(rsp):
     try:
         pass
-        # print(rsp.response[0].decode("utf-8"))
+        print(rsp.response[0].decode("utf-8"))
         # print(f.headers)
     except:
         traceback.print_exc()
