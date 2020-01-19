@@ -10,7 +10,7 @@ from utils import logger, base64_decode
 import requests
 
 import utils
-from conf.conf import get_conf, user_agent
+from conf.conf import get_conf, user_agent, get_conf_int
 from orm import SubscribeCrawl, SubscribeVmss, db
 from orm.subscribe_crawl import SubscribeCrawlType
 
@@ -21,28 +21,42 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
             return False
 
         # 已经存在了，就不管了
-        if (
-            db.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
-            is not None
-        ):
+        data = db().query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+        if data is not None:
+            if data.death_count is None or data.death_count < get_conf_int(
+                "MAX_DEATH_COUNT"
+            ):
+                new_db = db()
+                new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+                    {
+                        SubscribeVmss.death_count: int(
+                            int(get_conf_int("MAX_DEATH_COUNT")) / 2
+                        ),
+                    }
+                )
+                new_db.commit()
             return True
 
         if v2ray_url.startswith("vmess://"):  # vmess
             try:
                 logger.debug("new vmess is {}".format(v2ray_url))
                 v = json.loads(base64_decode(v2ray_url.replace("vmess://", "")))
-                db.add(
+                new_db = db()
+                new_db.add(
                     SubscribeVmss(
                         url=v2ray_url,
                         network_protocol_type=""
                         if v.get("net") is None
                         else v.get("net"),
-                        interval=interval,
-                        crawl_id=crawl_id,
+                        death_count=0,
+                        next_at=0,
+                        is_closed=False,
+                        interval=int(interval),
+                        crawl_id=int(crawl_id),
                         conf_details=v,
                     )
                 )
-                db.commit()
+                new_db.commit()
             except (UnicodeDecodeError, json.decoder.JSONDecodeError):
                 pass
             except:
@@ -88,7 +102,7 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
 
 def crawl_by_subscribe():
     data_list = (
-        db.query(SubscribeCrawl)
+        db().query(SubscribeCrawl)
         .filter(SubscribeCrawl.next_at <= utils.now())
         .filter(SubscribeCrawl.is_closed == False)
         .filter(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
@@ -98,14 +112,15 @@ def crawl_by_subscribe():
     for data in data_list:
         try:
             crawl_by_subscribe_url(data)
-            db.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
+            new_db = db()
+            new_db.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
                 {
                     SubscribeCrawl.next_at: int(
                         random.uniform(0.5, 1.5) * data.interval + utils.now()
                     )
                 }
             )
-            db.commit()
+            new_db.commit()
         except:
             traceback.print_exc()
 

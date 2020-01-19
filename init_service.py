@@ -10,6 +10,7 @@ from task import *
 task_func_map = {
     keep_time_consistent: {"startup_mode": "thread", "enable": False},
     update_new_node: {"startup_mode": "thread", "enable": True},
+    check_link_alive: {"startup_mode": "thread", "enable": True},
 }
 
 

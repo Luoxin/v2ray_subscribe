@@ -6,7 +6,7 @@ import traceback
 
 import psutil
 
-from log import logger
+from utils import logger
 
 
 class V2rayServer:

@@ -20,7 +20,7 @@ class SubscribeCrawl(base):
     interval = Column(Integer, comment="间隔")
     note = Column(Text, comment="备注信息")
 
-    __table_args__ = ({"comment": "抓取的配置表"})  # 添加索引和表注释
+    __table_args__ = {"comment": "抓取的配置表"}  # 添加索引和表注释
 
 
 @unique

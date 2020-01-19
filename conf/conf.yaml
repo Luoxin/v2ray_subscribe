@@ -6,10 +6,10 @@ HOST: "0.0.0.0"
 # port
 PORT: 1800
 
-# 日志级别
-LOG_DEBUG: false
-# 日志路径
-LOG_PATH: "./log/v2ray_subscribe.log"
+## 日志级别
+#LOG_DEBUG: false
+## 日志路径
+#LOG_PATH: ""
 
 # TEST_FILE_URL: "http://cachefly.cachefly.net/1mb.test"
 TEST_FILE_URL: "http://www.google.com"
@@ -24,7 +24,7 @@ SQLALCHEMY_DEBUG: false
 BASE_SPEED: 5000
 
 # 默认的生命值
-HEALTH_POINTS: 10
+MAX_DEATH_COUNT: 10
 
 # Redis连接信息
 REDIS_HOST: "127.0.0.1"

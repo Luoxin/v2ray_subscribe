@@ -24,7 +24,30 @@ def init_state(filename=os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml
 
 def get_conf(key):
     global s
-    return s.get(key)
+    try:
+        return s.get(key)
+    except:
+        return None
 
+
+def get_conf_int(key):
+    try:
+        return int(get_conf(key))
+    except:
+        return 0
+
+
+def get_conf_float(key):
+    try:
+        return float(get_conf(key))
+    except:
+        return 0.0
+
+
+def get_conf_bool(key):
+    try:
+        return bool(get_conf(key))
+    except:
+        return False
 
 user_agent = UserAgent()

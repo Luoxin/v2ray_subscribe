@@ -6,12 +6,20 @@ from sqlalchemy.orm import sessionmaker
 
 from enum import unique, Enum
 
+from sqlalchemy.pool import QueuePool
 
 from conf.conf import get_conf
 
 base = declarative_base()
 
-engine = create_engine(get_conf("DB_URL"), pool_pre_ping=True, pool_recycle=3600,)
+engine = create_engine(
+    get_conf("DB_URL"),
+    poolclass=QueuePool,
+    pool_recycle=3600,
+    pool_use_lifo=True,
+    pool_pre_ping=True,
+    max_overflow=-1,
+)
 
 # class BaseModel(_base):
 #     """Base Class """
@@ -34,4 +42,4 @@ from orm.subscribe_crawl import SubscribeCrawl
 from orm.subscribe_vmss import SubscribeVmss
 
 base.metadata.create_all(engine)
-db = sessionmaker(bind=engine)()
+db = sessionmaker(bind=engine)

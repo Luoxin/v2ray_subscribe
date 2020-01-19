@@ -5,19 +5,23 @@ import os
 import sys
 import platform
 
-try:
-    from conf.conf import LOG_DEBUG, SERVER_NAME, LOG_PATH
-except (ModuleNotFoundError, ImportError):
-    LOG_DEBUG = True
-    SERVER_NAME = "test"
-    LOG_PATH = "./test.log"
+# try:
+#     from conf.conf import get_conf, get_conf_bool
+#     LOG_DEBUG = get_conf_bool("LOG_DEBUG")
+#     SERVER_NAME = "test" if get_conf("SERVER_NAME") is None else get_conf("SERVER_NAME")
+#     LOG_PATH = "./test.log" if get_conf("LOG_PATH") is None else get_conf("LOG_PATH")
+# except:
+LOG_DEBUG = True
+SERVER_NAME = "v2ray_subscribe"
+LOG_PATH = "./test.log"
+
 
 sys.path.append("../")
 
 # 如果日志路径为空，根据系统来分别设置默认路径
 if LOG_PATH == "":
     if platform.system() == "Windows":
-        LOG_PATH = "C:/log"
+        LOG_PATH = "C:/ProgramData/log"
     elif platform.system() == "Linux":
         LOG_PATH = "/home/log"
     # TODO 对于java平台的默认日志路径的处理

@@ -7,10 +7,10 @@ import urllib
 
 import requests
 import utils
-from node import V2ray, Shadowsocks
-from orm import SubscribeVmss, db
+from task.node import V2ray, Shadowsocks
+from orm import SubscribeVmss, db, or_
 from proxy_server import V2rayServer
-from conf.conf import user_agent, get_conf
+from conf.conf import user_agent, get_conf, get_conf_int
 from utils import logger
 
 v2ray_server = V2rayServer(
@@ -60,11 +60,11 @@ def get_node_by_url(url: str != ""):
         return node, node_type
 
 
-def check_by_v2ray_url(url: str):
+def check_by_v2ray_url(url: str, test_url: str):
     try:
         node, node_type = get_node_by_url(url)
         if node is None:
-            return 0
+            return -1, -1
         json.dump(
             node.format_config(), open(get_conf("V2RAY_CONFIG_LOCAL"), "w"), indent=2
         )
@@ -76,7 +76,10 @@ def check_by_v2ray_url(url: str):
             }
             start_time = time.time()
             r = requests.get(
-                proxies=get_conf("PROXIES_TEST"), timeout=10, headers=headers,
+                url=test_url,
+                proxies=get_conf("PROXIES_TEST"),
+                timeout=10,
+                headers=headers,
             )
             if r.status_code == 200:
                 request_time = time.time() - start_time
@@ -110,59 +113,109 @@ def check_by_v2ray_url(url: str):
         return -1, -1
 
 
+def check_link_alive_by_google(data: SubscribeVmss):
+    try:
+        speed, network_delay = check_by_v2ray_url(data.url, "https://www.google.com/")
+        new_db = db()
+        new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+            {
+                SubscribeVmss.speed_google: speed,
+                SubscribeVmss.network_delay_google: network_delay
+                if network_delay > 0
+                else 0,
+                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
+                + int(time.time()),
+                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count + 1,
+            }
+        )
+        new_db.commit()
+    except:
+        logger.error(traceback.format_exc())
+
+
+def check_link_alive_by_youtube(data: SubscribeVmss):
+    try:
+        speed, network_delay = check_by_v2ray_url(data.url, "https://www.youtube.com/")
+        new_db = db()
+        new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+            {
+                SubscribeVmss.speed_youtube: speed,
+                SubscribeVmss.network_delay_youtube: network_delay
+                if network_delay > 0
+                else 0,
+                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
+                + int(time.time()),
+                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count + 1,
+            }
+        )
+        new_db.commit()
+    except:
+        logger.error(traceback.format_exc())
+
+
+def check_link_alive_by_internet(data: SubscribeVmss):
+    try:
+        speed, network_delay = check_by_v2ray_url(
+            data.url, "http://cachefly.cachefly.net/1mb.test"
+        )
+
+        new_db = db()
+        new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
+            {
+                SubscribeVmss.speed_internet: speed,
+                SubscribeVmss.network_delay_internet: network_delay
+                if network_delay > 0
+                else 0,
+                SubscribeVmss.next_at: int(random.uniform(0.5, 1.5) * data.interval)
+                + int(time.time()),
+                SubscribeVmss.death_count: 0 if speed >= 0 else data.death_count,
+            }
+        )
+        new_db.commit()
+    except:
+        logger.error(traceback.format_exc())
+
+
 def check_link_alive():
+    logger.info("starting check vpn node......")
     while True:
         try:
             data_list = (
-                db.query(SubscribeVmss)
-                .filter(SubscribeVmss.next_at < int(time.time()))
-                .order_by(SubscribeVmss.speed.desc())
+                db().query(SubscribeVmss)
+                .filter(
+                    or_(
+                        SubscribeVmss.death_count < get_conf_int("MAX_DEATH_COUNT"),
+                        SubscribeVmss.death_count == None,
+                    )
+                )
+                .filter(
+                    or_(
+                        SubscribeVmss.next_at < int(time.time()),
+                        SubscribeVmss.next_at == None,
+                    )
+                )
+                .order_by(SubscribeVmss.next_at)
                 .all()
             )
-            # filter(SubscribeVmss.last_state.notin_(1)). \
             if len(data_list) <= 0:
-                # logger.info("暂时没有待检测节点")
+                logger.info("暂时没有待检测节点")
                 time.sleep(20)
                 continue
 
             else:
                 for i, data in enumerate(data_list):
                     try:
-                        speed, network_delay = check_by_v2ray_url(data.url)
-                        if speed >= 0:
-                            db.query(SubscribeVmss).filter(
-                                SubscribeVmss.id == data.id
-                            ).update(
-                                {
-                                    SubscribeVmss.next_at: int(
-                                        random.uniform(0.5, 1.5) * data.interval
-                                    )
-                                    + int(time.time()),
-                                    SubscribeVmss.death_count: 0,
-                                }
-                            )
-                        else:
-                            db.query(SubscribeVmss).filter(
-                                SubscribeVmss.id == data.id
-                            ).update(
-                                {
-                                    SubscribeVmss.next_at: int(
-                                        random.uniform(0.5, 1.5) * data.interval
-                                    )
-                                    + int(time.time()),
-                                    SubscribeVmss.death_count: data.death_count + 1,
-                                }
-                            )
-                        db.commit()
+                        check_link_alive_by_google(data)
+                        check_link_alive_by_youtube(data)
+                        check_link_alive_by_internet(data)
                     except:
                         logger.error(traceback.format_exc())
                     finally:
                         time.sleep(5)
                         # logger.info("第{}个节点监测完成".format(i+1))
-                logger.info("{}个节点检测完成".format(i + 1))
+                logger.debug("{}个节点检测完成".format(i + 1))
         except:
             logger.error(traceback.format_exc())
             time.sleep(10)
         finally:
-            # logger.info("节点检测完成")
             time.sleep(10)
