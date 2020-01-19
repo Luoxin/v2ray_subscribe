@@ -54,15 +54,8 @@ def get_node_by_url(url: str != ""):
         return None
 
 
-def check_by_v2ray_url(url: str, test_url: str):
+def check_by_v2ray_url(test_url: str):
     try:
-        node = get_node_by_url(url)
-        if node is None:
-            return -1, -1
-        json.dump(
-            node.format_config(), open(get_conf("V2RAY_CONFIG_LOCAL"), "w"), indent=2
-        )
-        v2ray_server.restart()
         try:
             headers = {
                 "Connection": "close",
@@ -71,7 +64,10 @@ def check_by_v2ray_url(url: str, test_url: str):
             start_time = time.time()
             r = requests.get(
                 url=test_url,
-                proxies=get_conf("PROXIES_TEST"),
+                proxies={
+                    "http": "socks5://127.0.0.1:{}".format(get_conf_int("CHECK_PORT")),
+                    "https": "socks5://127.0.0.1:{}".format(get_conf_int("CHECK_PORT")),
+                },
                 timeout=10,
                 headers=headers,
             )
@@ -99,8 +95,7 @@ def check_by_v2ray_url(url: str, test_url: str):
             network_delay = -1
             logger.error(traceback.format_exc())
 
-        logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
-        # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
+        logger.info("{}kb/s({} ms)\t测试连接{}".format(speed, network_delay, test_url))
         return float(speed), float(network_delay)
     except:
         logger.error(traceback.format_exc())
@@ -109,7 +104,7 @@ def check_by_v2ray_url(url: str, test_url: str):
 
 def check_link_alive_by_google(data: SubscribeVmss):
     try:
-        speed, network_delay = check_by_v2ray_url(data.url, "https://www.google.com/")
+        speed, network_delay = check_by_v2ray_url("https://www.google.com/")
         new_db = db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
@@ -129,7 +124,7 @@ def check_link_alive_by_google(data: SubscribeVmss):
 
 def check_link_alive_by_youtube(data: SubscribeVmss):
     try:
-        speed, network_delay = check_by_v2ray_url(data.url, "https://www.youtube.com/")
+        speed, network_delay = check_by_v2ray_url("https://www.youtube.com/")
         new_db = db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
@@ -150,7 +145,7 @@ def check_link_alive_by_youtube(data: SubscribeVmss):
 def check_link_alive_by_internet(data: SubscribeVmss):
     try:
         speed, network_delay = check_by_v2ray_url(
-            data.url, "http://cachefly.cachefly.net/1mb.test"
+            "http://cachefly.cachefly.net/1mb.test"
         )
 
         new_db = db()
@@ -168,6 +163,15 @@ def check_link_alive_by_internet(data: SubscribeVmss):
         new_db.commit()
     except:
         logger.error(traceback.format_exc())
+
+
+def update_v2ray_conf(v2ray_url):
+    node = get_node_by_url(v2ray_url)
+    if node is None:
+        return -1, -1
+    json.dump(node.format_config(), open(get_conf("V2RAY_CONFIG_LOCAL"), "w"), indent=2)
+    v2ray_server.restart()
+    logger.info("v2ray 配置已更换为\t{}".format(v2ray_url))
 
 
 def check_link_alive():
@@ -200,6 +204,7 @@ def check_link_alive():
             else:
                 for i, data in enumerate(data_list):
                     try:
+                        update_v2ray_conf(data.url)
                         check_link_alive_by_google(data)
                         check_link_alive_by_youtube(data)
                         check_link_alive_by_internet(data)

@@ -40,7 +40,6 @@ DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
 Interval: 60 * 60
 
 CHECK_PORT: 1086
-PROXIES_TEST: {"http": "socks5://127.0.0.1:1086", "https": "socks5://127.0.0.1:1086"}
 
 PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:1088", "https": "socks5://127.0.0.1:1088"}
 
