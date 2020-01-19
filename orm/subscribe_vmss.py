@@ -1,36 +1,37 @@
+import utils
 from orm import *
 
 
-class SubscribeVmss(BaseModel):
-    """
-        抓取到的数据表
-    """
+class SubscribeVmss(base):
+    __tablename__ = "subscribe_vmss"
 
-    id = IntegerField(primary_key=True)
+    id = Column(Integer, primary_key=True)
+    created_at = Column(Integer, server_default=str(utils.now()))
+    updated_at = Column(
+        Integer, server_default=str(int(utils.now())), onupdate=str(int(utils.now()))
+    )
 
-    created_at = IntegerField(default=now(), verbose_name="创建时间")
-    updated_at = IntegerField(default=now(), verbose_name="更新时间")
+    url = Column(String(1000), unique=True, comment="节点分享地址")
+    network_protocol_type = Column(String(100), index=True, comment="网络协议类型")
 
-    url = CharField(max_length=1000, null=False, verbose_name="节点分享地址")
-    network_protocol_type = CharField(default="", max_length=50, verbose_name="网络协议类型")
-
-    conf_details = JSONField(verbose_name="配置的详情内容")
+    conf_details = Column(JSON, comment="配置的详情内容")
 
     # 各个维度的速度测试
-    speed_google = FloatField(default=0, verbose_name="google访问速度")
-    network_delay_google = FloatField(default=0, verbose_name="google访问延时")
+    speed_google = Column(Float, comment="google访问速度")
+    network_delay_google = Column(Float, comment="google访问延时")
 
-    speed_youtube = FloatField(default=0, verbose_name="youtube访问速度")
-    network_delay_youtube = FloatField(default=0, verbose_name="youtube访问延时")
+    speed_youtube = Column(Float, comment="youtube访问速度")
+    network_delay_youtube = Column(Float, comment="youtube访问延时")
 
-    speed_internet = FloatField(default=0, verbose_name="测速网站 测速速度")
-    network_delay_internet = FloatField(default=0, verbose_name="测速网站 访问延时")
+    speed_internet = Column(Float, comment="测速网站 测速速度")
+    network_delay_internet = Column(Float, comment="测速网站 访问延时")
 
-    next_at = IntegerField(default=0, verbose_name="下一次的测速时间")
-    interval = IntegerField(default=0, verbose_name="间隔")
-    crawl_id = IntegerField(default=0, verbose_name="关联的 SubscribeCrawl 的 id")
+    next_at = Column(Integer, comment="下一次的测速时间")
+    interval = Column(Integer, comment="间隔")
+    crawl_id = Column(Integer, comment="关联的 SubscribeCrawl 的 id")
 
-    is_closed = BooleanField(default=False, verbose_name="是否禁用")
+    is_closed = Column(Boolean, comment="是否禁用")
 
-    class Meta:
-        db_table = "subscribe_vmss"
+    __table_args__ = (
+        {"comment": "抓取到的数据表"},
+    )  # 添加索引和表注释
