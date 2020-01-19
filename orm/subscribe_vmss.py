@@ -32,6 +32,8 @@ class SubscribeVmss(base):
 
     is_closed = Column(Boolean, comment="是否禁用")
 
+    death_count = Column(Integer, comment="死亡计时")
+
     __table_args__ = (
         {"comment": "抓取到的数据表"},
     )  # 添加索引和表注释

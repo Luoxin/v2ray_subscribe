@@ -3,142 +3,166 @@ import random
 import sys
 import time
 import traceback
-import requests
+import urllib
 
+import requests
 import utils
-from conf.conf import get_conf, user_agent
-from node import V2ray
-from orm import SubscribeVmss
+from node import V2ray, Shadowsocks
+from orm import SubscribeVmss, db
 from proxy_server import V2rayServer
+from conf.conf import user_agent, get_conf
 from utils import logger
 
+v2ray_server = V2rayServer(
+    get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL")
+)
 
-class CheckAlive:
-    def __init__(self):
-        self.v2ray_server = V2rayServer(
-            get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL")
+
+def get_node_by_url(url: str != ""):
+    node = None
+    node_type = ""
+    try:
+        if url.startswith("ss://"):  # ss node
+            node_type = "ss"
+            base64_str = url.replace("ss://", "")
+            base64_str = urllib.parse.unquote(base64_str)
+
+            origin = utils.decode(base64_str[0 : base64_str.index("#")])
+            remark = base64_str[base64_str.index("#") + 1 :]
+            security = origin[0 : origin.index(":")]
+            password = origin[origin.index(":") + 1 : origin.index("@")]
+            ipandport = origin[origin.index("@") + 1 :]
+            ip = ipandport[0 : ipandport.index(":")]
+            port = int(ipandport[ipandport.index(":") + 1 :])
+            ssode = Shadowsocks(ip, port, remark, security, password)
+            node = ssode
+        elif url.startswith("vmess://"):  # vmess
+            node_type = "v2ray"
+            base64_str = url.replace("vmess://", "")
+            jsonstr = utils.decode(base64_str)
+
+            server_node = json.loads(jsonstr)
+            v2node = V2ray(
+                server_node["add"],
+                int(server_node["port"]),
+                server_node["ps"],
+                "auto",
+                server_node["id"],
+                int(server_node["aid"]),
+                server_node["net"],
+                server_node["type"],
+                server_node["host"],
+                server_node["path"],
+                server_node["tls"],
+            )
+            node = v2node
+    finally:
+        return node, node_type
+
+
+def check_by_v2ray_url(url: str):
+    try:
+        node, node_type = get_node_by_url(url)
+        if node is None:
+            return 0
+        json.dump(
+            node.format_config(), open(get_conf("V2RAY_CONFIG_LOCAL"), "w"), indent=2
         )
-        self.v2ray_config_local_path = get_conf("V2RAY_CONFIG_LOCAL")
-        self.proxies = get_conf("PROXIES_TEST")
-        self.ua = user_agent
+        v2ray_server.restart()
+        try:
+            headers = {
+                "Connection": "close",
+                "User-Agent": user_agent.random,
+            }
+            start_time = time.time()
+            r = requests.get(
+                proxies=get_conf("PROXIES_TEST"), timeout=10, headers=headers,
+            )
+            if r.status_code == 200:
+                request_time = time.time() - start_time
+                del start_time
+                size = sys.getsizeof(r.content) / 1024
+                network_delay = r.elapsed.microseconds / 1000 / 1000
+                speed = size / (request_time - network_delay)
+            else:
+                speed = 0
+                network_delay = 0
+            r.close()
+            del r
+        except requests.exceptions.Timeout:
+            logger.warning("connect time out")
+            speed = -2
+            network_delay = -2
+        except requests.exceptions.ConnectionError:
+            logger.warning("connect error")
+            speed = -3
+            network_delay = -3
+        except:
+            speed = -1
+            network_delay = -1
+            logger.error(traceback.format_exc())
 
-        if self.v2ray_config_local_path is None:
-            raise Exception("miss v2ray config local path")
+        logger.info("\t{}kb/s\t连接\t{}".format(speed, url))
+        # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
+        return float(speed), float(network_delay)
+    except:
+        logger.error(traceback.format_exc())
+        return -1, -1
 
-    def check_link_alive(self):
-        while True:
-            try:
-                data_list = (
-                    SubscribeVmss.select()
-                    .where(SubscribeVmss.next_at < utils.now())
-                    .where(SubscribeVmss.is_closed == False)
-                )
+
+def check_link_alive():
+    while True:
+        try:
+            data_list = (
+                db.query(SubscribeVmss)
+                .filter(SubscribeVmss.next_at < int(time.time()))
+                .order_by(SubscribeVmss.speed.desc())
+                .all()
+            )
+            # filter(SubscribeVmss.last_state.notin_(1)). \
+            if len(data_list) <= 0:
+                # logger.info("暂时没有待检测节点")
+                time.sleep(20)
+                continue
+
+            else:
                 for i, data in enumerate(data_list):
                     try:
-                        speed, network_delay = self.check_by_v2ray_url(data.url, "")
-                        SubscribeVmss.update(
-                            next_at=random.uniform(0.5, 1.5) * data.interval
-                            + utils.now(),
-                        ).where(SubscribeVmss.id == data.id).execute()
+                        speed, network_delay = check_by_v2ray_url(data.url)
+                        if speed >= 0:
+                            db.query(SubscribeVmss).filter(
+                                SubscribeVmss.id == data.id
+                            ).update(
+                                {
+                                    SubscribeVmss.next_at: int(
+                                        random.uniform(0.5, 1.5) * data.interval
+                                    )
+                                    + int(time.time()),
+                                    SubscribeVmss.death_count: 0,
+                                }
+                            )
+                        else:
+                            db.query(SubscribeVmss).filter(
+                                SubscribeVmss.id == data.id
+                            ).update(
+                                {
+                                    SubscribeVmss.next_at: int(
+                                        random.uniform(0.5, 1.5) * data.interval
+                                    )
+                                    + int(time.time()),
+                                    SubscribeVmss.death_count: data.death_count + 1,
+                                }
+                            )
+                        db.commit()
                     except:
                         logger.error(traceback.format_exc())
                     finally:
                         time.sleep(5)
                         # logger.info("第{}个节点监测完成".format(i+1))
-
                 logger.info("{}个节点检测完成".format(i + 1))
-                del i
-            except:
-                logger.error(traceback.format_exc())
-                time.sleep(10)
-            finally:
-                # logger.info("节点检测完成")
-                time.sleep(10)
-
-    def get_node_by_url(self, url: str != ""):
-        try:
-            # if url.startswith("ss://"):  # ss node
-            #     node_type = "ss"
-            #     base64_str = url.replace("ss://", "")
-            #     base64_str = urllib.parse.unquote(base64_str)
-            #
-            #     origin = utils.decode(base64_str[0 : base64_str.index("#")])
-            #     remark = base64_str[base64_str.index("#") + 1 :]
-            #     security = origin[0 : origin.index(":")]
-            #     password = origin[origin.index(":") + 1 : origin.index("@")]
-            #     ipandport = origin[origin.index("@") + 1 :]
-            #     ip = ipandport[0 : ipandport.index(":")]
-            #     port = int(ipandport[ipandport.index(":") + 1 :])
-            #     ssode = Shadowsocks(ip, port, remark, security, password)
-            #     node = ssode
-            if url.startswith("vmess://"):  # vmess
-                server_node = json.loads(utils.decode(url.replace("vmess://", "")))
-                return V2ray(
-                    server_node["add"],
-                    int(server_node["port"]),
-                    server_node["ps"],
-                    "auto",
-                    server_node["id"],
-                    int(server_node["aid"]),
-                    server_node["net"],
-                    server_node["type"],
-                    server_node["host"],
-                    server_node["path"],
-                    server_node["tls"],
-                )
-        except:
-            logger.error("err: {}".format(traceback.format_exc()))
-        return None
-
-    def check_by_v2ray_url(self, url: str, test_url: str):
-        try:
-            if url == "" or test_url == "":
-                return 0
-
-            node, node_type = self.get_node_by_url(url)
-            if node is None:
-                return 0
-            json.dump(
-                node.format_config(), open(self.v2ray_config_local_path, "w"), indent=2
-            )
-            self.v2ray_server.restart()
-
-            try:
-                start_time = time.time()
-                r = requests.get(
-                    test_url,
-                    proxies=self.proxies,
-                    timeout=1 * 1000,
-                    headers={"Connection": "close", "User-Agent": self.ua.random,},
-                )
-                if r.status_code == 200:
-                    # speed = r.elapsed.microseconds / 1000 / 1000 // 请求的延时
-                    request_time = time.time() - start_time
-                    del start_time
-                    size = sys.getsizeof(r.content) / 1024
-                    network_delay = r.elapsed.microseconds / 1000 / 1000
-                    speed = size / (request_time - network_delay)
-                else:
-                    speed = 0
-                r.close()
-                del r
-            except requests.exceptions.Timeout:
-                logger.warning("connect time out")
-                speed = -2
-                network_delay = -2
-            except requests.exceptions.ConnectionError:
-                logger.warning("connect error")
-                speed = -3
-                network_delay = -3
-            except:
-                speed = -1
-                network_delay = -1
-                logger.error(traceback.format_exc())
-
-            logger.info("\t{}kb/s\t{}\tms\t连接\t{}".format(speed, network_delay, url))
-            # subprocess.call('mv ' + V2RAY_CONFIG_LOCAL + '.bak ' + V2RAY_CONFIG_LOCAL, shell=True)
-            return float(speed), float(network_delay)
         except:
             logger.error(traceback.format_exc())
-
-        return -1, -1
+            time.sleep(10)
+        finally:
+            # logger.info("节点检测完成")
+            time.sleep(10)

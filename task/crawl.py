@@ -21,20 +21,27 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
             return False
 
         # 已经存在了，就不管了
-        if db.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first() is not None:
+        if (
+            db.query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+            is not None
+        ):
             return True
 
         if v2ray_url.startswith("vmess://"):  # vmess
             try:
                 logger.debug("new vmess is {}".format(v2ray_url))
                 v = json.loads(base64_decode(v2ray_url.replace("vmess://", "")))
-                db.add(SubscribeVmss(
-                    url=v2ray_url,
-                    network_protocol_type="" if v.get("net") is None else v.get("net"),
-                    interval=interval,
-                    crawl_id=crawl_id,
-                    conf_details=v,
-                ))
+                db.add(
+                    SubscribeVmss(
+                        url=v2ray_url,
+                        network_protocol_type=""
+                        if v.get("net") is None
+                        else v.get("net"),
+                        interval=interval,
+                        crawl_id=crawl_id,
+                        conf_details=v,
+                    )
+                )
                 db.commit()
             except (UnicodeDecodeError, json.decoder.JSONDecodeError):
                 pass
@@ -66,10 +73,10 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
             for v2ray_url in v2ray_url_list:
                 add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
         except (
-                requests.exceptions.RequestException,
-                requests.exceptions.RequestsWarning,
-                requests.exceptions.Timeout,
-                requests.exceptions.ConnectionError,
+            requests.exceptions.RequestException,
+            requests.exceptions.RequestsWarning,
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
         ):
             return
         except:
@@ -82,20 +89,22 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
 def crawl_by_subscribe():
     data_list = (
         db.query(SubscribeCrawl)
-            .filter(SubscribeCrawl.next_at <= utils.now())
-            .filter(SubscribeCrawl.is_closed == False)
-            .filter(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
-            .all()
+        .filter(SubscribeCrawl.next_at <= utils.now())
+        .filter(SubscribeCrawl.is_closed == False)
+        .filter(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
+        .all()
     )
 
     for data in data_list:
         try:
             crawl_by_subscribe_url(data)
-            db.query(SubscribeCrawl) \
-                .filter(SubscribeCrawl.id == data.id) \
-                .update({
-                SubscribeCrawl.next_at: int(random.uniform(0.5, 1.5) * data.interval + utils.now())
-            })
+            db.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
+                {
+                    SubscribeCrawl.next_at: int(
+                        random.uniform(0.5, 1.5) * data.interval + utils.now()
+                    )
+                }
+            )
             db.commit()
         except:
             traceback.print_exc()
