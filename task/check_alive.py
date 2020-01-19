@@ -19,30 +19,24 @@ v2ray_server = V2rayServer(
 
 
 def get_node_by_url(url: str != ""):
-    node = None
-    node_type = ""
     try:
-        if url.startswith("ss://"):  # ss node
-            node_type = "ss"
-            base64_str = url.replace("ss://", "")
-            base64_str = urllib.parse.unquote(base64_str)
-
-            origin = utils.decode(base64_str[0 : base64_str.index("#")])
-            remark = base64_str[base64_str.index("#") + 1 :]
-            security = origin[0 : origin.index(":")]
-            password = origin[origin.index(":") + 1 : origin.index("@")]
-            ipandport = origin[origin.index("@") + 1 :]
-            ip = ipandport[0 : ipandport.index(":")]
-            port = int(ipandport[ipandport.index(":") + 1 :])
-            ssode = Shadowsocks(ip, port, remark, security, password)
-            node = ssode
-        elif url.startswith("vmess://"):  # vmess
-            node_type = "v2ray"
-            base64_str = url.replace("vmess://", "")
-            jsonstr = utils.decode(base64_str)
-
-            server_node = json.loads(jsonstr)
-            v2node = V2ray(
+        # if url.startswith("ss://"):  # ss node
+        #     node_type = "ss"
+        #     base64_str = url.replace("ss://", "")
+        #     base64_str = urllib.parse.unquote(base64_str)
+        #
+        #     origin = utils.decode(base64_str[0 : base64_str.index("#")])
+        #     remark = base64_str[base64_str.index("#") + 1 :]
+        #     security = origin[0 : origin.index(":")]
+        #     password = origin[origin.index(":") + 1 : origin.index("@")]
+        #     ipandport = origin[origin.index("@") + 1 :]
+        #     ip = ipandport[0 : ipandport.index(":")]
+        #     port = int(ipandport[ipandport.index(":") + 1 :])
+        #     ssode = Shadowsocks(ip, port, remark, security, password)
+        #     node = ssode
+        if url.startswith("vmess://"):  # vmess
+            server_node = json.loads(utils.base64_decode(url.replace("vmess://", "")))
+            return V2ray(
                 server_node["add"],
                 int(server_node["port"]),
                 server_node["ps"],
@@ -55,14 +49,14 @@ def get_node_by_url(url: str != ""):
                 server_node["path"],
                 server_node["tls"],
             )
-            node = v2node
-    finally:
-        return node, node_type
+    except:
+        logger.error(traceback.format_exc())
+        return None
 
 
 def check_by_v2ray_url(url: str, test_url: str):
     try:
-        node, node_type = get_node_by_url(url)
+        node = get_node_by_url(url)
         if node is None:
             return -1, -1
         json.dump(
@@ -181,7 +175,8 @@ def check_link_alive():
     while True:
         try:
             data_list = (
-                db().query(SubscribeVmss)
+                db()
+                .query(SubscribeVmss)
                 .filter(
                     or_(
                         SubscribeVmss.death_count < get_conf_int("MAX_DEATH_COUNT"),

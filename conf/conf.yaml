@@ -7,9 +7,9 @@ HOST: "0.0.0.0"
 PORT: 1800
 
 ## 日志级别
-#LOG_DEBUG: false
+# LOG_DEBUG: false
 ## 日志路径
-#LOG_PATH: ""
+# LOG_PATH: ""
 
 # TEST_FILE_URL: "http://cachefly.cachefly.net/1mb.test"
 TEST_FILE_URL: "http://www.google.com"
@@ -39,15 +39,16 @@ DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
 # 默认检测间隔
 Interval: 60 * 60
 
-PROXIES_TEST: {"http": "socks5://127.0.0.1:1086","https": "socks5://127.0.0.1:1086"}
+CHECK_PORT: 1086
+PROXIES_TEST: {"http": "socks5://127.0.0.1:1086", "https": "socks5://127.0.0.1:1086"}
 
-PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:1088","https": "socks5://127.0.0.1:1088"}
+PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:1088", "https": "socks5://127.0.0.1:1088"}
 
-V2RAY_SERVICE_PATH: "C:/Users/Luoxin/Desktop/v2ray/v2ray.exe"
+V2RAY_SERVICE_PATH: "C:/Users/luoxi/Desktop/v2ray/v2ray.exe"
 # V2RAY_SERVICE_PATH: "/usr/bin/v2ray/v2ray"
 
 # V2RAY_CONFIG_LOCAL: "/etc/v2ray/config.json"
-V2RAY_CONFIG_LOCAL: "C:/Users/Luoxin/Desktop/v2ray/c.json"
+V2RAY_CONFIG_LOCAL: "C:/Users/luoxi/Desktop/v2ray/c.json"
 
 # 是否开启NTP自动校时服务
 NTP_SERVER_ENABLE: True

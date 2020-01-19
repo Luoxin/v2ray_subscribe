@@ -102,7 +102,8 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
 
 def crawl_by_subscribe():
     data_list = (
-        db().query(SubscribeCrawl)
+        db()
+        .query(SubscribeCrawl)
         .filter(SubscribeCrawl.next_at <= utils.now())
         .filter(SubscribeCrawl.is_closed == False)
         .filter(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
