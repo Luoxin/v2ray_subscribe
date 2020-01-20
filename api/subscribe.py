@@ -1,14 +1,17 @@
+import traceback
+
 from flask import Blueprint, request
 
 import utils
 from orm import db, SubscribeVmss, or_
+from task.crawl import add_new_vmess
 from utils import logger  # 日志
 from error_exception import create_error_with_msg
 
 subscribe_api = Blueprint("subscribe", __name__)
 
 
-@subscribe_api.route("/api/subscription", methods=["GET"])
+@subscribe_api.route("/api/subscribe/subscription", methods=["GET"])
 def subscription():
     req = request.args
 
@@ -74,6 +77,18 @@ def subscription():
             vmess_list.append(subscribe_vmess.url)
 
         return utils.base64_encode(("\n".join(vmess_list)))
+
+
+@subscribe_api.route("/api/subscribe/add", methods=["POST"])
+def add_with_vmess():
+    req = request.get_json()
+
+    if "vmess" in req:
+        vmess = req.get("vmess")
+        if add_new_vmess(vmess):
+            return {"message": "ok"}
+
+    return {"message": "failure"}
 
 
 # def get_alive_url():
