@@ -1,4 +1,6 @@
 from conf.conf import get_conf
+from orm import db
+
 import traceback
 
 from flask import Flask, ctx, jsonify
@@ -7,7 +9,6 @@ from conntext import JSONResponse, before_request, after_request
 from error_exception import InternalException
 from init_service import init_service
 
-from orm import db
 
 from route_list import ROUTE_LIST
 from utils import logger
