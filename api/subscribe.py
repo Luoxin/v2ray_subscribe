@@ -71,6 +71,11 @@ def subscription():
                 .order_by(SubscribeVmss.speed_google.desc())
             )
 
+        network_protocol_type = req.get("network_type")
+
+        if network_protocol_type != "" and network_protocol_type is not None:
+            new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
+
         can_be_used = new_db.all()
         vmess_list = []
         for subscribe_vmess in can_be_used:
