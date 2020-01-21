@@ -3,7 +3,7 @@ import traceback
 
 from flask import Flask, ctx, jsonify
 
-from conntext import JSONResponse, before_request
+from conntext import JSONResponse, before_request, after_request
 from error_exception import InternalException
 from init_service import init_service
 
@@ -18,6 +18,7 @@ app = Flask(
 
 app.response_class = JSONResponse
 app.before_request(before_request)
+app.after_request(after_request)
 app.logger = logger
 
 
