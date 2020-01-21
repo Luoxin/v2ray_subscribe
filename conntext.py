@@ -14,13 +14,13 @@ class JSONResponse(Response):
     default_mimetype = "application/json"
 
     def __init__(
-            self,
-            response=None,
-            status=None,
-            headers=None,
-            mimetype=None,
-            content_type=None,
-            direct_passthrough=False,
+        self,
+        response=None,
+        status=None,
+        headers=None,
+        mimetype=None,
+        content_type=None,
+        direct_passthrough=False,
     ):
         super().__init__(
             response, status, headers, mimetype, content_type, direct_passthrough
@@ -64,8 +64,8 @@ class JSONResponse(Response):
         response_data = {"data": response, "errcode": 0, "errmsg": ""}
         if isinstance(response, dict):
             if (
-                    isinstance(response.get("errcode"), int)
-                    and response.get("errcode") != 0
+                isinstance(response.get("errcode"), int)
+                and response.get("errcode") != 0
             ):
                 response_data = response
 
@@ -93,14 +93,16 @@ def before_request():
     if request.headers.get("X-Forwarded-For") is not None:
         real_ip = request.headers.get("X-Forwarded-For")
 
-    # TODO 优化一下权限控制
     if request.path == "/api/subscribe/subscription":
         req = request.args
-        secret_key = req.get("SecretKey")
+        secret_key = req.get("key")
         uuid = req.get("id")
 
         # 访客访问的限制
-        if secret_key != "4DA7A73E8E3048999CFBDEA5D2E24A31" or uuid != "6358dca556c34349a10d146ae4bf5ad6":
+        if (
+            secret_key != "2AB0621AC6B94E29BE37B583EAFA80C6"
+            or uuid != "6358dca556c34349a10d146ae4bf5ad6"
+        ):
             secret = get_global("secret")
             if real_ip not in secret:
                 secret[real_ip] = 0

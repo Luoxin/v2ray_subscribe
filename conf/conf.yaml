@@ -41,7 +41,7 @@ Interval: 60 * 60
 
 CHECK_PORT: 1086
 
-PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:1088", "https": "socks5://127.0.0.1:1088"}
+PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:10808", "https": "socks5://127.0.0.1:10808"}
 
 V2RAY_SERVICE_PATH: "C:/Users/luoxi/Desktop/v2ray/v2ray.exe"
 # V2RAY_SERVICE_PATH: "/usr/bin/v2ray/v2ray"

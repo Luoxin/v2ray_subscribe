@@ -55,7 +55,7 @@ class V2ray(Node):
             "policy": {
                 "system": {"statsInboundUplink": True, "statsInboundDownlink": True}
             },
-            "log": {"access": "", "error": "", "loglevel": "warning"},
+            "log": {"access": "./v2ray_access.log", "error": "./v2ray_err.log", "loglevel": "warning"},
             "inbounds": [
                 {
                     "tag": "proxy",

@@ -26,50 +26,50 @@ def subscription():
     subscription_type = req.get("type") if "type" in req.keys() else "delayed"
 
     if subscription_site == "youtube":
+        new_db = (
+            new_db.filter(SubscribeVmss.speed_youtube > 0)
+            .filter(SubscribeVmss.network_delay_youtube > 0)
+            .filter(SubscribeVmss.network_delay_youtube < 500)
+        )
+
         if subscription_type == "speed":
-            new_db = (
-                new_db.filter(SubscribeVmss.speed_youtube > 0)
-                .filter(SubscribeVmss.network_delay_youtube > 0)
-                .order_by(SubscribeVmss.speed_youtube.desc())
-                .order_by(SubscribeVmss.network_delay_youtube.desc())
+            new_db = new_db.order_by(SubscribeVmss.speed_youtube.desc()).order_by(
+                SubscribeVmss.network_delay_youtube.desc()
             )
         else:
-            new_db = (
-                new_db.filter(SubscribeVmss.speed_youtube > 0)
-                .filter(SubscribeVmss.network_delay_youtube > 0)
-                .order_by(SubscribeVmss.network_delay_youtube.desc())
-                .order_by(SubscribeVmss.speed_youtube.desc())
-            )
+            new_db = new_db.order_by(
+                SubscribeVmss.network_delay_youtube.desc()
+            ).order_by(SubscribeVmss.speed_youtube.desc())
     elif subscription_site == "internet":
+        new_db = (
+            new_db.filter(SubscribeVmss.speed_internet > 0)
+            .filter(SubscribeVmss.network_delay_internet > 0)
+            .filter(SubscribeVmss.network_delay_internet < 500)
+        )
+
         if subscription_type == "speed":
-            new_db = (
-                new_db.filter(SubscribeVmss.speed_internet > 0)
-                .filter(SubscribeVmss.network_delay_internet > 0)
-                .order_by(SubscribeVmss.speed_internet.desc())
-                .order_by(SubscribeVmss.network_delay_internet.desc())
+            new_db = new_db.order_by(SubscribeVmss.speed_internet.desc()).order_by(
+                SubscribeVmss.network_delay_internet.desc()
             )
         else:
-            new_db = (
-                new_db.filter(SubscribeVmss.network_delay_internet > 0)
-                .filter(SubscribeVmss.speed_internet > 0)
-                .order_by(SubscribeVmss.network_delay_internet.desc())
-                .order_by(SubscribeVmss.speed_youtube.desc())
-            )
+            new_db = new_db.order_by(
+                SubscribeVmss.network_delay_internet.desc()
+            ).order_by(SubscribeVmss.speed_youtube.desc())
     else:
+        new_db = (
+            new_db.filter(SubscribeVmss.speed_google > 0)
+            .filter(SubscribeVmss.network_delay_google > 0)
+            .filter(SubscribeVmss.network_delay_google < 500)
+        )
+
         if subscription_type == "speed":
-            new_db = (
-                new_db.filter(SubscribeVmss.speed_google > 0)
-                .filter(SubscribeVmss.network_delay_google > 0)
-                .order_by(SubscribeVmss.speed_google.desc())
-                .order_by(SubscribeVmss.network_delay_google.desc())
+            new_db = new_db.order_by(SubscribeVmss.speed_google.desc()).order_by(
+                SubscribeVmss.network_delay_google.desc()
             )
         else:
-            new_db = (
-                new_db.filter(SubscribeVmss.network_delay_google > 0)
-                .filter(SubscribeVmss.speed_google > 0)
-                .order_by(SubscribeVmss.network_delay_google.desc())
-                .order_by(SubscribeVmss.speed_google.desc())
-            )
+            new_db = new_db.order_by(
+                SubscribeVmss.network_delay_google.desc()
+            ).order_by(SubscribeVmss.speed_google.desc())
 
         network_protocol_type = req.get("network_type")
 

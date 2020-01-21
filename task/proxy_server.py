@@ -1,8 +1,8 @@
 import os
 import signal
 import subprocess
-import threading
 import traceback
+
 import psutil
 
 from utils import logger
@@ -10,7 +10,7 @@ from utils import logger
 
 class V2rayServer:
     def __init__(self, path, conf):
-        self.cmd = "{} -config {}".format(path, conf)
+        self.cmd = "{} -config {} ".format(path, conf)
         self.pid = 0
 
     def run_server(self):
