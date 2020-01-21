@@ -17,7 +17,7 @@ def _get_conf_file_path() -> str:
         if os.path.exists(conf_path):
             return conf_path
 
-    print("无法找到配置文件")
+    print("无法找到配置文件 {}".format(conf_path_list))
     os._exit(-1)
 
 
