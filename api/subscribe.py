@@ -1,14 +1,17 @@
+import traceback
+
 from flask import Blueprint, request
 
 import utils
 from orm import db, SubscribeVmss, or_
+from task.crawl import add_new_vmess
 from utils import logger  # 日志
 from error_exception import create_error_with_msg
 
 subscribe_api = Blueprint("subscribe", __name__)
 
 
-@subscribe_api.route("/api/subscription", methods=["GET"])
+@subscribe_api.route("/api/subscribe/subscription", methods=["GET"])
 def subscription():
     req = request.args
 
@@ -68,12 +71,29 @@ def subscription():
                 .order_by(SubscribeVmss.speed_google.desc())
             )
 
+        network_protocol_type = req.get("network_type")
+
+        if network_protocol_type != "" and network_protocol_type is not None:
+            new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
+
         can_be_used = new_db.all()
         vmess_list = []
         for subscribe_vmess in can_be_used:
             vmess_list.append(subscribe_vmess.url)
 
         return utils.base64_encode(("\n".join(vmess_list)))
+
+
+@subscribe_api.route("/api/subscribe/add", methods=["POST"])
+def add_with_vmess():
+    req = request.get_json()
+
+    if "vmess" in req:
+        vmess = req.get("vmess")
+        if add_new_vmess(vmess):
+            return {"message": "ok"}
+
+    return {"message": "failure"}
 
 
 # def get_alive_url():

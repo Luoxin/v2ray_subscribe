@@ -45,7 +45,7 @@ class ErrorException:
 
 class ErrorEnum(Enum):
     def __init__(self):
-        y = yaml.load(open(ERROR_ENUM_PATH, "r"))
+        y = yaml.load(open("", "r"))
         if y.get("ErrorEnum") is not None:
             error_enum_map = y.get("ErrorEnum")
             if isinstance(error_enum_map, dict):

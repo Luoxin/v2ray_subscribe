@@ -5,7 +5,8 @@ from werkzeug._compat import integer_types, text_type
 from werkzeug.datastructures import Headers
 from werkzeug.utils import get_content_type
 from werkzeug.wrappers import Response
-
+from conf.conf import get_global, set_global
+from error_exception import create_error_with_msg
 from utils import logger  # 日志
 
 
@@ -13,13 +14,13 @@ class JSONResponse(Response):
     default_mimetype = "application/json"
 
     def __init__(
-        self,
-        response=None,
-        status=None,
-        headers=None,
-        mimetype=None,
-        content_type=None,
-        direct_passthrough=False,
+            self,
+            response=None,
+            status=None,
+            headers=None,
+            mimetype=None,
+            content_type=None,
+            direct_passthrough=False,
     ):
         super().__init__(
             response, status, headers, mimetype, content_type, direct_passthrough
@@ -63,8 +64,8 @@ class JSONResponse(Response):
         response_data = {"data": response, "errcode": 0, "errmsg": ""}
         if isinstance(response, dict):
             if (
-                isinstance(response.get("errcode"), int)
-                and response.get("errcode") != 0
+                    isinstance(response.get("errcode"), int)
+                    and response.get("errcode") != 0
             ):
                 response_data = response
 
@@ -92,6 +93,23 @@ def before_request():
     if request.headers.get("X-Forwarded-For") is not None:
         real_ip = request.headers.get("X-Forwarded-For")
 
+    # TODO 优化一下权限控制
+    if request.path == "/api/subscribe/subscription":
+        req = request.args
+        secret_key = req.get("SecretKey")
+        uuid = req.get("id")
+
+        # 访客访问的限制
+        if secret_key != "4DA7A73E8E3048999CFBDEA5D2E24A31" or uuid != "6358dca556c34349a10d146ae4bf5ad6":
+            secret = get_global("secret")
+            if real_ip not in secret:
+                secret[real_ip] = 0
+
+            secret[real_ip] += 1
+            set_global(key="secret", value=secret)
+            if secret[real_ip] > 3:
+                create_error_with_msg(2, "权限错误")
+
     logger.info(
         "Path: {}  Method: {} RemoteAddr: {} headers: {} request_message: {}  ".format(
             request.path,
@@ -104,10 +122,10 @@ def before_request():
     )
 
 
-def after_request_func(rsp):
+def after_request(rsp):
     try:
         pass
-        print(rsp.response[0].decode("utf-8"))
+        logger.info("response is {}".format(rsp.response[0].decode("utf-8")))
         # print(f.headers)
     except:
         traceback.print_exc()

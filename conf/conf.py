@@ -3,6 +3,7 @@ import yaml
 from fake_useragent import UserAgent
 
 s = None
+g = {}
 
 
 def _get_conf_file_path() -> str:
@@ -69,6 +70,22 @@ def get_conf_bool(key):
         return False
 
 
+def get_global(key):
+    global g
+    try:
+        return g.get(key)
+    except:
+        return None
+
+
+def set_global(key, value):
+    global g
+    try:
+        g[key] = value
+    except:
+        pass
+
+
 user_agent = UserAgent()
 
 if __name__ == "__main__":
@@ -83,4 +100,3 @@ if __name__ == "__main__":
 
     print("***获取上上级目录***")
     print(os.path.abspath(os.path.join(os.getcwd(), "../..")))
-
