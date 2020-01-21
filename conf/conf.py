@@ -8,9 +8,9 @@ g = {}
 
 def _get_conf_file_path() -> str:
     conf_path_list = [
-        os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml",
-        os.path.abspath(os.getcwd()) + "\conf.yaml",
-        os.path.abspath(os.path.dirname(os.getcwd())) + "\conf.yaml",
+        str(os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml").replace("\\", "/"),
+        str(os.path.abspath(os.getcwd())).replace("\\", "/"),
+        os.path.abspath(os.path.dirname(os.getcwd())).replace("\\", "/"),
     ]
 
     for conf_path in conf_path_list:
