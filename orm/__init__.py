@@ -18,7 +18,7 @@ engine = create_engine(
     pool_recycle=3600,
     pool_use_lifo=True,
     pool_pre_ping=True,
-    # max_overflow=-1,
+    max_overflow=-1,
 )
 
 # class BaseModel(_base):
