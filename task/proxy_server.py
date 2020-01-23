@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+import time
 import traceback
 
 import psutil
@@ -48,6 +49,7 @@ class V2rayServer:
             self.kill()
 
         self.run_server()
+        time.sleep(1)
 
     def _find_pid(self):
         for pid in psutil.pids():
