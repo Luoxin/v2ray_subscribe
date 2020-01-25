@@ -29,9 +29,7 @@ class Person(base):
 
     name = Column(String)
 
-    __mapper_args__ = {
-        'concrete': True
-    }
+    __mapper_args__ = {"concrete": True}
 
 
 base.metadata.create_all(engine)
