@@ -7,7 +7,7 @@ HOST: "0.0.0.0"
 PORT: 1800
 
 ## 日志级别
-# LOG_DEBUG: false
+#LOG_DEBUG: true
 ## 日志路径
 # LOG_PATH: "./v2ray_subscribe"
 

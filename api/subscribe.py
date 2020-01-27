@@ -17,9 +17,9 @@ def subscription():
 
     new_db = (
         db()
-        .query(SubscribeVmss)
-        .filter(SubscribeVmss.death_count >= 0)
-        .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
+            .query(SubscribeVmss)
+            .filter(SubscribeVmss.death_count >= 0)
+            .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
     )
 
     subscription_site = req.get("site") if "site" in req.keys() else "google"
@@ -28,8 +28,8 @@ def subscription():
     if subscription_site == "youtube":
         new_db = (
             new_db.filter(SubscribeVmss.speed_youtube > 0)
-            .filter(SubscribeVmss.network_delay_youtube > 0)
-            .filter(SubscribeVmss.network_delay_youtube < 500)
+                .filter(SubscribeVmss.network_delay_youtube > 0)
+            # .filter(SubscribeVmss.network_delay_youtube < 500)
         )
 
         if subscription_type == "speed":
@@ -43,8 +43,8 @@ def subscription():
     elif subscription_site == "internet":
         new_db = (
             new_db.filter(SubscribeVmss.speed_internet > 0)
-            .filter(SubscribeVmss.network_delay_internet > 0)
-            .filter(SubscribeVmss.network_delay_internet < 500)
+                .filter(SubscribeVmss.network_delay_internet > 0)
+            # .filter(SubscribeVmss.network_delay_internet < 500)
         )
 
         if subscription_type == "speed":
@@ -58,8 +58,8 @@ def subscription():
     else:
         new_db = (
             new_db.filter(SubscribeVmss.speed_google > 0)
-            .filter(SubscribeVmss.network_delay_google > 0)
-            .filter(SubscribeVmss.network_delay_google < 500)
+                .filter(SubscribeVmss.network_delay_google > 0)
+            # .filter(SubscribeVmss.network_delay_google < 500)
         )
 
         if subscription_type == "speed":
@@ -71,17 +71,18 @@ def subscription():
                 SubscribeVmss.network_delay_google.desc()
             ).order_by(SubscribeVmss.speed_google.desc())
 
-        network_protocol_type = req.get("network_type")
+    network_protocol_type = req.get("network_type")
 
-        if network_protocol_type != "" and network_protocol_type is not None:
-            new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
+    if network_protocol_type != "" and network_protocol_type is not None:
+        new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
 
-        can_be_used = new_db.all()
-        vmess_list = []
-        for subscribe_vmess in can_be_used:
-            vmess_list.append(subscribe_vmess.url)
+    # logger.debug("执行的sql为 {}".format(str(new_db)))
+    can_be_used = new_db.all()
+    vmess_list = []
+    for subscribe_vmess in can_be_used:
+        vmess_list.append(subscribe_vmess.url)
 
-        return utils.base64_encode(("\n".join(vmess_list)))
+    return utils.base64_encode(("\n".join(vmess_list)))
 
 
 @subscribe_api.route("/api/subscribe/add", methods=["POST"])
@@ -94,7 +95,6 @@ def add_with_vmess():
             return {"message": "ok"}
 
     return {"message": "failure"}
-
 
 # def get_alive_url():
 #     data_list = (
