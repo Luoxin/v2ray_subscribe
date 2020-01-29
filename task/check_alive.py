@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import sys
 import time
@@ -13,8 +14,10 @@ from proxy_server import V2rayServer
 from conf.conf import user_agent, get_conf, get_conf_int
 from utils import logger
 
+
 v2ray_server = V2rayServer(
-    get_conf("V2RAY_SERVICE_PATH"), get_conf("V2RAY_CONFIG_LOCAL")
+    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray.exe"),
+    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray_subscribe.conf"),
 )
 
 

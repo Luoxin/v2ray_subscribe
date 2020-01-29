@@ -1,4 +1,4 @@
-from conf.conf import get_conf
+from conf.conf import get_conf, init_conf
 from orm import db
 
 import traceback

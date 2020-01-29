@@ -1,12 +1,11 @@
 import traceback
 
-from flask import request, jsonify, after_this_request
+from flask import request, jsonify
 from werkzeug._compat import integer_types, text_type
 from werkzeug.datastructures import Headers
 from werkzeug.utils import get_content_type
 from werkzeug.wrappers import Response
-from conf.conf import get_global, set_global
-from error_exception import create_error_with_msg
+
 from utils import logger  # 日志
 
 

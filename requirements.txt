@@ -1,0 +1,5 @@
+flask
+ntplib
+sqlalchemy
+requests
+fake-useragent

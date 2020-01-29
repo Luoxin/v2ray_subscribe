@@ -17,9 +17,9 @@ def subscription():
 
     new_db = (
         db()
-            .query(SubscribeVmss)
-            .filter(SubscribeVmss.death_count >= 0)
-            .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
+        .query(SubscribeVmss)
+        .filter(SubscribeVmss.death_count >= 0)
+        .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
     )
 
     subscription_site = req.get("site") if "site" in req.keys() else "google"
@@ -27,8 +27,9 @@ def subscription():
 
     if subscription_site == "youtube":
         new_db = (
-            new_db.filter(SubscribeVmss.speed_youtube > 0)
-                .filter(SubscribeVmss.network_delay_youtube > 0)
+            new_db.filter(SubscribeVmss.speed_youtube > 0).filter(
+                SubscribeVmss.network_delay_youtube > 0
+            )
             # .filter(SubscribeVmss.network_delay_youtube < 500)
         )
 
@@ -42,8 +43,9 @@ def subscription():
             ).order_by(SubscribeVmss.speed_youtube.desc())
     elif subscription_site == "internet":
         new_db = (
-            new_db.filter(SubscribeVmss.speed_internet > 0)
-                .filter(SubscribeVmss.network_delay_internet > 0)
+            new_db.filter(SubscribeVmss.speed_internet > 0).filter(
+                SubscribeVmss.network_delay_internet > 0
+            )
             # .filter(SubscribeVmss.network_delay_internet < 500)
         )
 
@@ -57,8 +59,9 @@ def subscription():
             ).order_by(SubscribeVmss.speed_youtube.desc())
     else:
         new_db = (
-            new_db.filter(SubscribeVmss.speed_google > 0)
-                .filter(SubscribeVmss.network_delay_google > 0)
+            new_db.filter(SubscribeVmss.speed_google > 0).filter(
+                SubscribeVmss.network_delay_google > 0
+            )
             # .filter(SubscribeVmss.network_delay_google < 500)
         )
 
@@ -95,6 +98,7 @@ def add_with_vmess():
             return {"message": "ok"}
 
     return {"message": "failure"}
+
 
 # def get_alive_url():
 #     data_list = (

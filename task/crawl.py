@@ -3,8 +3,6 @@ import random
 import time
 import traceback
 
-from playhouse.shortcuts import model_to_dict, dict_to_model
-
 from utils import logger, base64_decode
 
 import requests

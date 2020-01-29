@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import re
 import time
 import uuid as uu
 
@@ -59,3 +60,7 @@ def base64_decode(base64_str: str):
 
 def now():
     return int(time.time())
+
+
+def is_url(url: str) -> bool:
+    return True if re.match(r"^[a-z+]+?:/{2,3}\w.+$", url) else False

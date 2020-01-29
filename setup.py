@@ -7,5 +7,7 @@ setup(
     author="Luoxin",  # 作者
     author_email="luoxin.ttt@gmail.com",  # 作者邮箱
     url="https://gitee.com/luoxinY/v2ray_subscribe",  # 包的主页
-    packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
+    packages=find_packages(
+        exclude=["ez_setup", "examples", "tests"], install_requires=["requests"],
+    ),
 )
