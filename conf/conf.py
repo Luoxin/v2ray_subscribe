@@ -1,14 +1,17 @@
 import os
 import yaml
+import traceback
+
 from fake_useragent import UserAgent
 
 s = None
-g = {}
 
 
 def _get_conf_file_path() -> str:
     conf_path_list = [
-        str(os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml").replace("\\", "/"),
+        str(os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml").replace(
+            "\\", "/"
+        ),
         str(os.path.abspath(os.getcwd())).replace("\\", "/"),
         os.path.abspath(os.path.dirname(os.getcwd())).replace("\\", "/"),
     ]
@@ -27,11 +30,13 @@ def init_conf(filename=_get_conf_file_path()):
         f = open(filename, encoding="utf-8")
         s = yaml.load(f, Loader=yaml.FullLoader)
         return True
-    except:
+    except yaml.scanner.ScannerError:
+        print("Parse yaml file failed")
+        traceback.print_exc()
         return False
-
-
-init_conf()
+    except:
+        traceback.print_exc()
+        return False
 
 
 def init_state(filename=_get_conf_file_path()):
@@ -70,33 +75,21 @@ def get_conf_bool(key):
         return False
 
 
-def get_global(key):
-    global g
-    try:
-        return g.get(key)
-    except:
-        return None
-
-
-def set_global(key, value):
-    global g
-    try:
-        g[key] = value
-    except:
-        pass
-
+if not init_conf():
+    raise Exception("can not read conf file")
 
 user_agent = UserAgent()
 
 if __name__ == "__main__":
-    print("***获取当前目录***")
-    print(os.getcwd())
-    print(os.path.abspath(os.path.dirname(__file__)))
-
-    print("***获取上级目录***")
-    print(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-    print(os.path.abspath(os.path.dirname(os.getcwd())))
-    print(os.path.abspath(os.path.join(os.getcwd(), "..")))
-
-    print("***获取上上级目录***")
-    print(os.path.abspath(os.path.join(os.getcwd(), "../..")))
+    print(get_conf("DB_URL"))
+    # print("***获取当前目录***")
+    # print(os.getcwd())
+    # print(os.path.abspath(os.path.dirname(__file__)))
+    #
+    # print("***获取上级目录***")
+    # print(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
+    # print(os.path.abspath(os.path.dirname(os.getcwd())))
+    # print(os.path.abspath(os.path.join(os.getcwd(), "..")))
+    #
+    # print("***获取上上级目录***")
+    # print(os.path.abspath(os.path.join(os.getcwd(), "../..")))
