@@ -10,8 +10,8 @@ import requests
 import utils
 from task.node import V2ray, Shadowsocks
 from orm import SubscribeVmss, db, or_
-from proxy_server import V2rayServer
 from conf.conf import user_agent, get_conf, get_conf_int
+from task.proxy_server import V2rayServer
 from utils import logger
 
 
@@ -54,7 +54,7 @@ def get_node_by_url(url: str != ""):
             )
     except:
         logger.error(traceback.format_exc())
-        return None
+    return None
 
 
 def check_by_v2ray_url(test_url: str):
@@ -164,7 +164,7 @@ def update_v2ray_conf(v2ray_url):
     node = get_node_by_url(v2ray_url)
     if node is None:
         return -1, -1
-    json.dump(node.format_config(), open(get_conf("V2RAY_CONFIG_LOCAL"), "w"), indent=2)
+    json.dump(node.format_config(), open(v2ray_server.get_conf_path(), "w"), indent=2)
     v2ray_server.restart()
     logger.info("v2ray 配置已更换为\t{}".format(v2ray_url))
 

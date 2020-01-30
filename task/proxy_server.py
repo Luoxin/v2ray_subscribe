@@ -11,7 +11,9 @@ from utils import logger
 
 class V2rayServer:
     def __init__(self, path, conf):
-        self.cmd = "{} -config {} ".format(path, conf)
+        self._path = path
+        self._conf = conf
+        self.cmd = "{} -config {} ".format(self._path, self._conf)
         self.pid = 0
 
     def run_server(self):
@@ -63,3 +65,6 @@ class V2rayServer:
                     return
             except:
                 pass
+
+    def get_conf_path(self):
+        return self._conf

@@ -67,12 +67,12 @@ def get_conf_float(key):
         return 0.0
 
 
-def get_conf_bool(key):
+def get_conf_bool(key, default: bool = False):
     try:
         value = get_conf(key)
-        return bool(value) if value is not None else False
+        return bool(value) if value is not None else default
     except:
-        return False
+        return default
 
 
 if not init_conf():

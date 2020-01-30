@@ -11,24 +11,11 @@ PORT: 1800
 ## 日志路径
 # LOG_PATH: "./v2ray_subscribe"
 
-# TEST_FILE_URL: "http://cachefly.cachefly.net/1mb.test"
-TEST_FILE_URL: "http://www.google.com"
-
 # flask debug
 FLASK_DEBUG: false
 
-# sqlalchemy debug
-SQLALCHEMY_DEBUG: false
-
-# min speed
-BASE_SPEED: 5000
-
 # 默认的生命值
 MAX_DEATH_COUNT: 10
-
-# Redis连接信息
-REDIS_HOST: "127.0.0.1"
-REDIS_PORT: 6379
 
 # 数据库地址
 # 如果使用 `sqlite` 请加上 ?check_same_thread=false
@@ -45,13 +32,9 @@ PROXIES_CRAWLER: {"http": "socks5://127.0.0.1:10808", "https": "socks5://127.0.0
 
 # v2ray 工作目录
 V2RAY_SERVICE_PATH: "F:/Desk/v2ray"
-# V2RAY_SERVICE_PATH: "/usr/bin/v2ray/v2ray"
 
-# 是否开启NTP自动校时服务
-NTP_SERVER_ENABLE: True
-# ntp server
-NTP_HOST: "ntp.aliyun.com"
-# ntp 服务端口
-NTP_PORT: 123
-# ntp 请求间隔
-NTP_INTERVAL: 64
+# 是否打开测速
+ENABLE_CHECK_ALIVE: true
+
+# 是否打开抓取
+ENABLE_CRAWL: true
