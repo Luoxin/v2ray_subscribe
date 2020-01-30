@@ -3,11 +3,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative.base import declared_attr
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 from enum import unique, Enum
 
-from sqlalchemy.pool import QueuePool
-
 from conf.conf import get_conf
+import utils
+
 
 base = declarative_base()
 
