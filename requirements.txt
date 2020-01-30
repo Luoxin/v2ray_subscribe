@@ -3,3 +3,4 @@ ntplib
 sqlalchemy
 requests
 fake-useragent
+PyMySQL

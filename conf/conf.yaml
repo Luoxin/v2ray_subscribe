@@ -32,8 +32,8 @@ REDIS_PORT: 6379
 
 # 数据库地址
 # 如果使用 `sqlite` 请加上 ?check_same_thread=false
-# DB_URL: "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/dev"
-DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
+DB_URL: "mysql+pymysql://root:N6qCcRQf2zNlxmHz7OtdeJ6T67zWJj7l@203.195.187.254:3306/release"
+#DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
 #DB_URL: "postgresql+psycopg2://postgres:S8R0jXGasTBg8k0jEvushPvo6xOXbyeh@203.195.187.254:5432/release"
 
 # 默认检测间隔

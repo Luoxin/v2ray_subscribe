@@ -11,7 +11,7 @@ class SubscribeCrawl(base):
         Integer, server_default=str(int(utils.now())), onupdate=str(int(utils.now()))
     )
 
-    crawl_url = Column(String(1000), unique=True, comment="订阅地址/抓取源地址")
+    crawl_url = Column(String(500), unique=True, comment="订阅地址/抓取源地址")
 
     crawl_type = Column(Integer, index=True, comment="抓取类型")
     rule = Column(JSON, comment="抓取规则")

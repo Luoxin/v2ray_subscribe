@@ -11,7 +11,7 @@ class SubscribeVmss(base):
         Integer, server_default=str(int(utils.now())), onupdate=str(int(utils.now()))
     )
 
-    url = Column(String(1000), unique=True, comment="节点分享地址")
+    url = Column(String(500), unique=True, comment="节点分享地址")
     network_protocol_type = Column(String(100), index=True, comment="网络协议类型")
 
     conf_details = Column(JSON, comment="配置的详情内容")
