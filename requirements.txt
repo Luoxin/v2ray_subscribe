@@ -4,3 +4,5 @@ sqlalchemy
 requests
 fake-useragent
 PyMySQL
+PyYAML
+psutil

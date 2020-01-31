@@ -12,7 +12,7 @@ def _get_conf_file_path() -> str:
         str(os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml").replace(
             "\\", "/"
         ),
-        str(os.path.abspath(os.getcwd())).replace("\\", "/"),
+        str(os.path.abspath(os.getcwd() + "\conf.yaml")).replace("\\", "/"),
         os.path.abspath(os.path.dirname(os.getcwd())).replace("\\", "/"),
     ]
 
