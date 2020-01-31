@@ -34,7 +34,8 @@ class V2rayServer:
         try:
             if self.pid != 0:
                 # logger.debug("wil kill old progress, pid is {}".format(self.pid))
-                os.kill(self.pid, signal.SIGKILL)
+                # os.kill(self.pid, signal.SIGKILL)
+                os.kill(self.pid, signal.SIGTERM)
         except:
             logger.error(traceback.format_exc())
             logger.error("进程pid为 {}".format(self.pid))
