@@ -16,7 +16,7 @@ from utils import logger
 
 
 v2ray_server = V2rayServer(
-    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray.exe"),
+    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray"),
     os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray_subscribe.conf"),
 )
 
