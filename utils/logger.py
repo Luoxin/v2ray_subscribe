@@ -4,25 +4,17 @@ import socket
 import os
 import sys
 import platform
+import traceback
+
 
 try:
-    from conf.conf import get_conf, get_conf_bool
-
-    LOG_DEBUG = (
-        False if get_conf_bool("LOG_DEBUG") is None else get_conf_bool("LOG_DEBUG")
-    )
-    SERVER_NAME = (
-        "v2ray_subscribe"
-        if get_conf("SERVER_NAME") is None
-        else get_conf("SERVER_NAME")
-    )
-    LOG_PATH = (
-        "./v2ray_subscribe.log"
-        if get_conf("LOG_PATH") is None
-        else get_conf("LOG_PATH")
-    )
+    from conf import global_variable
+    LOG_DEBUG = global_variable.get_conf_bool("LOG_DEBUG", default=False)
+    SERVER_NAME = global_variable.get_conf_str("SERVER_NAME", default="v2ray_subscribe")
+    LOG_PATH = global_variable.get_conf_str("LOG_PATH", default="./v2ray_subscribe.log")
 except:
-    LOG_DEBUG = True
+    traceback.print_exc()
+    LOG_DEBUG = False
     SERVER_NAME = "v2ray_subscribe"
     LOG_PATH = "./v2ray_subscribe.log"
 

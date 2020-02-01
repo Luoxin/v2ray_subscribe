@@ -4,20 +4,22 @@ import random
 import sys
 import time
 import traceback
-import urllib
-
+from conf import global_variable
 import requests
+
 import utils
-from task.node import V2ray, Shadowsocks
-from orm import SubscribeVmss, db, or_
-from conf.conf import user_agent, get_conf, get_conf_int
+from orm import SubscribeVmss, or_
+from task.node import V2ray
 from task.proxy_server import V2rayServer
 from utils import logger
 
-
 v2ray_server = V2rayServer(
-    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray"),
-    os.path.join(get_conf("V2RAY_SERVICE_PATH"), "v2ray_subscribe.conf"),
+    os.path.join(global_variable.get_conf_str("V2RAY_SERVICE_PATH",
+                                              default="C:/ProgramData/v2ray" if sys.platform == "win" else "/usr/bin/v2ray"),
+                 "v2ray"),
+    os.path.join(global_variable.get_conf_str("V2RAY_SERVICE_PATH",
+                                              default="C:/ProgramData/v2ray" if sys.platform == "win" else "/usr/bin/v2ray"),
+                 "v2ray_subscribe.conf"),
 )
 
 
@@ -62,14 +64,14 @@ def check_by_v2ray_url(test_url: str):
         try:
             headers = {
                 "Connection": "close",
-                "User-Agent": user_agent.random,
+                "User-Agent": global_variable.get_user_agent(),
             }
             start_time = time.time()
             r = requests.get(
                 url=test_url,
                 proxies={
-                    "http": "socks5://127.0.0.1:{}".format(get_conf_int("CHECK_PORT")),
-                    "https": "socks5://127.0.0.1:{}".format(get_conf_int("CHECK_PORT")),
+                    "http": "socks5://127.0.0.1:{}".format(global_variable.get_conf_int("CHECK_PORT", default=1080)),
+                    "https": "socks5://127.0.0.1:{}".format(global_variable.get_conf_int("CHECK_PORT", default=1080)),
                 },
                 timeout=10,
                 headers=headers,
@@ -109,7 +111,7 @@ def check_link_alive_by_google(data: SubscribeVmss):
     try:
         speed, network_delay = check_by_v2ray_url("https://www.google.com/")
 
-        new_db = db()
+        new_db = global_variable.get_db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_google: speed,
@@ -126,7 +128,7 @@ def check_link_alive_by_google(data: SubscribeVmss):
 def check_link_alive_by_youtube(data: SubscribeVmss):
     try:
         speed, network_delay = check_by_v2ray_url("https://www.youtube.com/")
-        new_db = db()
+        new_db = global_variable.get_db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_youtube: speed,
@@ -146,7 +148,7 @@ def check_link_alive_by_internet(data: SubscribeVmss):
             "http://cachefly.cachefly.net/1mb.test"
         )
 
-        new_db = db()
+        new_db = global_variable.get_db()
         new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
             {
                 SubscribeVmss.speed_internet: speed,
@@ -174,22 +176,22 @@ def check_link_alive():
     while True:
         try:
             data_list = (
-                db()
-                .query(SubscribeVmss)
-                .filter(
+                global_variable.get_db()
+                    .query(SubscribeVmss)
+                    .filter(
                     or_(
-                        SubscribeVmss.death_count < get_conf_int("MAX_DEATH_COUNT"),
+                        SubscribeVmss.death_count < global_variable.get_conf_int("MAX_DEATH_COUNT"),
                         SubscribeVmss.death_count == None,
                     )
                 )
-                .filter(
+                    .filter(
                     or_(
                         SubscribeVmss.next_at < int(time.time()),
                         SubscribeVmss.next_at == None,
                     )
                 )
-                .order_by(SubscribeVmss.next_at)
-                .all()
+                    .order_by(SubscribeVmss.next_at)
+                    .all()
             )
             if len(data_list) <= 0:
                 logger.debug("暂时没有待检测节点")
@@ -203,9 +205,9 @@ def check_link_alive():
                         death_count = data.death_count
 
                         alive = (
-                            check_link_alive_by_google(data)
-                            + check_link_alive_by_youtube(data)
-                            + check_link_alive_by_internet(data)
+                                check_link_alive_by_google(data)
+                                + check_link_alive_by_youtube(data)
+                                + check_link_alive_by_internet(data)
                         )
 
                         if alive <= 0:
@@ -215,7 +217,7 @@ def check_link_alive():
                                 death_count = 0
                             death_count += alive
 
-                        new_db = db()
+                        new_db = global_variable.get_db()
                         new_db.query(SubscribeVmss).filter(
                             SubscribeVmss.id == data.id
                         ).update(
@@ -223,7 +225,7 @@ def check_link_alive():
                                 SubscribeVmss.next_at: int(
                                     random.uniform(0.5, 1.5) * data.interval
                                 )
-                                + int(time.time()),
+                                                       + int(time.time()),
                                 SubscribeVmss.death_count: death_count,
                             }
                         )

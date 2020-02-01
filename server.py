@@ -1,20 +1,18 @@
-from conf.conf import get_conf, init_conf
-from orm import db
-
+from conf import global_variable
 import traceback
-
 from flask import Flask, ctx, jsonify
 
 from conntext import JSONResponse, before_request, after_request
 from error_exception import InternalException
 from init_service import init_service
 
-
 from route_list import ROUTE_LIST
 from utils import logger
 
 app = Flask(
-    "v2ray_subscribe" if get_conf("SERVER_NAME") is None else get_conf("SERVER_NAME")
+    "v2ray_subscribe"
+    if global_variable.get_conf("SERVER_NAME") is None
+    else global_variable.get_conf("SERVER_NAME")
 )
 
 app.response_class = JSONResponse
@@ -72,4 +70,8 @@ def favicon():
 
 
 if __name__ == "__main__":
-    app.run(get_conf("HOST"), port=get_conf("PORT"), threaded=True)
+    app.run(
+        global_variable.get_conf_str("HOST", default="0.0.0.0"),
+        port=global_variable.get_conf_int("PORT", default=1800),
+        threaded=True,
+    )

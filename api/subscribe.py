@@ -1,12 +1,9 @@
-import traceback
-
 from flask import Blueprint, request
-
 import utils
-from orm import db, SubscribeVmss, or_
+from orm import SubscribeVmss, or_
 from task.crawl import add_new_vmess
+from conf import global_variable
 from utils import logger  # 日志
-from error_exception import create_error_with_msg
 
 subscribe_api = Blueprint("subscribe", __name__)
 
@@ -16,7 +13,7 @@ def subscription():
     req = request.args
 
     new_db = (
-        db()
+        global_variable.get_db()
         .query(SubscribeVmss)
         .filter(SubscribeVmss.death_count >= 0)
         .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
@@ -79,7 +76,8 @@ def subscription():
     if network_protocol_type != "" and network_protocol_type is not None:
         new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
 
-    # logger.debug("执行的sql为 {}".format(str(new_db)))
+    logger.debug("执行的sql为 {}".format(str(new_db)))
+
     can_be_used = new_db.all()
     vmess_list = []
     for subscribe_vmess in can_be_used:

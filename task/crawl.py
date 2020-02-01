@@ -3,32 +3,33 @@ import random
 import time
 import traceback
 
-from utils import logger, base64_decode
+import sqlalchemy
 
+from conf import global_variable
+
+from utils import logger
 import requests
-
 import utils
-from conf.conf import get_conf, user_agent, get_conf_int
-from orm import SubscribeCrawl, SubscribeVmss, db
+from orm import SubscribeCrawl, SubscribeVmss
 from orm.subscribe_crawl import SubscribeCrawlType
 
 
-def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool:
+def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = global_variable.get_conf_int("INTERVAL", default=3600)) -> bool:
     try:
         if v2ray_url == "":
             return False
 
         # 已经存在了，就不管了
-        data = db().query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+        data = global_variable.get_db().query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
         if data is not None:
-            if data.death_count is None or data.death_count < get_conf_int(
-                "MAX_DEATH_COUNT"
+            if data.death_count is None or data.death_count < global_variable.get_conf_int(
+                "MAX_DEATH_COUNT", default=10
             ):
-                new_db = db()
+                new_db = global_variable.get_db()
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
                     {
                         SubscribeVmss.death_count: int(
-                            int(get_conf_int("MAX_DEATH_COUNT")) / 2
+                            global_variable.get_conf_int("MAX_DEATH_COUNT", default=10) / 2
                         ),
                     }
                 )
@@ -38,8 +39,8 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
         if v2ray_url.startswith("vmess://"):  # vmess
             try:
                 logger.debug("new vmess is {}".format(v2ray_url))
-                v = json.loads(base64_decode(v2ray_url.replace("vmess://", "")))
-                new_db = db()
+                v = json.loads(utils.base64_decode(v2ray_url.replace("vmess://", "")))
+                new_db = global_variable.get_db()
                 new_db.add(
                     SubscribeVmss(
                         url=v2ray_url,
@@ -68,18 +69,25 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = 60 * 60) -> bool
 def crawl_by_subscribe_url(data: SubscribeCrawl):
     try:
         proxies = None
+        timeout = 10
+
         if isinstance(data.rule, dict):
             if data.rule.get("need_proxy"):
-                proxies = get_conf("PROXIES_CRAWLER")
+                proxies = global_variable.get_conf_dict("PROXIES_CRAWLER", default={"http": "socks5://127.0.0.1:10808", "https": "socks5://127.0.0.1:10808"})
+            if data.rule.get("timeout"):
+                try:
+                    timeout = int(data.rule.get("timeout"))
+                except:
+                    timeout = 10
 
         try:
             headers = {
-                "User-Agent": user_agent.random,
+                "User-Agent": global_variable.get_user_agent(),
                 "Connection": "close",
             }
-            v2ray_url_list = base64_decode(
+            v2ray_url_list = global_variable.base64_decode(
                 requests.get(
-                    data.crawl_url, headers=headers, timeout=10, proxies=proxies
+                    data.crawl_url, headers=headers, timeout=timeout, proxies=proxies
                 ).text
             ).split("\n")
             for v2ray_url in v2ray_url_list:
@@ -100,7 +108,7 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
 
 def crawl_by_subscribe():
     data_list = (
-        db()
+        global_variable.get_db()
         .query(SubscribeCrawl)
         .filter(SubscribeCrawl.next_at <= utils.now())
         .filter(SubscribeCrawl.is_closed == False)
@@ -111,7 +119,7 @@ def crawl_by_subscribe():
     for data in data_list:
         try:
             crawl_by_subscribe_url(data)
-            new_db = db()
+            new_db = global_variable.get_db()
             new_db.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
                 {
                     SubscribeCrawl.next_at: int(
@@ -193,5 +201,5 @@ def update_new_node():
 
 if __name__ == "__main__":
     v2ray_url = "vmess://Y2hhY2hhMjAtcG9seTEzMDU6OTUxMzc4NTctNzBmYS00YWM4LThmOTAtNGUyMGFlYjY2MmNmQHVuaS5raXRzdW5lYmkuZnVuOjQ0Mw==?network=h2&h2Path=/v2&aid=0&tls=1&allowInsecure=0&tlsServer=uni.kitsunebi.fun&mux=0&muxConcurrency=8&remark=H2%20Test%20Outbound"
-    print(base64_decode(v2ray_url.replace("vmess://", "")))
-    print(json.loads(base64_decode(v2ray_url.replace("vmess://", ""))))
+    print(utils.base64_decode(v2ray_url.replace("vmess://", "")))
+    print(json.loads(utils.base64_decode(v2ray_url.replace("vmess://", ""))))

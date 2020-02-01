@@ -3,15 +3,20 @@
 """
 import multiprocessing
 import threading
+from conf import global_variable
 
-# from api.time_info import keep_time_consistent
-from conf.conf import get_conf_bool
 from task import *
 
 task_func_map = {
     # keep_time_consistent: {"startup_mode": "thread", "enable": False},
-    update_new_node: {"startup_mode": "thread", "enable": get_conf_bool("ENABLE_CRAWL", default=True)},
-    check_link_alive: {"startup_mode": "thread", "enable": get_conf_bool("ENABLE_CHECK_ALIVE", default=True)},
+    update_new_node: {
+        "startup_mode": "thread",
+        "enable": global_variable.get_conf_bool("ENABLE_CRAWL", default=True),
+    },
+    check_link_alive: {
+        "startup_mode": "thread",
+        "enable": global_variable.get_conf_bool("ENABLE_CHECK_ALIVE", default=True),
+    },
 }
 
 

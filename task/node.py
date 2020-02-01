@@ -1,4 +1,4 @@
-from conf.conf import get_conf_int
+from conf import global_variable
 
 
 class Node:
@@ -63,7 +63,7 @@ class V2ray(Node):
             "inbounds": [
                 {
                     "tag": "proxy",
-                    "port": get_conf_int("CHECK_PORT"),
+                    "port": global_variable.get_conf_int("CHECK_PORT", default=1080),
                     "listen": "127.0.0.1",
                     "protocol": "socks",
                     "sniffing": {"enabled": True, "destOverride": ["http", "tls"]},
@@ -439,7 +439,7 @@ class Shadowsocks(Node):
             },
             "inbounds": [
                 {
-                    "port": CHECK_PORT,
+                    "port": global_variable.get_conf_int("CHECK_PORT", default=1080),
                     "listen": "127.0.0.1",
                     "protocol": "socks",
                     "settings": {"udp": True},
