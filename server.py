@@ -1,19 +1,25 @@
 from conf import global_variable
 import traceback
-from flask import Flask, ctx, jsonify
+from flask import Flask, ctx, jsonify, Response
 
-from conntext import JSONResponse, before_request, after_request
+from conntext import before_request
 from error_exception import InternalException
 from init_service import init_service
 
 from route_list import ROUTE_LIST
 from utils import logger
 
-app = Flask(global_variable.get_conf_str("SERVER_NAME", "v2ray_subscribe"))
+class ServiceCentre(Flask):
+    def make_response(self, rv):
+        logger.info(rv)
+        if isinstance(rv, ServiceResponse):
+            return Response(rv.get_data(), mimetype='application/json', status=200)
+        return super().make_response(rv)
 
-app.response_class = JSONResponse
+
+app = ServiceCentre(global_variable.get_conf_str("SERVER_NAME", "v2ray_subscribe"))
+
 app.before_request(before_request)
-app.after_request(after_request)
 app.logger = logger
 
 
