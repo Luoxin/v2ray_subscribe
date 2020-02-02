@@ -7,7 +7,7 @@ from utils import logger, json  # 日志
 class ServiceResponse(object):
     def __init__(self, response=None):
         if response is None or isinstance(response, dict):
-            self.response = json.dumps({"data": {}, "errcode": 0, "errmsg": ""})
+            self.response = json.dumps({"data": response, "errcode": 0, "errmsg": ""})
         else:
             self.response = response
 
