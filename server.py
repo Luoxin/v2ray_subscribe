@@ -9,11 +9,7 @@ from init_service import init_service
 from route_list import ROUTE_LIST
 from utils import logger
 
-app = Flask(
-    "v2ray_subscribe"
-    if global_variable.get_conf("SERVER_NAME") is None
-    else global_variable.get_conf("SERVER_NAME")
-)
+app = Flask(global_variable.get_conf_str("SERVER_NAME", "v2ray_subscribe"))
 
 app.response_class = JSONResponse
 app.before_request(before_request)
@@ -71,7 +67,7 @@ def favicon():
 
 if __name__ == "__main__":
     app.run(
-        global_variable.get_conf_str("HOST", default="0.0.0.0"),
-        port=global_variable.get_conf_int("PORT", default=1800),
+        global_variable.get_conf_str("HOST", default="127.0.0.1"),
+        port=global_variable.get_conf_int("PORT", default=5000),
         threaded=True,
     )

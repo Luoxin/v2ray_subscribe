@@ -1,21 +1,29 @@
+import os
+import shelve
 import sys
 import time
 import threading
 
 
 class MemoryCache:
-    """
-     :ttl The effective time
-            unit: s
-            default: 5 min
-     :max_size Maximum memory value that can withstand
-            unit: bytes
-            default: 10 Mb
-    """
-
-    def __init__(self, ttl: int = 5 * 60, max_size: int = 10 * 1024 * 1024):
-        self.__cache = {}  # 具体的缓存数据
-        self.__ttl_cache = {}  # 每一个结束时间对应的所有应该清除的key列表
+    def __init__(
+        self,
+        ttl: int = 5 * 60,
+        max_size: int = 10 * 1024 * 1024,
+        persistent_path: str = "",
+    ):
+        """
+         :param ttl: The effective time
+                        unit: s
+                        default: 5 min
+         :param max_size: Maximum memory value that can withstand
+                        unit: bytes
+                        default: 10 Mb
+        """
+        self.__cache = {}  # Specific cached data
+        self.__ttl_cache = (
+            {}
+        )  # A list of all keys that should be cleared for each end time
         self.__lock = threading.Lock
         self.__size = 0
 
@@ -27,6 +35,38 @@ class MemoryCache:
             max_size = 10 * 1024 * 1024
         self.__max_size = max_size
 
+        self.__need_persistent = False
+        if len(persistent_path) == 0:
+            try:
+                if not os.path.exists(persistent_path):
+                    shelve.open(persistent_path).close()
+                self.__db = shelve.open(
+                    persistent_path, flag="c", protocol=2, writeback=True
+                )
+                for key in self.__db.keys():
+                    try:
+                        node = self.__db[key]
+                        if isinstance(node, dict):
+                            value = (
+                                "" if node.get("value") is None else node.get("value")
+                            )
+                            dead_time = (
+                                0
+                                if node.get("dead_time") is None
+                                else node.get("dead_time")
+                            )
+                            self.add_node_with_dead_time(
+                                key=key, value=value, dead_time=dead_time
+                            )
+                    except:
+                        pass
+                self.__need_persistent = True
+            except:
+                raise FileNotFoundError(
+                    " No such file or directory: {}".format(persistent_path)
+                )
+
+        # Periodically clean up stale data
         clean_timer = threading.Thread(None, self.__clean_timer, None)
         clean_timer.daemon = True
         clean_timer.start()
@@ -53,20 +93,22 @@ class MemoryCache:
         if self.__size > self.__max_size:
             self.clean_by_dead()
 
-    """
-    Add a cache node
-    :key key
-    :value value
-    :ttl The effective time
-            unit: s
-    :dead_time Dead time
-    """
-
     def add_node(
         self, key: (int, float, str), value, ttl: int = 0, dead_time: int = 0
     ) -> bool:
+        """
+        Add a cache node
+        :param key:
+        :param dead_time:
+        :param ttl: The effective time
+                        unit: s
+        :param value:
+        :param dead_time: Dead time
+
+        """
         try:
-            self.__before()
+            if self.__size > self.__max_size:
+                self.clean_by_dead()
 
             key = str(key)
             node = {
@@ -84,6 +126,9 @@ class MemoryCache:
 
                 self.__size += node["size"]
                 self.__ttl_cache[node.get("dead_time")].append(key)
+                if self.__need_persistent:
+                    self.__db[key] = node
+                    self.__db.sync()
                 return True
             else:
                 return False
@@ -97,14 +142,6 @@ class MemoryCache:
 
     def add_node_with_ttl(self, key: (int, float, str), value, ttl: int = 0) -> bool:
         return self.add_node(key, value, ttl)
-
-    def get_key_list(self) -> list:
-        try:
-            self.__before()
-
-            return list(self.__cache.keys())
-        except:
-            return []
 
     def get_node(self, key: (int, float, str)):
         try:
@@ -133,9 +170,9 @@ class MemoryCache:
 
     def clean_by_dead(self):
         try:
-            list(self.__ttl_cache.keys()).sort()
+            dead_time_list = self.__ttl_cache.keys().sort()
             now_time = self.__get_now_time()
-            for dead_time in self.__ttl_cache.keys():
+            for dead_time in dead_time_list:
                 # If the first uninvalidated one is found, exit clean
                 if dead_time > now_time:
                     break
@@ -151,9 +188,9 @@ class MemoryCache:
         # First clean up the expired key
         self.clean_by_dead()
 
-        list(self.__ttl_cache.keys()).sort()
+        dead_time_list = self.__ttl_cache.keys().sort()
         while self.__size <= size:
-            for dead_time in self.__ttl_cache.keys():
+            for dead_time in dead_time_list:
                 for key in self.__ttl_cache[dead_time]:
                     self.__del_by_key(key)
                     break
@@ -167,14 +204,12 @@ class MemoryCache:
             if key in self.__cache:
                 dead_node = self.__cache.pop(key)
                 self.__size -= dead_node["size"]
+                if self.__need_persistent:
+                    del self.__db[key]
+                    self.__db.sync()
             return True
         except:
             return False
 
-
-if __name__ == "__main__":
-    c = MemoryCache()
-    c.add_node("key", "value", ttl=1)
-    print(c.get_node("key"))
-    time.sleep(1)
-    print(c.get_node("key"))
+    def get_keys(self) -> list:
+        return list(self.__cache.keys())
