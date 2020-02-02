@@ -5,10 +5,10 @@ from task.crawl import add_new_vmess
 from conf import global_variable
 from utils import logger  # 日志
 
-subscribe_api = Blueprint("subscribe", __name__)
+subscribe_api = Blueprint("subscribe", __name__, url_prefix="/api/subscribe")
 
 
-@subscribe_api.route("/api/subscribe/subscription", methods=["GET"])
+@subscribe_api.route("/subscription", methods=["GET"])
 def subscription():
     req = request.args
 
