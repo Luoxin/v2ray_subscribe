@@ -44,6 +44,3 @@ def start_task():
     # process_pool.close()
     # process_pool.join()
 
-
-def init_service():
-    start_task()
