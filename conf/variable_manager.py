@@ -167,5 +167,3 @@ class VariableManager(object):
 
     def get_conf_all(self):
         return self._variable
-
-

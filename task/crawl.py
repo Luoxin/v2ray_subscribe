@@ -14,9 +14,9 @@ from utils import logger
 
 
 def add_new_vmess(
-        v2ray_url,
-        crawl_id: int = 0,
-        interval: int = global_variable.get_conf_int("INTERVAL", default=3600),
+    v2ray_url,
+    crawl_id: int = 0,
+    interval: int = global_variable.get_conf_int("INTERVAL", default=3600),
 ) -> bool:
     try:
         if v2ray_url == "":
@@ -25,15 +25,15 @@ def add_new_vmess(
         # 已经存在了，就不管了
         data = (
             global_variable.get_db()
-                .query(SubscribeVmss)
-                .filter(SubscribeVmss.url == v2ray_url)
-                .first()
+            .query(SubscribeVmss)
+            .filter(SubscribeVmss.url == v2ray_url)
+            .first()
         )
         if data is not None:
             if (
-                    data.death_count is None
-                    or data.death_count
-                    < global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
+                data.death_count is None
+                or data.death_count
+                < global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
             ):
                 new_db = global_variable.get_db()
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
@@ -111,10 +111,10 @@ def download(data: SubscribeCrawl):
             if rsp.status_code == 200:
                 return rsp.content.decode("utf-8")
         except (
-                requests.exceptions.RequestException,
-                requests.exceptions.RequestsWarning,
-                requests.exceptions.Timeout,
-                requests.exceptions.ConnectionError,
+            requests.exceptions.RequestException,
+            requests.exceptions.RequestsWarning,
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
         ):
             pass
         except:
@@ -161,10 +161,10 @@ def get_data_from_network(data: SubscribeCrawl):
 def crawl_by_subscribe():
     data_list = (
         global_variable.get_db()
-            .query(SubscribeCrawl)
-            .filter(SubscribeCrawl.next_at <= utils.now())
-            .filter(SubscribeCrawl.is_closed == False)
-            .all()
+        .query(SubscribeCrawl)
+        .filter(SubscribeCrawl.next_at <= utils.now())
+        .filter(SubscribeCrawl.is_closed == False)
+        .all()
     )
 
     for data in data_list:
