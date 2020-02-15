@@ -1,86 +1,95 @@
-import traceback
-
 from flask import Blueprint, request
-
 import utils
-from orm import db, SubscribeVmss, or_
+from orm import SubscribeVmss, or_
 from task.crawl import add_new_vmess
+from conf import global_variable, VariableManager
 from utils import logger  # 日志
-from error_exception import create_error_with_msg
 
-subscribe_api = Blueprint("subscribe", __name__)
+subscribe_api = Blueprint("subscribe", __name__, url_prefix="/api/subscribe")
 
 
-@subscribe_api.route("/api/subscribe/subscription", methods=["GET"])
+@subscribe_api.route("/subscription", methods=["GET"])
 def subscription():
-    req = request.args
-
-    new_db = (
-        db()
-        .query(SubscribeVmss)
-        .filter(SubscribeVmss.death_count >= 0)
-        .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
-    )
-
-    subscription_site = req.get("site") if "site" in req.keys() else "google"
-    subscription_type = req.get("type") if "type" in req.keys() else "delayed"
-
-    if subscription_site == "youtube":
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_youtube > 0).filter(
-                SubscribeVmss.network_delay_youtube > 0
+    def get_new_db():
+        return (
+            global_variable.get_db()
+                .query(SubscribeVmss)
+                .filter(SubscribeVmss.death_count >= 0)
+                .filter(
+                or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed is None)
             )
-            # .filter(SubscribeVmss.network_delay_youtube < 500)
+                .filter(SubscribeVmss.speed_youtube > 0)
+                .filter(SubscribeVmss.network_delay_youtube > 0)
+                .filter(SubscribeVmss.speed_internet > 0)
+                .filter(SubscribeVmss.network_delay_internet > 0)
+                .filter(SubscribeVmss.speed_google > 0)
+                .filter(SubscribeVmss.network_delay_google > 0)
         )
 
-        if subscription_type == "speed":
-            new_db = new_db.order_by(SubscribeVmss.speed_youtube.desc()).order_by(
-                SubscribeVmss.network_delay_youtube.desc()
-            )
-        else:
-            new_db = new_db.order_by(
-                SubscribeVmss.network_delay_youtube.desc()
-            ).order_by(SubscribeVmss.speed_youtube.desc())
-    elif subscription_site == "internet":
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_internet > 0).filter(
-                SubscribeVmss.network_delay_internet > 0
-            )
-            # .filter(SubscribeVmss.network_delay_internet < 500)
+    can_be_used = []
+
+    req = VariableManager(request.args)
+
+    auto_select = req.get_conf_bool("auto", False)
+    if auto_select:
+        low_delay_list = (
+            get_new_db().order_by(SubscribeVmss.network_delay_google.desc()).all()
         )
 
-        if subscription_type == "speed":
-            new_db = new_db.order_by(SubscribeVmss.speed_internet.desc()).order_by(
-                SubscribeVmss.network_delay_internet.desc()
-            )
-        else:
-            new_db = new_db.order_by(
-                SubscribeVmss.network_delay_internet.desc()
-            ).order_by(SubscribeVmss.speed_youtube.desc())
+        fast_list = get_new_db().order_by(SubscribeVmss.speed_google.desc()).all()
+
+        low_delay_id_list = []
+        for node in low_delay_list:
+            low_delay_id_list.append(node.id)
+
+        for node in fast_list:
+            if node.id in low_delay_id_list:
+                can_be_used.append(node)
+            if len(can_be_used) >= 20:
+                break
     else:
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_google > 0).filter(
-                SubscribeVmss.network_delay_google > 0
-            )
-            # .filter(SubscribeVmss.network_delay_google < 500)
-        )
+        subscription_site = req.get_conf_str("site", default="google")
+        subscription_type = req.get_conf_str("type", default="delayed")
 
-        if subscription_type == "speed":
-            new_db = new_db.order_by(SubscribeVmss.speed_google.desc()).order_by(
-                SubscribeVmss.network_delay_google.desc()
-            )
+        new_db = get_new_db
+
+        if subscription_site == "youtube":
+            if subscription_type == "speed":
+                new_db = new_db.order_by(SubscribeVmss.speed_youtube.desc()).order_by(
+                    SubscribeVmss.network_delay_youtube.desc()
+                )
+            else:
+                new_db = new_db.order_by(
+                    SubscribeVmss.network_delay_youtube.desc()
+                ).order_by(SubscribeVmss.speed_youtube.desc())
+        elif subscription_site == "internet":
+            if subscription_type == "speed":
+                new_db = new_db.order_by(SubscribeVmss.speed_internet.desc()).order_by(
+                    SubscribeVmss.network_delay_internet.desc()
+                )
+            else:
+                new_db = new_db.order_by(
+                    SubscribeVmss.network_delay_internet.desc()
+                ).order_by(SubscribeVmss.speed_youtube.desc())
         else:
-            new_db = new_db.order_by(
-                SubscribeVmss.network_delay_google.desc()
-            ).order_by(SubscribeVmss.speed_google.desc())
+            if subscription_type == "speed":
+                new_db = new_db.order_by(SubscribeVmss.speed_google.desc()).order_by(
+                    SubscribeVmss.network_delay_google.desc()
+                )
+            else:
+                new_db = new_db.order_by(
+                    SubscribeVmss.network_delay_google.desc()
+                ).order_by(SubscribeVmss.speed_google.desc())
 
-    network_protocol_type = req.get("network_type")
+        network_protocol_type = req.get_conf("network_type")
 
-    if network_protocol_type != "" and network_protocol_type is not None:
-        new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
+        if network_protocol_type is not None:
+            new_db.filter(SubscribeVmss.network_protocol_type == network_protocol_type)
 
-    # logger.debug("执行的sql为 {}".format(str(new_db)))
-    can_be_used = new_db.all()
+        logger.debug("执行的sql为 {}".format(str(new_db)))
+
+        can_be_used = new_db.all()
+
     vmess_list = []
     for subscribe_vmess in can_be_used:
         vmess_list.append(subscribe_vmess.url)

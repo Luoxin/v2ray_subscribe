@@ -11,17 +11,14 @@ PORT: 1800
 ## 日志路径
 # LOG_PATH: "./v2ray_subscribe"
 
-# flask debug
-FLASK_DEBUG: false
-
 # 默认的生命值
 MAX_DEATH_COUNT: 10
 
+# 是否使用数据库
+ENABLE_DATABASE: true
 # 数据库地址
 # 如果使用 `sqlite` 请加上 ?check_same_thread=false
-DB_URL: "mysql+pymysql://root:N6qCcRQf2zNlxmHz7OtdeJ6T67zWJj7l@203.195.187.254:3306/release"
-#DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
-#DB_URL: "postgresql+psycopg2://postgres:S8R0jXGasTBg8k0jEvushPvo6xOXbyeh@203.195.187.254:5432/release"
+DB_URL: "sqlite:///subscribe.vdb?check_same_thread=false"
 
 # 默认检测间隔
 Interval: 60 * 60
@@ -37,4 +34,5 @@ V2RAY_SERVICE_PATH: "F:/Desk/v2ray"
 ENABLE_CHECK_ALIVE: true
 
 # 是否打开抓取
+ENABLE_CRAWL: true
 ENABLE_CRAWL: true

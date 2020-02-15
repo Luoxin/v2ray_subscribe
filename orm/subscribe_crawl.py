@@ -1,4 +1,5 @@
 from orm import *
+from orm import base
 
 
 class SubscribeCrawl(base):

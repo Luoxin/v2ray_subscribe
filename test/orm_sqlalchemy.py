@@ -7,7 +7,8 @@ from sqlalchemy.pool import QueuePool
 base = declarative_base()
 
 engine = create_engine(
-    "sqlite:///subscribe.vdb?check_same_thread=false",
+    # "sqlite:///subscribe.vdb?check_same_thread=false",
+    "sqlite:///:memory:?check_same_thread=false",
     poolclass=QueuePool,
     pool_recycle=3600,
     pool_use_lifo=True,
@@ -16,25 +17,19 @@ engine = create_engine(
 )
 
 
-# class BaseModel(base):
-#     """Base Class """
-#
-#     id = Column(Integer, primary_key=True, nullable=False)
-#     created = Column(DateTime, nullable=False)
-#
-#     __mapper_args__ = {
-#         'polymorphic_identity': 'base',
-#         'polymorphic_on': type
-#     }
+class Person(base):
+    __tablename__ = "person"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    __mapper_args__ = {"concrete": True}
 
 
-# class Person(base):
-#     __tablename__ = "person"
-#
-#     name = Column(String)
-#
-#     __mapper_args__ = {"concrete": True}
-#
-#
-# base.metadata.create_all(engine)
-# db = sessionmaker(bind=engine)()
+base.metadata.create_all(engine)
+db = sessionmaker(bind=engine)()
+
+db.add(Person(name="name"))
+db.commit()
+
+print(db.query(Person).all()[0].__dict__)
