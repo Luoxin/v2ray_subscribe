@@ -16,7 +16,7 @@ from utils import logger
 def add_new_vmess(
     v2ray_url,
     crawl_id: int = 0,
-    interval: int = global_variable.get_conf_int("INTERVAL", default=3600),
+    interval: int = global_variable.get_conf_int("INTERVAL", default=1800),
 ) -> bool:
     try:
         if v2ray_url == "":

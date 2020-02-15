@@ -16,20 +16,19 @@ def subscription():
         global_variable.get_db()
         .query(SubscribeVmss)
         .filter(SubscribeVmss.death_count >= 0)
-        .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed == None))
+        .filter(or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed is None))
+        .filter(SubscribeVmss.speed_youtube > 0)
+        .filter(SubscribeVmss.network_delay_youtube > 0)
+        .filter(SubscribeVmss.speed_internet > 0)
+        .filter(SubscribeVmss.network_delay_internet > 0)
+        .filter(SubscribeVmss.speed_google > 0)
+        .filter(SubscribeVmss.network_delay_google > 0)
     )
 
     subscription_site = req.get("site") if "site" in req.keys() else "google"
     subscription_type = req.get("type") if "type" in req.keys() else "delayed"
 
     if subscription_site == "youtube":
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_youtube > 0).filter(
-                SubscribeVmss.network_delay_youtube > 0
-            )
-            # .filter(SubscribeVmss.network_delay_youtube < 500)
-        )
-
         if subscription_type == "speed":
             new_db = new_db.order_by(SubscribeVmss.speed_youtube.desc()).order_by(
                 SubscribeVmss.network_delay_youtube.desc()
@@ -39,13 +38,6 @@ def subscription():
                 SubscribeVmss.network_delay_youtube.desc()
             ).order_by(SubscribeVmss.speed_youtube.desc())
     elif subscription_site == "internet":
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_internet > 0).filter(
-                SubscribeVmss.network_delay_internet > 0
-            )
-            # .filter(SubscribeVmss.network_delay_internet < 500)
-        )
-
         if subscription_type == "speed":
             new_db = new_db.order_by(SubscribeVmss.speed_internet.desc()).order_by(
                 SubscribeVmss.network_delay_internet.desc()
@@ -55,13 +47,6 @@ def subscription():
                 SubscribeVmss.network_delay_internet.desc()
             ).order_by(SubscribeVmss.speed_youtube.desc())
     else:
-        new_db = (
-            new_db.filter(SubscribeVmss.speed_google > 0).filter(
-                SubscribeVmss.network_delay_google > 0
-            )
-            # .filter(SubscribeVmss.network_delay_google < 500)
-        )
-
         if subscription_type == "speed":
             new_db = new_db.order_by(SubscribeVmss.speed_google.desc()).order_by(
                 SubscribeVmss.network_delay_google.desc()
