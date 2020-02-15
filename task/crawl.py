@@ -40,7 +40,7 @@ def add_new_vmess(
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
                     {
                         SubscribeVmss.death_count: int(
-                            global_variable.get_conf_int("BASE_DEATH_COUNT", default=10)
+                            global_variable.get_conf_int("BASE_DEATH_COUNT", default=30)
                             / 2
                         ),
                     }
@@ -60,7 +60,7 @@ def add_new_vmess(
                         if v.get("net") is None
                         else v.get("net"),
                         death_count=global_variable.get_conf_int(
-                            "BASE_DEATH_COUNT", default=10
+                            "BASE_DEATH_COUNT", default=30
                         ),
                         next_at=0,
                         is_closed=False,
