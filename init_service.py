@@ -3,12 +3,17 @@
 """
 import multiprocessing
 import threading
+
+from api.time_info import keep_time_consistent
 from conf import global_variable
 
 from task import *
 
 task_func_map = {
-    # keep_time_consistent: {"startup_mode": "thread", "enable": False},
+    keep_time_consistent: {
+        "startup_mode": "thread",
+        "enable": global_variable.get_conf_bool("ENABLE_NTP", default=False),
+    },
     update_new_node: {
         "startup_mode": "thread",
         "enable": global_variable.get_conf_bool("ENABLE_CRAWL", default=True),
