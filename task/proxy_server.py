@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+import sys
 import time
 import traceback
 
@@ -34,6 +35,13 @@ class V2rayServer:
         try:
             if self.pid != 0:
                 # logger.debug("wil kill old progress, pid is {}".format(self.pid))
+                try:
+                    if sys.platform == "win32":
+                        os.popen('taskkill.exe /pid:' + str(self.pid))
+                        return
+                except:
+                    logger.error("err: {}".format(traceback.format_exc()))
+
                 try:
                     os.kill(self.pid, signal.SIGTERM)
                 except:
