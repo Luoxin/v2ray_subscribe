@@ -191,25 +191,26 @@ def check_link_alive():
     logger.info("starting check vpn node......")
     while True:
         try:
+
             data_list = (
                 global_variable.get_db()
                 .query(SubscribeVmss)
                 .filter(
                     or_(
-                        SubscribeVmss.death_count
-                        > global_variable.get_conf_int("MAX_DEATH_COUNT", default=-10),
+                        SubscribeVmss.death_count > 0,
                         SubscribeVmss.death_count == None,
                     )
                 )
                 .filter(
                     or_(
-                        SubscribeVmss.next_at < int(time.time()),
+                        SubscribeVmss.next_at < utils.now(),
                         SubscribeVmss.next_at == None,
                     )
                 )
                 .order_by(SubscribeVmss.next_at)
                 .all()
             )
+
             if len(data_list) <= 0:
                 logger.debug("暂时没有待检测节点")
                 time.sleep(20)
