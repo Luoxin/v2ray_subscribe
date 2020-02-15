@@ -24,6 +24,7 @@ def subscription():
             .filter(SubscribeVmss.network_delay_internet > 0)
             .filter(SubscribeVmss.speed_google > 0)
             .filter(SubscribeVmss.network_delay_google > 0)
+            .filter(SubscribeVmss.next_at > 0)
         )
 
     can_be_used = []
