@@ -31,6 +31,8 @@ def subscription():
     req = VariableManager(request.args)
 
     auto_select = req.get_conf_bool("auto", False)
+    limit = req.get_conf_int("limit", default=20)
+
     if auto_select:
         low_delay_list = (
             get_new_db().order_by(SubscribeVmss.network_delay_google.desc()).all()
@@ -45,7 +47,7 @@ def subscription():
         for node in fast_list:
             if node.id in low_delay_id_list:
                 can_be_used.append(node)
-            if len(can_be_used) >= 20:
+            if len(can_be_used) >= limit:
                 break
     else:
         subscription_site = req.get_conf_str("site", default="google")
@@ -88,7 +90,7 @@ def subscription():
 
         logger.debug("执行的sql为 {}".format(str(new_db)))
 
-        can_be_used = new_db.all()
+        can_be_used = new_db.limit(limit).all()
 
     vmess_list = []
     for subscribe_vmess in can_be_used:
