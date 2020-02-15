@@ -39,7 +39,7 @@ def add_new_vmess(
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
                     {
                         SubscribeVmss.death_count: int(
-                            global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
+                            global_variable.get_conf_int("BASE_DEATH_COUNT", default=10)
                             / 2
                         ),
                     }
