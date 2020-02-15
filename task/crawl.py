@@ -35,6 +35,7 @@ def add_new_vmess(
                 or data.death_count
                 < global_variable.get_conf_int("BASE_DEATH_COUNT", default=10)
             ):
+                logger.debug("vmess crawl again {}".format(v2ray_url))
                 new_db = global_variable.get_db()
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
                     {
