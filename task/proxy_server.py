@@ -13,16 +13,8 @@ from utils import logger
 
 class V2rayServer:
     def __init__(self, path, conf):
-        self._path = (
-            path.replace("\\", "/")
-            if sys.platform == "win"
-            else path.replace("/", "\\") + ".exe"
-        )
-        self._conf = (
-            conf.replace("\\", "/")
-            if sys.platform == "win"
-            else conf.replace("/", "\\")
-        )
+        self._path = path
+        self._conf = conf
         self.cmd = "{} -config {} ".format(self._path, self._conf,)
         self.pid = 0
         logger.debug("启动 v2ray 的命令 {}".format(self.cmd))
