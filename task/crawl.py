@@ -2,34 +2,45 @@ import json
 import random
 import time
 import traceback
+from lxml import etree
 
-import sqlalchemy
-
-from conf import global_variable
-
-from utils import logger
 import requests
+
 import utils
+from conf import global_variable, VariableManager
 from orm import SubscribeCrawl, SubscribeVmss
 from orm.subscribe_crawl import SubscribeCrawlType
+from utils import logger
 
 
-def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = global_variable.get_conf_int("INTERVAL", default=3600)) -> bool:
+def add_new_vmess(
+        v2ray_url,
+        crawl_id: int = 0,
+        interval: int = global_variable.get_conf_int("INTERVAL", default=3600),
+) -> bool:
     try:
         if v2ray_url == "":
             return False
 
         # 已经存在了，就不管了
-        data = global_variable.get_db().query(SubscribeVmss).filter(SubscribeVmss.url == v2ray_url).first()
+        data = (
+            global_variable.get_db()
+                .query(SubscribeVmss)
+                .filter(SubscribeVmss.url == v2ray_url)
+                .first()
+        )
         if data is not None:
-            if data.death_count is None or data.death_count < global_variable.get_conf_int(
-                "MAX_DEATH_COUNT", default=10
+            if (
+                    data.death_count is None
+                    or data.death_count
+                    < global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
             ):
                 new_db = global_variable.get_db()
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
                     {
                         SubscribeVmss.death_count: int(
-                            global_variable.get_conf_int("MAX_DEATH_COUNT", default=10) / 2
+                            global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
+                            / 2
                         ),
                     }
                 )
@@ -66,14 +77,21 @@ def add_new_vmess(v2ray_url, crawl_id: int = 0, interval: int = global_variable.
     return False
 
 
-def crawl_by_subscribe_url(data: SubscribeCrawl):
+def download(data: SubscribeCrawl):
     try:
         proxies = None
         timeout = 10
 
         if isinstance(data.rule, dict):
-            if data.rule.get("need_proxy"):
-                proxies = global_variable.get_conf_dict("PROXIES_CRAWLER", default={"http": "socks5://127.0.0.1:10808", "https": "socks5://127.0.0.1:10808"})
+            rule = VariableManager(data.rule)
+            if rule.get_conf_bool("need_proxy", default=False):
+                proxies = global_variable.get_conf_dict(
+                    "PROXIES_CRAWLER",
+                    default={
+                        "http": "socks5://127.0.0.1:10808",
+                        "https": "socks5://127.0.0.1:10808",
+                    },
+                )
             if data.rule.get("timeout"):
                 try:
                     timeout = int(data.rule.get("timeout"))
@@ -85,40 +103,73 @@ def crawl_by_subscribe_url(data: SubscribeCrawl):
                 "User-Agent": global_variable.get_user_agent(),
                 "Connection": "close",
             }
-            v2ray_url_list = global_variable.base64_decode(
-                requests.get(
-                    data.crawl_url, headers=headers, timeout=timeout, proxies=proxies
-                ).text
-            ).split("\n")
-            for v2ray_url in v2ray_url_list:
-                add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
+
+            rsp = requests.get(
+                data.crawl_url, headers=headers, timeout=timeout, proxies=proxies
+            )
+
+            if rsp.status_code == 200:
+                return rsp.content.decode("utf-8")
         except (
-            requests.exceptions.RequestException,
-            requests.exceptions.RequestsWarning,
-            requests.exceptions.Timeout,
-            requests.exceptions.ConnectionError,
+                requests.exceptions.RequestException,
+                requests.exceptions.RequestsWarning,
+                requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError,
         ):
-            return
+            pass
         except:
             logger.error("err: {}".format(traceback.format_exc()))
 
     except:
         logger.error("err: {}".format(traceback.format_exc()))
 
+    return None
+
+
+def analyze(data: SubscribeCrawl, html: str):
+    if html is None or html == "":
+        return None
+
+    if data.crawl_type == SubscribeCrawlType.Subscription.value:
+        try:
+            v2ray_url_list = utils.base64_decode(html).split("\n")
+            for v2ray_url in v2ray_url_list:
+                add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
+        except:
+            logger.error("err: {}".format(traceback.format_exc()))
+
+    elif data.crawl_type == SubscribeCrawlType.Xpath.value:
+        rule = VariableManager(data.rule)
+        soup = etree.HTML(html)
+        for result in soup.xpath(rule.get_conf_str("xpath")):
+            if not isinstance(result, str) or result.__len__() == 0:
+                continue
+            try:
+                v2ray_url_list = utils.base64_decode(result).split("\n")
+                for v2ray_url in v2ray_url_list:
+                    add_new_vmess(v2ray_url, crawl_id=data.id, interval=data.interval)
+            except:
+                logger.error("err: {}".format(traceback.format_exc()))
+
+
+def get_data_from_network(data: SubscribeCrawl):
+    html = download(data)
+    if html is not None and isinstance(html, str) and len(html) > 0:
+        analyze(data, html)
+
 
 def crawl_by_subscribe():
     data_list = (
         global_variable.get_db()
-        .query(SubscribeCrawl)
-        .filter(SubscribeCrawl.next_at <= utils.now())
-        .filter(SubscribeCrawl.is_closed == False)
-        .filter(SubscribeCrawl.crawl_type == SubscribeCrawlType.Subscription.value)
-        .all()
+            .query(SubscribeCrawl)
+            .filter(SubscribeCrawl.next_at <= utils.now())
+            .filter(SubscribeCrawl.is_closed == False)
+            .all()
     )
 
     for data in data_list:
         try:
-            crawl_by_subscribe_url(data)
+            get_data_from_network(data)
             new_db = global_variable.get_db()
             new_db.query(SubscribeCrawl).filter(SubscribeCrawl.id == data.id).update(
                 {

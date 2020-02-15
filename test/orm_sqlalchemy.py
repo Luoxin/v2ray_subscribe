@@ -29,11 +29,7 @@ class Person(base):
 base.metadata.create_all(engine)
 db = sessionmaker(bind=engine)()
 
-db.add(
-    Person(
-        name="name"
-    )
-)
+db.add(Person(name="name"))
 db.commit()
 
 print(db.query(Person).all()[0].__dict__)

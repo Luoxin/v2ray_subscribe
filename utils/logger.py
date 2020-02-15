@@ -9,6 +9,7 @@ import traceback
 
 try:
     from conf import global_variable
+
     LOG_DEBUG = global_variable.get_conf_bool("LOG_DEBUG", default=False)
     SERVER_NAME = global_variable.get_conf_str("SERVER_NAME", default="v2ray_subscribe")
     LOG_PATH = global_variable.get_conf_str("LOG_PATH", default="./v2ray_subscribe.log")

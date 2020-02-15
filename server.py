@@ -9,13 +9,15 @@ from utils import logger
 
 class ServiceCentre(Flask):
     def __init__(self):
-        super().__init__(import_name=global_variable.get_conf_str("SERVER_NAME", "v2ray_subscribe"))
+        super().__init__(
+            import_name=global_variable.get_conf_str("SERVER_NAME", "v2ray_subscribe")
+        )
 
         self._init_service()
 
     def make_response(self, rv):
         if isinstance(rv, ServiceResponse):
-            return Response(rv.get_data(), mimetype='application/json', status=200)
+            return Response(rv.get_data(), mimetype="application/json", status=200)
         return super().make_response(rv)
 
     def _init_route_list(self):

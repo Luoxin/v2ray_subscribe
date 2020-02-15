@@ -1,8 +1,8 @@
 import json
 import os
 import traceback
-
 import yaml
+from .utils import get_conf_file_path
 
 
 class VariableManagerException(Exception):
@@ -34,22 +34,28 @@ class VariableManager(object):
     def set_conf(self, key: str, value):
         self._variable[key] = value
 
-    def set_load_file(self, load_file=False, file_type: str = "yaml"):
+    def set_load_file(self, load_file=False, file_type: str = "yaml") -> bool:
         """
         :param file_type: 如果加载文件有效，此变量才生效，默认yaml，其他类型正在添加支持
         :param load_file: 如果不传入，默认不加载文件，如果传入
                             如果传入True，使用默认路径加载文件
                             如果传入指定路径，使用指定路径加载文件
+        :return bool: 返回是否修改成功
         """
         if isinstance(load_file, bool):
             if load_file:
-                self.load_file_path = _get_conf_file_path()
+                self.load_file_path = get_conf_file_path()
             else:
-                return
+                return False
         elif isinstance(load_file, str):
             self.load_file_path = load_file
+        elif isinstance(load_file, dict):
+            self._variable = load_file
+            self.file_type = "json"
+            return False
 
         self.set_load_file_type(file_type=file_type)
+        return True
 
     def set_load_file_type(self, file_type: str = "yaml"):
         """
@@ -61,7 +67,8 @@ class VariableManager(object):
         self.file_type = file_type
 
     def reload_file(self, load_file=False, file_type: str = "yaml"):
-        self.set_load_file(load_file=load_file, file_type=file_type)
+        if not self.set_load_file(load_file=load_file, file_type=file_type):
+            return
 
         # 先判断配置文件是否存在，后期做默认配置
         if not os.path.exists(self.load_file_path):
@@ -138,25 +145,27 @@ class VariableManager(object):
         except:
             return default
 
+    def get_conf_list_int(self, key, default: list = None):
+        if default is None:
+            default = []
+        try:
+            value = self.get_conf(key)
 
-def _get_conf_file_path() -> str:
-    conf_path_list = [
-        str(os.path.abspath(os.path.dirname(__file__)) + "\conf.yaml").replace(
-            "\\", "/"
-        ),
-        str(os.path.abspath(os.getcwd() + "\conf.yaml")).replace("\\", "/"),
-        os.path.abspath(os.path.dirname(os.getcwd())).replace("\\", "/"),
-    ]
+            temp = []
+            if isinstance(value, list):
+                for item in value:
+                    try:
+                        temp.append(int(item))
+                    except:
+                        pass
+            else:
+                temp = default
 
-    for conf_path in conf_path_list:
-        if os.path.exists(conf_path):
-            return conf_path
+            return temp
+        except:
+            return default
 
-    print("无法找到配置文件 {}".format(conf_path_list))
-    os._exit(-1)
+    def get_conf_all(self):
+        return self._variable
 
 
-
-if __name__ == "__main__":
-    tmp = VariableManager(load_file=True)
-    print(tmp.get_conf_bool("A"))

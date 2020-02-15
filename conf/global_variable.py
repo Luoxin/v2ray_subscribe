@@ -1,7 +1,8 @@
 from fake_useragent import UserAgent
 from sqlalchemy.orm import sessionmaker
 
-from .conf import VariableManager
+from .variable_manager import VariableManager
+
 
 class GlobalVariable(VariableManager):
     def __init__(self):
@@ -15,7 +16,7 @@ class GlobalVariable(VariableManager):
             self.set_conf("SERVER_NAME", "v2ray_subscribe")
 
     def init_ua(self):
-        self._user_agent = UserAgent()
+        self._user_agent = UserAgent(verify_ssl=False)
 
     def init_db(self, engine):
         if self.get_conf_bool("ENABLE_DATABASE", default=True):
