@@ -47,7 +47,7 @@ def subscription():
         for node in fast_list:
             if node.id in low_delay_id_list:
                 can_be_used.append(node)
-            if len(can_be_used) >= limit:
+            if len(can_be_used) >= limit > 0:
                 break
     else:
         subscription_site = req.get_conf_str("site", default="google")
@@ -90,7 +90,10 @@ def subscription():
 
         logger.debug("执行的sql为 {}".format(str(new_db)))
 
-        can_be_used = new_db.limit(limit).all()
+        if limit > 0:
+            new_db.limit(limit)
+
+        can_be_used = new_db.all()
 
     vmess_list = []
     for subscribe_vmess in can_be_used:
