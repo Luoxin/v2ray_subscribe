@@ -13,17 +13,17 @@ def subscription():
     def get_new_db():
         return (
             global_variable.get_db()
-                .query(SubscribeVmss)
-                .filter(SubscribeVmss.death_count >= 0)
-                .filter(
+            .query(SubscribeVmss)
+            .filter(SubscribeVmss.death_count >= 0)
+            .filter(
                 or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed is None)
             )
-                .filter(SubscribeVmss.speed_youtube > 0)
-                .filter(SubscribeVmss.network_delay_youtube > 0)
-                .filter(SubscribeVmss.speed_internet > 0)
-                .filter(SubscribeVmss.network_delay_internet > 0)
-                .filter(SubscribeVmss.speed_google > 0)
-                .filter(SubscribeVmss.network_delay_google > 0)
+            .filter(SubscribeVmss.speed_youtube > 0)
+            .filter(SubscribeVmss.network_delay_youtube > 0)
+            .filter(SubscribeVmss.speed_internet > 0)
+            .filter(SubscribeVmss.network_delay_internet > 0)
+            .filter(SubscribeVmss.speed_google > 0)
+            .filter(SubscribeVmss.network_delay_google > 0)
         )
 
     can_be_used = []

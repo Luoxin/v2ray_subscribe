@@ -58,7 +58,9 @@ def add_new_vmess(
                         network_protocol_type=""
                         if v.get("net") is None
                         else v.get("net"),
-                        death_count=global_variable.get_conf_int("BASE_DEATH_COUNT", default=10),
+                        death_count=global_variable.get_conf_int(
+                            "BASE_DEATH_COUNT", default=10
+                        ),
                         next_at=0,
                         is_closed=False,
                         interval=int(interval),

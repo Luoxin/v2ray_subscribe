@@ -4,19 +4,23 @@
 import multiprocessing
 import threading
 
-# from api.time_info import keep_time_consistent
-from conf.conf import get_conf_bool
+from api.time_info import keep_time_consistent
+from conf import global_variable
+
 from task import *
 
 task_func_map = {
-    # keep_time_consistent: {"startup_mode": "thread", "enable": False},
+    keep_time_consistent: {
+        "startup_mode": "thread",
+        "enable": global_variable.get_conf_bool("ENABLE_NTP", default=False),
+    },
     update_new_node: {
         "startup_mode": "thread",
-        "enable": get_conf_bool("ENABLE_CRAWL", default=True),
+        "enable": global_variable.get_conf_bool("ENABLE_CRAWL", default=True),
     },
     check_link_alive: {
         "startup_mode": "thread",
-        "enable": get_conf_bool("ENABLE_CHECK_ALIVE", default=True),
+        "enable": global_variable.get_conf_bool("ENABLE_CHECK_ALIVE", default=True),
     },
 }
 
@@ -44,7 +48,3 @@ def start_task():
 
     # process_pool.close()
     # process_pool.join()
-
-
-def init_service():
-    start_task()

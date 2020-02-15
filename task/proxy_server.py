@@ -37,7 +37,7 @@ class V2rayServer:
                 # logger.debug("wil kill old progress, pid is {}".format(self.pid))
                 try:
                     if sys.platform == "win32":
-                        os.popen('taskkill.exe /pid:' + str(self.pid))
+                        os.popen("taskkill.exe /pid:" + str(self.pid))
                         return
                 except:
                     logger.error("err: {}".format(traceback.format_exc()))
