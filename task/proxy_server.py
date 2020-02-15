@@ -7,6 +7,7 @@ import traceback
 
 import psutil
 
+from conf import global_variable
 from utils import logger
 
 
@@ -78,29 +79,28 @@ class V2rayServer:
         time.sleep(1)
 
     def _find_pid(self):
-        def _filepath_comparison(path1, path2) -> bool:
-            return path1.replace("/", "").replace("\\", "") == path1.replace(
-                "/", ""
-            ).replace("\\", "")
-
         for pid in psutil.pids():
             try:
                 p = psutil.Process(pid)
-                cmd = p.cmdline()
-
-                if len(cmd) == 3:
-                    if "v2ray" in cmd[0]:
-                        if _filepath_comparison(cmd[0], self._path) and _filepath_comparison(cmd[2], self._conf):
-                            logger.info("找到的 cmd 的指令".format(cmd))
-                            self.pid = pid
-                            return
-
-                cmd = " ".join(cmd)
-                if cmd == self.cmd:
-                    logger.info("找到了正确的指令为 {}".format(cmd))
-                    self.pid = pid
-                    return
-            except:
+                if pid == 0 or len(p.cmdline()) == 0:
+                    continue
+                for connection in p.connections():
+                    if (
+                        connection.type == 1
+                        and (
+                            connection.laddr.port == global_variable.get_conf_int("CHECK_PORT", default=1080)
+                            if connection.laddr != ()
+                            else False
+                        )
+                        or (
+                            connection.raddr.port != global_variable.get_conf_int("CHECK_PORT", default=1080)
+                            if connection.laddr == ()
+                            else False
+                        )
+                    ):
+                        self.pid = pid
+                        return
+            except (PermissionError, psutil.AccessDenied, psutil.NoSuchProcess):
                 pass
 
     def get_conf_path(self):
