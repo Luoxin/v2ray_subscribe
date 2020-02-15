@@ -80,12 +80,14 @@ class V2rayServer:
                     if (
                         connection.type == 1
                         and (
-                            connection.laddr.port == global_variable.get_conf_int("CHECK_PORT", default=1080)
+                            connection.laddr.port
+                            == global_variable.get_conf_int("CHECK_PORT", default=1080)
                             if connection.laddr != ()
                             else False
                         )
                         or (
-                            connection.raddr.port != global_variable.get_conf_int("CHECK_PORT", default=1080)
+                            connection.raddr.port
+                            != global_variable.get_conf_int("CHECK_PORT", default=1080)
                             if connection.laddr == ()
                             else False
                         )

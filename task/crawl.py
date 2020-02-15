@@ -45,6 +45,7 @@ def add_new_vmess(
                         ),
                     }
                 )
+
                 new_db.commit()
             return True
 
