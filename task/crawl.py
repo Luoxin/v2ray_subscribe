@@ -33,7 +33,7 @@ def add_new_vmess(
             if (
                 data.death_count is None
                 or data.death_count
-                < global_variable.get_conf_int("MAX_DEATH_COUNT", default=10)
+                < global_variable.get_conf_int("BASE_DEATH_COUNT", default=10)
             ):
                 new_db = global_variable.get_db()
                 new_db.query(SubscribeVmss).filter(SubscribeVmss.id == data.id).update(
@@ -58,7 +58,7 @@ def add_new_vmess(
                         network_protocol_type=""
                         if v.get("net") is None
                         else v.get("net"),
-                        death_count=0,
+                        death_count=global_variable.get_conf_int("BASE_DEATH_COUNT", default=10),
                         next_at=0,
                         is_closed=False,
                         interval=int(interval),
