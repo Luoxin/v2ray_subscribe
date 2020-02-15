@@ -197,7 +197,7 @@ def check_link_alive():
                 .filter(
                     or_(
                         SubscribeVmss.death_count
-                        < global_variable.get_conf_int("MAX_DEATH_COUNT"),
+                        > global_variable.get_conf_int("MAX_DEATH_COUNT", default=-10),
                         SubscribeVmss.death_count == None,
                     )
                 )
