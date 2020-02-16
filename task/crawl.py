@@ -2,9 +2,9 @@ import json
 import random
 import time
 import traceback
-from lxml import etree
 
 import requests
+from lxml import etree
 
 import utils
 from conf import global_variable, VariableManager

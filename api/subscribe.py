@@ -1,11 +1,34 @@
+import json
+import traceback
+
 from flask import Blueprint, request
 import utils
 from orm import SubscribeVmss, or_
 from task.crawl import add_new_vmess
 from conf import global_variable, VariableManager
+from task.node_title import NodeTitle
 from utils import logger  # 日志
 
 subscribe_api = Blueprint("subscribe", __name__, url_prefix="/api/subscribe")
+title_service = NodeTitle()
+
+
+def data_cleaning(can_be_used):
+    title = title_service.get()
+    vmess_list = []
+
+    index = 0
+    for subscribe_vmess in can_be_used:
+        index += 1
+        try:
+            v = json.loads(utils.base64_decode(subscribe_vmess.url.replace("vmess://", "")))
+            v["ps"] = "{}-{}".format(index, title)
+            vmess_list.append("vmess://" + utils.base64_encode(v))
+        except:
+            logger.error("err: {}".format(traceback.format_exc()))
+            vmess_list.append(subscribe_vmess.url)
+
+    return vmess_list
 
 
 @subscribe_api.route("/subscription", methods=["GET"])
@@ -13,18 +36,18 @@ def subscription():
     def get_new_db():
         return (
             global_variable.get_db()
-            .query(SubscribeVmss)
-            .filter(SubscribeVmss.death_count >= 0)
-            .filter(
+                .query(SubscribeVmss)
+                .filter(SubscribeVmss.death_count >= 0)
+                .filter(
                 or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed is None)
             )
-            .filter(SubscribeVmss.speed_youtube > 0)
-            .filter(SubscribeVmss.network_delay_youtube > 0)
-            .filter(SubscribeVmss.speed_internet > 0)
-            .filter(SubscribeVmss.network_delay_internet > 0)
-            .filter(SubscribeVmss.speed_google > 0)
-            .filter(SubscribeVmss.network_delay_google > 0)
-            .filter(SubscribeVmss.next_at > 0)
+                .filter(SubscribeVmss.speed_youtube > 0)
+                .filter(SubscribeVmss.network_delay_youtube > 0)
+                .filter(SubscribeVmss.speed_internet > 0)
+                .filter(SubscribeVmss.network_delay_internet > 0)
+                .filter(SubscribeVmss.speed_google > 0)
+                .filter(SubscribeVmss.network_delay_google > 0)
+                .filter(SubscribeVmss.next_at > 0)
         )
 
     can_be_used = []
@@ -96,11 +119,7 @@ def subscription():
 
         can_be_used = new_db.all()
 
-    vmess_list = []
-    for subscribe_vmess in can_be_used:
-        vmess_list.append(subscribe_vmess.url)
-
-    return utils.base64_encode(("\n".join(vmess_list)))
+    return utils.base64_encode(("\n".join(data_cleaning(can_be_used))))
 
 
 @subscribe_api.route("/api/subscribe/add", methods=["POST"])
@@ -113,7 +132,6 @@ def add_with_vmess():
             return {"message": "ok"}
 
     return {"message": "failure"}
-
 
 # def get_alive_url():
 #     data_list = (
