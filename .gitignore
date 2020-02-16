@@ -98,3 +98,4 @@ ENV/
 .idea
 subscribe.vdb
 conf/conf.yaml
+*.tmp
