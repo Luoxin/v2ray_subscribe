@@ -49,6 +49,7 @@ class VariableManager(object):
                 return False
         elif isinstance(load_file, str):
             self.load_file_path = load_file
+            print("配置目录为", load_file)
         elif isinstance(load_file, dict):
             self._variable = load_file
             self.file_type = "json"
