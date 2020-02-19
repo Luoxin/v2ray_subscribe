@@ -49,7 +49,6 @@ class VariableManager(object):
                 return False
         elif isinstance(load_file, str):
             self.load_file_path = load_file
-            print("配置目录为", load_file)
         elif isinstance(load_file, dict):
             self._variable = load_file
             self.file_type = "json"
@@ -72,6 +71,7 @@ class VariableManager(object):
             return
 
         # 先判断配置文件是否存在，后期做默认配置
+        print("配置目录为", load_file)
         if not os.path.exists(self.load_file_path):
             raise FileNotFoundError()
 
