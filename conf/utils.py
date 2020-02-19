@@ -2,7 +2,7 @@ import os
 
 
 def get_conf_file_path() -> str:
-    return find_file("./conf.yaml")
+    return find_file("conf.yaml")
 
 
 def get_project_root_path():
@@ -16,7 +16,6 @@ def find_file(file_name):
     ]
 
     for conf_path in conf_path_list:
-        print(conf_path)
         if os.path.exists(conf_path):
             return conf_path
 
