@@ -59,10 +59,10 @@ class NodeTitle(object):
                 if rsp.status_code == 200:
                     return rsp.json().get("hitokoto")
             except (
-                    requests.exceptions.RequestException,
-                    requests.exceptions.RequestsWarning,
-                    requests.exceptions.Timeout,
-                    requests.exceptions.ConnectionError,
+                requests.exceptions.RequestException,
+                requests.exceptions.RequestsWarning,
+                requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError,
             ):
                 pass
             except:

@@ -21,7 +21,9 @@ def data_cleaning(can_be_used):
     for subscribe_vmess in can_be_used:
         index += 1
         try:
-            v = json.loads(utils.base64_decode(subscribe_vmess.url.replace("vmess://", "")))
+            v = json.loads(
+                utils.base64_decode(subscribe_vmess.url.replace("vmess://", ""))
+            )
             v["ps"] = "{}-{}".format(index, title)
             vmess_list.append("vmess://" + utils.base64_encode(v))
         except:
@@ -36,18 +38,18 @@ def subscription():
     def get_new_db():
         return (
             global_variable.get_db()
-                .query(SubscribeVmss)
-                .filter(SubscribeVmss.death_count >= 0)
-                .filter(
+            .query(SubscribeVmss)
+            .filter(SubscribeVmss.death_count >= 0)
+            .filter(
                 or_(SubscribeVmss.is_closed == False, SubscribeVmss.is_closed is None)
             )
-                .filter(SubscribeVmss.speed_youtube > 0)
-                .filter(SubscribeVmss.network_delay_youtube > 0)
-                .filter(SubscribeVmss.speed_internet > 0)
-                .filter(SubscribeVmss.network_delay_internet > 0)
-                .filter(SubscribeVmss.speed_google > 0)
-                .filter(SubscribeVmss.network_delay_google > 0)
-                .filter(SubscribeVmss.next_at > 0)
+            .filter(SubscribeVmss.speed_youtube > 0)
+            .filter(SubscribeVmss.network_delay_youtube > 0)
+            .filter(SubscribeVmss.speed_internet > 0)
+            .filter(SubscribeVmss.network_delay_internet > 0)
+            .filter(SubscribeVmss.speed_google > 0)
+            .filter(SubscribeVmss.network_delay_google > 0)
+            .filter(SubscribeVmss.next_at > 0)
         )
 
     can_be_used = []
@@ -58,9 +60,12 @@ def subscription():
     limit = req.get_conf_int("limit", default=20)
 
     if auto_select:
-        low_delay_list = (
-            get_new_db().order_by(SubscribeVmss.network_delay_google.desc()).all()
-        )
+        new_db = get_new_db().order_by(SubscribeVmss.network_delay_google.desc())
+
+        if limit > 0:
+            new_db.limit(limit * 2)
+
+        low_delay_list = new_db.all()
 
         fast_list = get_new_db().order_by(SubscribeVmss.speed_google.desc()).all()
 
@@ -132,6 +137,7 @@ def add_with_vmess():
             return {"message": "ok"}
 
     return {"message": "failure"}
+
 
 # def get_alive_url():
 #     data_list = (
