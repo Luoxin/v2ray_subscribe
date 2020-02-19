@@ -16,6 +16,7 @@ def find_file(file_name):
     ]
 
     for conf_path in conf_path_list:
+        print(conf_path)
         if os.path.exists(conf_path):
             return conf_path
 
