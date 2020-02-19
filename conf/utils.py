@@ -14,6 +14,7 @@ def find_file(file_name):
         os.path.join(get_project_root_path(), file_name).replace("\\", "/"),
         os.path.join(get_project_root_path(), "conf", file_name).replace("\\", "/"),
         str(os.path.abspath(os.getcwd() + file_name)).replace("\\", "/"),
+        str(os.path.join(os.getcwd() , "conf", file_name)).replace("\\", "/"),
     ]
 
     for conf_path in conf_path_list:
