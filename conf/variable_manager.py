@@ -181,3 +181,12 @@ class VariableManager(object):
             return default
         except:
             return default
+
+    def get_conf_with_type(self, key, value_type, default: Enum = None):
+        try:
+            value = self.get_conf(key)
+            if isinstance(value, value_type):
+                return value
+            return default
+        except:
+            return default
