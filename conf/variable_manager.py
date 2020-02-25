@@ -1,6 +1,8 @@
 import json
 import os
 import traceback
+from enum import Enum
+
 import yaml
 from .utils import get_conf_file_path
 
@@ -170,3 +172,12 @@ class VariableManager(object):
 
     def get_conf_all(self):
         return self._variable
+
+    def get_conf_enum(self, key, default: Enum = None):
+        try:
+            value = self.get_conf(key)
+            if isinstance(value, Enum):
+                return value
+            return default
+        except:
+            return default
