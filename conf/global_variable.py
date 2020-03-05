@@ -16,7 +16,7 @@ class GlobalVariable(VariableManager):
             self.set_conf("SERVER_NAME", "v2ray_subscribe")
 
     def init_ua(self):
-        self._user_agent = UserAgent(verify_ssl=False)
+        self._user_agent = UserAgent(verify_ssl=False, use_cache_server=False)
 
     def init_db(self, engine):
         if self.get_conf_bool("ENABLE_DATABASE", default=True):
