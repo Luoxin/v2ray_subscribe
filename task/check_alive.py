@@ -74,6 +74,7 @@ def get_node_by_url(url: str != ""):
 def check_by_v2ray_url(test_url: str):
     try:
         try:
+            time.sleep(5)
             headers = {
                 "Connection": "close",
                 "User-Agent": global_variable.get_user_agent(),
@@ -89,7 +90,7 @@ def check_by_v2ray_url(test_url: str):
                         global_variable.get_conf_int("CHECK_PORT", default=1080)
                     ),
                 },
-                timeout=10,
+                timeout=30,
                 headers=headers,
             )
             if r.status_code == 200:
