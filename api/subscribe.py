@@ -82,7 +82,7 @@ def subscription():
         subscription_site = req.get_conf_str("site", default="google")
         subscription_type = req.get_conf_str("type", default="delayed")
 
-        new_db = get_new_db
+        new_db = get_new_db()
 
         if subscription_site == "youtube":
             if subscription_type == "speed":

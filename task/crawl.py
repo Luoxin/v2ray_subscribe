@@ -145,7 +145,7 @@ def analyze(data: SubscribeCrawl, html: str):
     elif data.crawl_type == SubscribeCrawlType.Xpath.value:
         rule = VariableManager(data.rule)
         soup = etree.HTML(html)
-        for result in soup.xpath(rule.get_conf_str("xpath")):
+        for result in soup.xpath(rule.get_conf_str("xpath", default=None)):
             if not isinstance(result, str) or result.__len__() == 0:
                 continue
             try:
