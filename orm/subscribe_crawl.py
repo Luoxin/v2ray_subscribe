@@ -26,6 +26,6 @@ class SubscribeCrawl(base):
 @unique
 class SubscribeCrawlType(Enum):
     Nil = 0
-    
+
     Subscription = 1
     Xpath = 2
