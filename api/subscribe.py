@@ -127,7 +127,7 @@ def subscription():
     return utils.base64_encode(("\n".join(data_cleaning(can_be_used))))
 
 
-@subscribe_api.route("/api/subscribe/add", methods=["POST"])
+@subscribe_api.route("/add", methods=["POST"])
 def add_with_vmess():
     req = request.get_json()
 

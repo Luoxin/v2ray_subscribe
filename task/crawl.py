@@ -47,7 +47,7 @@ def add_new_vmess(
                 )
 
                 new_db.commit()
-            return True
+                return True
 
         if v2ray_url.startswith("vmess://"):  # vmess
             try:
@@ -71,6 +71,7 @@ def add_new_vmess(
                     )
                 )
                 new_db.commit()
+                return True
             except (UnicodeDecodeError, json.decoder.JSONDecodeError):
                 pass
             except:
@@ -78,7 +79,7 @@ def add_new_vmess(
                 return False
     except:
         logger.error("err: {}".format(traceback.format_exc()))
-    return False
+    return True
 
 
 def download(data: SubscribeCrawl):
