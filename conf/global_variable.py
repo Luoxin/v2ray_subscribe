@@ -1,7 +1,6 @@
 from fake_useragent import UserAgent
 from sqlalchemy.orm import sessionmaker
 
-from task.node_title import NodeTitle
 from .variable_manager import VariableManager
 
 
@@ -19,7 +18,6 @@ class GlobalVariable(VariableManager):
 
     def init_ua(self):
         self._user_agent = UserAgent(verify_ssl=False, use_cache_server=False)
-        self._title_service = NodeTitle()
 
     def init_db(self, engine):
         if self.get_conf_bool("ENABLE_DATABASE", default=True):
@@ -31,5 +29,5 @@ class GlobalVariable(VariableManager):
     def get_user_agent(self):
         return self._user_agent.random
 
-    def get_title(self):
-        return self._title_service.get()
+    # def get_title(self):
+    #     return self._title_service.get()
