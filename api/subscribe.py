@@ -2,19 +2,17 @@ import json
 import traceback
 
 from flask import Blueprint, request
+
 import utils
+from conf import global_variable, VariableManager
 from orm import SubscribeVmss, or_
 from task.crawl import add_new_vmess
-from conf import global_variable, VariableManager
-from task.node_title import NodeTitle
 from utils import logger  # 日志
 
 subscribe_api = Blueprint("subscribe", __name__, url_prefix="/api/subscribe")
-title_service = NodeTitle()
 
 
 def data_cleaning(can_be_used):
-    title = title_service.get()
     vmess_list = []
 
     index = 0
@@ -24,7 +22,7 @@ def data_cleaning(can_be_used):
             v = json.loads(
                 utils.base64_decode(subscribe_vmess.url.replace("vmess://", ""))
             )
-            v["ps"] = "{}-{}".format(index, title)
+            v["ps"] = "{}-{}".format(index, global_variable.get_title())
             vmess_list.append("vmess://" + utils.base64_encode(v))
         except:
             logger.error("err: {}".format(traceback.format_exc()))
