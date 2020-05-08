@@ -7,3 +7,4 @@ fake-useragent
 PyMySQL
 PyYAML
 psutil
+pyinstaller
