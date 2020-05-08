@@ -8,3 +8,4 @@ PyMySQL
 PyYAML
 psutil
 pyinstaller
+psycopg2
