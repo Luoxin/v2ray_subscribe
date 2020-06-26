@@ -1,38 +1,19 @@
 import json
-import os
 import random
 import sys
 import time
 import traceback
-from conf import global_variable
+
 import requests
 
 import utils
+from conf import global_variable
 from orm import SubscribeVmss, or_
 from task.node import V2ray
-from task.proxy_server import V2rayServer
+from task.proxy_server import new_proxy
 from utils import logger
 
-v2ray_server = V2rayServer(
-    os.path.join(
-        global_variable.get_conf_str(
-            "V2RAY_SERVICE_PATH",
-            default="C:/ProgramData/v2ray"
-            if sys.platform == "win"
-            else "/usr/bin/v2ray",
-        ),
-        "v2ray",
-    ),
-    os.path.join(
-        global_variable.get_conf_str(
-            "V2RAY_SERVICE_PATH",
-            default="C:/ProgramData/v2ray"
-            if sys.platform == "win"
-            else "/usr/bin/v2ray",
-        ),
-        "v2ray_subscribe.conf",
-    ),
-)
+_v2ray_server = new_proxy()
 
 
 def get_node_by_url(url: str != ""):
@@ -183,8 +164,8 @@ def update_v2ray_conf(v2ray_url):
     node = get_node_by_url(v2ray_url)
     if node is None:
         return -1, -1
-    json.dump(node.format_config(), open(v2ray_server.get_conf_path(), "w"), indent=2)
-    v2ray_server.restart()
+    json.dump(node.format_config(), open(_v2ray_server.get_conf_path(), "w"), indent=2)
+    _v2ray_server.restart()
     logger.info("v2ray 配置已更换为\t{}".format(v2ray_url))
 
 

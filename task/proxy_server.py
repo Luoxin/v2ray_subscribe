@@ -15,7 +15,7 @@ class V2rayServer:
     def __init__(self, path, conf):
         self._path = path
         self._conf = conf
-        self.cmd = "{} -config {} ".format(self._path, self._conf,)
+        self.cmd = "{} -config {} ".format(self._path, self._conf, )
         self.pid = 0
         logger.debug("启动 v2ray 的命令 {}".format(self.cmd))
 
@@ -78,19 +78,19 @@ class V2rayServer:
                     continue
                 for connection in p.connections():
                     if (
-                        connection.type == 1
-                        and (
+                            connection.type == 1
+                            and (
                             connection.laddr.port
                             == global_variable.get_conf_int("CHECK_PORT", default=1080)
                             if connection.laddr != ()
                             else False
-                        )
-                        or (
+                    )
+                            or (
                             connection.raddr.port
                             != global_variable.get_conf_int("CHECK_PORT", default=1080)
                             if connection.laddr == ()
                             else False
-                        )
+                    )
                     ):
                         self.pid = pid
                         return
@@ -99,3 +99,26 @@ class V2rayServer:
 
     def get_conf_path(self):
         return self._conf
+
+
+def new_proxy() -> V2rayServer:
+    return V2rayServer(
+        os.path.join(
+            global_variable.get_conf_str(
+                "V2RAY_SERVICE_PATH",
+                default="C:/ProgramData/v2ray"
+                if sys.platform == "win"
+                else "/usr/bin/v2ray",
+            ),
+            "v2ray",
+        ),
+        os.path.join(
+            global_variable.get_conf_str(
+                "V2RAY_SERVICE_PATH",
+                default="C:/ProgramData/v2ray"
+                if sys.platform == "win"
+                else "/usr/bin/v2ray",
+            ),
+            "v2ray_subscribe.conf",
+        ),
+    )
