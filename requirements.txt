@@ -50,3 +50,4 @@ django~=2.2.9
 traitlets~=4.3.3
 cffi~=1.14.0
 gevent~=1.4.0
+pysocks
