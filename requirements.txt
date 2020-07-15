@@ -10,7 +10,6 @@ psutil~=5.6.7
 pyinstaller~=3.6
 psycopg2
 faker~=4.0.3
-pip~=20.0.2
 argparse~=1.4.0
 wheel~=0.34.2
 brotli~=1.0.7
