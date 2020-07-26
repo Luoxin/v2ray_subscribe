@@ -66,7 +66,7 @@ def subscription():
 
         low_delay_list = new_db.all()
 
-        fast_list = get_new_db().order_by(SubscribeVmss.speed_google.desc()).all()
+        fast_list = get_new_db().order_by(SubscribeVmss.speed_internet.desc()).all()
 
         low_delay_id_list = []
         for node in low_delay_list:

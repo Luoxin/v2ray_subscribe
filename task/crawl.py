@@ -4,6 +4,7 @@ import time
 import traceback
 
 import requests
+import sqlalchemy.exc
 from lxml import etree
 
 import utils
@@ -72,6 +73,8 @@ def add_new_vmess(
                 )
                 new_db.commit()
                 return True
+            except sqlalchemy.exc.IntegrityError:
+                pass
             except (UnicodeDecodeError, json.decoder.JSONDecodeError):
                 pass
             except:

@@ -61,9 +61,9 @@ def get_file_list_by_file_path(
         print("\n".join(e.args))
     finally:
         result_list = list(result_set)
-        if sort_type is 1:
+        if sort_type == 1:
             result_list.sort(key=sort_key)
-        elif sort_type is 2:
+        elif sort_type == 2:
             result_list.sort(key=sort_key, reverse=True)
 
         return result_list
