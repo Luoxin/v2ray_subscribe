@@ -5,17 +5,14 @@ sqlalchemy~=1.3.13
 requests~=2.22.0
 fake-useragent
 PyMySQL
-PyYAML~=5.3
 psutil~=5.6.7
 pyinstaller~=3.6
 psycopg2
 faker~=4.0.3
-pip~=20.0.2
 argparse~=1.4.0
 wheel~=0.34.2
 brotli~=1.0.7
 cryptography~=2.8
-py~=1.8.1
 keyring~=21.1.0
 bs4~=0.0.1
 beautifulsoup4~=4.8.2
@@ -23,7 +20,7 @@ html5lib~=1.0.1
 future~=0.18.2
 colorama~=0.4.3
 jinja2~=2.10.3
-werkzeug~=1.0.0
+werkzeug~=1
 itsdangerous~=1.1.0
 click~=7.0
 python-dotenv~=0.12.0

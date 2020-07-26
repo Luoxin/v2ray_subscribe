@@ -13,7 +13,7 @@ from utils import logger
 
 class V2rayServer:
     def __init__(self, path, conf):
-        self._path = path
+        self._path = os.path.join(os.getcwd(), path)
         self._conf = conf
         self.cmd = "{} -config {} ".format(self._path, self._conf, )
         self.pid = 0
