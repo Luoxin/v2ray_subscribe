@@ -3,10 +3,8 @@ import random
 import time
 import traceback
 
-import requests
 import sqlalchemy.exc
 from grab import Grab, GrabNetworkError, GrabTimeoutError, GrabMisuseError, GrabError
-from lxml import etree
 
 import utils
 from conf import global_variable, VariableManager
