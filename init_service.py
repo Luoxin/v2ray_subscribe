@@ -14,7 +14,7 @@ task_func_map = {
         "startup_mode": "thread",
         "enable": global_variable.get_conf_bool("ENABLE_NTP", default=False),
     },
-    update_new_node: {
+    crawler_node: {
         "startup_mode": "thread",
         "enable": global_variable.get_conf_bool("ENABLE_CRAWL", default=True),
     },

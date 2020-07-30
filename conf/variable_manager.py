@@ -95,35 +95,35 @@ class VariableManager(object):
         except:
             return None
 
-    def get_conf_str(self, key, default: str = ""):
+    def get_conf_str(self, key, default=""):
         try:
             value = self.get_conf(key)
             return str(value) if value is not None else default
         except:
             return default
 
-    def get_conf_int(self, key, default: int = 0):
+    def get_conf_int(self, key, default=0):
         try:
             value = self.get_conf(key)
             return int(value) if value is not None else default
         except:
             return default
 
-    def get_conf_float(self, key, default: float = 0.0):
+    def get_conf_float(self, key, default=0.0):
         try:
             value = self.get_conf(key)
             return float(value) if value is not None else default
         except:
             return default
 
-    def get_conf_bool(self, key, default: bool = False):
+    def get_conf_bool(self, key, default=False):
         try:
             value = self.get_conf(key)
             return bool(value) if value is not None else default
         except:
             return default
 
-    def get_conf_dict(self, key, default: dict = None):
+    def get_conf_dict(self, key, default: None):
         if default is None:
             default = {}
         try:
@@ -132,7 +132,7 @@ class VariableManager(object):
         except:
             return default
 
-    def get_conf_json(self, key, default: dict = None):
+    def get_conf_json(self, key, default=None):
         if default is None:
             default = {}
         try:
@@ -141,7 +141,7 @@ class VariableManager(object):
         except:
             return default
 
-    def get_conf_list(self, key, default: list = None):
+    def get_conf_list(self, key, default=None):
         if default is None:
             default = []
         try:
@@ -150,7 +150,7 @@ class VariableManager(object):
         except:
             return default
 
-    def get_conf_list_int(self, key, default: list = None):
+    def get_conf_list_int(self, key, default=None):
         if default is None:
             default = []
         try:
@@ -173,7 +173,7 @@ class VariableManager(object):
     def get_conf_all(self):
         return self._variable
 
-    def get_conf_enum(self, key, default: Enum = None):
+    def get_conf_enum(self, key, default=None):
         try:
             value = self.get_conf(key)
             if isinstance(value, Enum):
@@ -182,7 +182,7 @@ class VariableManager(object):
         except:
             return default
 
-    def get_conf_with_type(self, key, value_type, default: Enum = None):
+    def get_conf_with_type(self, key, value_type, default=None):
         try:
             value = self.get_conf(key)
             if isinstance(value, value_type):
