@@ -58,7 +58,7 @@ class V2ray(Node):
             "log": {
                 "access": "./v2ray_access.log",
                 "error": "./v2ray_err.log",
-                "loglevel": "warning",
+                "loglevel": "none",
             },
             "inbounds": [
                 {
@@ -433,8 +433,8 @@ class Shadowsocks(Node):
     def format_config(self):
         ss_config = {
             "log": {
-                "access": "/var/log/v2ray/access.log",
-                "error": "/var/log/v2ray/error.log",
+                "access": "./v2ray/access.log",
+                "error": "./v2ray/error.log",
                 "logLevel": "none",
             },
             "inbounds": [
